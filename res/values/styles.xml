@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -17,6 +17,12 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <style name="TextView_list_row">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    
     <style name="Item_menu_search">
         <item name="android:icon">@android:drawable/ic_menu_search</item>
         <item name="android:showAsAction">always|collapseActionView</item>

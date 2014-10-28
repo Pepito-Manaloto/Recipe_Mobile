@@ -15,4 +15,8 @@
     <string name="hint_recipe">Search Recipe</string>
     <string name="hint_logs">Search Logs</string>
 
+    <!-- TEXT VIEW LABELS -->
+    <string name="text_empty_list">There are no recipies.</string>
+    
+    <string name="image_alt">Img</string>
 </resources>
