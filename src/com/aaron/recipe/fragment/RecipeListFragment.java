@@ -3,6 +3,7 @@ package com.aaron.recipe.fragment;
 import java.util.ArrayList;
 
 import com.aaron.recipe.R;
+import com.aaron.recipe.activity.LogsActivity;
 
 import android.app.ListFragment;
 import android.content.Intent;
@@ -139,7 +140,8 @@ public class RecipeListFragment extends ListFragment
             }
             case R.id.menu_logs:
             {
-
+                Intent intent = new Intent(getActivity(), LogsActivity.class);
+                startActivity(intent);
                 return true;
             }
             default:
