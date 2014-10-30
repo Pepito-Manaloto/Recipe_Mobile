@@ -17,6 +17,8 @@
 
     <!-- TEXT VIEW LABELS -->
     <string name="text_empty_list">There are no recipies.</string>
-    
+    <string name="text_build">Build Number</string>
+    <string name="text_last_updated">Last Updated</string>
+
     <string name="image_alt">Img</string>
 </resources>

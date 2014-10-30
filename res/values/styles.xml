@@ -23,7 +23,33 @@
         <item name="android:textSize">14sp</item>
 
     </style>
+
+    <style name="TextView_about">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">15dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:textSize">19sp</item>
+    </style>
+
+    <style name="TextView_sub_about">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">15dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/CornflowerBlueDark</item>
+    </style>
     
+    <style name="Divider_about">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:background">@color/sysLightGray</item>
+    </style>
+
     <style name="Item_menu_search">
         <item name="android:icon">@android:drawable/ic_menu_search</item>
         <item name="android:showAsAction">always|collapseActionView</item>

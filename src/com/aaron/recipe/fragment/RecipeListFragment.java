@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.aaron.recipe.R;
 import com.aaron.recipe.activity.LogsActivity;
+import com.aaron.recipe.activity.AboutActivity;
 
 import android.app.ListFragment;
 import android.content.Intent;
@@ -24,6 +25,10 @@ import android.widget.AbsListView.OnScrollListener;
 
 public class RecipeListFragment extends ListFragment
 {
+    private static final int REQUEST_UPDATE = 0;
+    private static final int REQUEST_SETTINGS = 1;
+    private static final int REQUEST_ABOUT = 2;
+
     /**
      * Initializes non-fragment user interface.
      */
@@ -135,6 +140,8 @@ public class RecipeListFragment extends ListFragment
             }
             case R.id.menu_about:
             {
+                Intent intent = new Intent(getActivity(), AboutActivity.class);
+                startActivityForResult(intent, REQUEST_ABOUT);
 
                 return true;
             }
