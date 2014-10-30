@@ -4,6 +4,7 @@
     <string name="app_name">Recipe</string>
     <!-- &#8211; is the unicode html_entity of "-" -->
     <string name="build_num"></string>
+    <string name="image_alt">Img</string>
 
     <!-- MENU LABELS -->
     <string name="menu_update">Update</string>
@@ -11,14 +12,21 @@
     <string name="menu_about">About</string>
     <string name="menu_logs">Logs</string>
     
+    <!-- URL -->
+    <string name="url_address">192.168.1.101</string>
+    <string name="url_resource">/Recipe/get.php</string>
+
     <!-- HINTS -->
     <string name="hint_recipe">Search Recipe</string>
     <string name="hint_logs">Search Logs</string>
+
+    <!-- DIALOG LABELS -->
+    <string name="dialog_update_title">Updating</string>
+    <string name="dialog_update_message">Retrieving data from server&#8230;</string> <!-- &#8230; is the unicode html_entity of "..." -->
 
     <!-- TEXT VIEW LABELS -->
     <string name="text_empty_list">There are no recipies.</string>
     <string name="text_build">Build Number</string>
     <string name="text_last_updated">Last Updated</string>
 
-    <string name="image_alt">Img</string>
 </resources>

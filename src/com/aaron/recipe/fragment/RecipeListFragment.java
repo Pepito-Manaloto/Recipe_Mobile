@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import com.aaron.recipe.R;
 import com.aaron.recipe.activity.LogsActivity;
 import com.aaron.recipe.activity.AboutActivity;
+import com.aaron.recipe.fragment.UpdateFragment;
 
+import android.app.FragmentManager;
 import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,6 +27,7 @@ import android.widget.AbsListView.OnScrollListener;
 
 public class RecipeListFragment extends ListFragment
 {
+    private static final String DIALOG_UPDATE = "update";
     private static final int REQUEST_UPDATE = 0;
     private static final int REQUEST_SETTINGS = 1;
     private static final int REQUEST_ABOUT = 2;
@@ -122,6 +125,8 @@ public class RecipeListFragment extends ListFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        FragmentManager fm = getActivity().getFragmentManager();
+
         switch(item.getItemId())
         {
             case R.id.menu_search:
@@ -130,6 +135,9 @@ public class RecipeListFragment extends ListFragment
             }
             case R.id.menu_update:
             {
+                UpdateFragment updateDialog = new UpdateFragment();
+                updateDialog.setTargetFragment(this, REQUEST_UPDATE);
+                updateDialog.show(fm, DIALOG_UPDATE);
 
                 return true;
             }
