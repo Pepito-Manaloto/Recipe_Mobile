@@ -18,7 +18,7 @@ public class RecipeManager
     public RecipeManager(final Activity activity)
     {}
     
-    public String getLastUpdated()
+    public String getLastUpdated(final String dateFormat)
     {
         return null;
     }

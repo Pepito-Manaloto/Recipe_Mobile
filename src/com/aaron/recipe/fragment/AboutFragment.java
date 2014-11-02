@@ -1,7 +1,5 @@
 package com.aaron.recipe.fragment;
 
-import java.util.HashMap;
-
 import com.aaron.recipe.R;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;

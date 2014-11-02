@@ -19,6 +19,33 @@
     <string name="text_empty_list">There are no recipies.</string>
     <string name="text_build">Build Number</string>
     <string name="text_last_updated">Last Updated</string>
+    <string name="text_font">Font</string>
 
     <string name="image_alt">Img</string>
+
+    <!-- COMBO BOX ITEMS -->
+    <string-array name="font_name_arrays">
+        <item>Default</item>
+        <item>Sans_Serif</item>
+        <item>Serif</item>
+        <item>Monospace</item>
+    </string-array>
+
+    <string-array name="font_style_arrays">
+        <item>Normal</item>
+        <item>Bold</item>
+        <item>Italic</item>
+        <item>Bold_Italic</item>
+    </string-array>
+
+    <string-array name="font_size_arrays">
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+    </string-array>
+
 </resources>

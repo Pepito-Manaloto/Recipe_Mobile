@@ -1,10 +1,10 @@
 package com.aaron.recipe.fragment;
 
-import java.util.ArrayList;
-
 import com.aaron.recipe.R;
 import com.aaron.recipe.activity.LogsActivity;
 import com.aaron.recipe.activity.AboutActivity;
+import com.aaron.recipe.activity.SettingsActivity;
+import com.aaron.recipe.fragment.SettingsFragment;
 
 import android.app.ListFragment;
 import android.content.Intent;
@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -135,6 +134,9 @@ public class RecipeListFragment extends ListFragment
             }
             case R.id.menu_settings:
             {
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                intent.putExtra(SettingsFragment.EXTRA_SETTINGS, this.settings);
+                startActivityForResult(intent, REQUEST_SETTINGS);
 
                 return true;
             }
