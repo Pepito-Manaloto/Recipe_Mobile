@@ -38,7 +38,6 @@
         style="@style/TextView_list_row"
         android:layout_toRightOf="@id/text_row_servings"
         android:layout_below="@id/text_row_category"
-
         android:text="Preparation Time: " />
 
 </RelativeLayout>

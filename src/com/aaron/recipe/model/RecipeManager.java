@@ -95,6 +95,11 @@ public class RecipeManager
         return null;
     }
 
+    public ArrayList<Recipe> getRecipesFromDisk()
+    {
+        return null;
+    }
+
     public void deleteRecipeFromDisk()
     {}
 }

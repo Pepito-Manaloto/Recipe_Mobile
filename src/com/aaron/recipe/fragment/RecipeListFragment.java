@@ -6,7 +6,13 @@ import com.aaron.recipe.R;
 import com.aaron.recipe.activity.LogsActivity;
 import com.aaron.recipe.activity.AboutActivity;
 import com.aaron.recipe.fragment.UpdateFragment;
+import com.aaron.recipe.activity.SettingsActivity;
+import com.aaron.recipe.fragment.SettingsFragment;
+import com.aaron.recipe.bean.Recipe;
+import com.aaron.recipe.bean.Settings;
+import com.aaron.recipe.model.LogsManager;
 
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.ListFragment;
 import android.content.Intent;
@@ -32,6 +38,8 @@ public class RecipeListFragment extends ListFragment
     private static final int REQUEST_SETTINGS = 1;
     private static final int REQUEST_ABOUT = 2;
 
+    private Settings settings;
+
     /**
      * Initializes non-fragment user interface.
      */
@@ -40,7 +48,21 @@ public class RecipeListFragment extends ListFragment
     {
         super.onCreate(savedInstanceState);
 
+        if(savedInstanceState != null)
+        {
+            this.settings = (Settings) savedInstanceState.getSerializable(SettingsFragment.EXTRA_SETTINGS);
+        }
+
+        if(this.settings == null)
+        {
+            this.settings = new Settings();
+        }
+
         setHasOptionsMenu(true);
+        
+        Log.d(LogsManager.TAG, "RecipeListFragment: onCreate. settings=" + this.settings);
+        LogsManager.addToLogs("RecipeListFragment: onCreate. settings=" + this.settings);
+
     }
 
     /**
@@ -50,6 +72,8 @@ public class RecipeListFragment extends ListFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_recipe_list, parent, false);
+
+        Log.d(LogsManager.TAG, "RecipeListFragment: onCreateView.");
 
         return view;
     }
@@ -66,13 +90,49 @@ public class RecipeListFragment extends ListFragment
     }
 
     /**
+     * Saves current state and settings in memory. For screen rotation.
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable(SettingsFragment.EXTRA_SETTINGS, this.settings);
+        //outState.putSerializable(EXTRA_LIST, this.list);
+
+        Log.d(LogsManager.TAG, "RecipeListFragment: onSaveInstanceState");
+    }
+
+    /**
      * Receives the result data from the previous fragment. Updates the
      * application's state depending on the data received.
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        if(resultCode != Activity.RESULT_OK)
+        {
+            return;
+        }
         
+        Log.d(LogsManager.TAG, "VocabularyListFragment: onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
+        LogsManager.addToLogs("VocabularyListFragment: onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
+
+        // Update action bar menu processing result
+        if(requestCode == REQUEST_UPDATE)// && data.hasExtra(UpdateFragment.EXTRA_VOCABULARY_LIST))
+        {
+            //this.updateListOnUiThread(this.list);
+        }
+        else if(requestCode == REQUEST_SETTINGS && data.hasExtra(SettingsFragment.EXTRA_SETTINGS))
+        {
+            this.settings = (Settings) data.getSerializableExtra(SettingsFragment.EXTRA_SETTINGS);
+
+        }
+        else if(requestCode == REQUEST_ABOUT)
+        {
+            //this.list = this.vocabularyManager.getVocabulariesFromDisk();
+            //this.updateListOnUiThread(this.list);
+        }
     }
 
     /**
@@ -143,6 +203,9 @@ public class RecipeListFragment extends ListFragment
             }
             case R.id.menu_settings:
             {
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                intent.putExtra(SettingsFragment.EXTRA_SETTINGS, this.settings);
+                startActivityForResult(intent, REQUEST_SETTINGS);
 
                 return true;
             }
@@ -164,6 +227,26 @@ public class RecipeListFragment extends ListFragment
                 return super.onOptionsItemSelected(item);
             }
         }
+    }
+
+    /**
+     * Updates the list view on UI thread.
+     * @param list the new list
+     */
+    private void updateListOnUiThread(final ArrayList<Recipe> list)
+    {
+        this.getActivity().runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    //VocabularyAdapter vocabularyAdapter = new VocabularyAdapter(getActivity(), list, settings);
+                    //setListAdapter(vocabularyAdapter);
+    
+                    Log.d(LogsManager.TAG, "VocabularyListFragment: updateListOnUiThread(run). settings=" + settings + " list=" + list);
+                    LogsManager.addToLogs("VocabularyListFragment: updateListOnUiThread(run). settings=" + settings + " list_size=" + list.size());
+                }
+            });
     }
 
     /**
