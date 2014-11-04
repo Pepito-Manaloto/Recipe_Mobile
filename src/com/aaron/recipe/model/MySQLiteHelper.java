@@ -15,23 +15,30 @@ public class MySQLiteHelper extends SQLiteOpenHelper
     private static final int DATABASE_VERSION = 1;
 
     public static final String TABLE_RECIPE = "recipe";
+    public static final String TABLE_INGREDIENTS = "ingredients";
+    public static final String TABLE_INSTRUCTIONS = "instructions";
     public static final String[] COLUMN_COUNT = new String[]{"COUNT(*)",};
 
     /**
      * The database's column names.
      */
-    public enum Column
+    public enum ColumnRecipe
     {
         id,
-
+        title,
+        category,
+        preparation_time,
+        description,
+        servings,
+        author,
         date_in,
     }
 
     private static final String CREATE_TABLE_RECIPE = "CREATE TABLE " + TABLE_RECIPE +
                                                "(" + 
-                                               Column.id.name() + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                                                ColumnRecipe.id.name() + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 
-                                               Column.date_in.name() + " TEXT NOT NULL, " +
+                                                ColumnRecipe.date_in.name() + " TEXT NOT NULL, " +
 
                                                ");";
 

@@ -7,10 +7,12 @@ import com.aaron.recipe.activity.LogsActivity;
 import com.aaron.recipe.activity.AboutActivity;
 import com.aaron.recipe.fragment.UpdateFragment;
 import com.aaron.recipe.activity.SettingsActivity;
+import com.aaron.recipe.adapter.RecipeAdapter;
 import com.aaron.recipe.fragment.SettingsFragment;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
+import com.aaron.recipe.model.RecipeManager;
 
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -33,12 +35,17 @@ import android.widget.AbsListView.OnScrollListener;
 
 public class RecipeListFragment extends ListFragment
 {
+    public static final String TAG = "RecipeListFragment";
     private static final String DIALOG_UPDATE = "update";
     private static final int REQUEST_UPDATE = 0;
     private static final int REQUEST_SETTINGS = 1;
     private static final int REQUEST_ABOUT = 2;
 
+    private ArrayList<Recipe> list;
     private Settings settings;
+    private RecipeManager recipeManager;
+
+    public static final String EXTRA_LIST = "com.aaron.recipe.fragment.list";
 
     /**
      * Initializes non-fragment user interface.
@@ -51,12 +58,30 @@ public class RecipeListFragment extends ListFragment
         if(savedInstanceState != null)
         {
             this.settings = (Settings) savedInstanceState.getSerializable(SettingsFragment.EXTRA_SETTINGS);
+
+            // But we are sure of its type
+            @SuppressWarnings("unchecked")
+            ArrayList<Recipe> listTemp = (ArrayList<Recipe>) savedInstanceState.getSerializable(EXTRA_LIST);
+
+            if(listTemp != null)
+            {
+                this.list = listTemp;
+            }
         }
 
         if(this.settings == null)
         {
             this.settings = new Settings();
         }
+
+        this.recipeManager = new RecipeManager(getActivity());
+
+        if(this.list == null)
+        {
+            this.list = this.recipeManager.getRecipesFromDisk();
+        }
+
+        this.updateListOnUiThread(this.list);
 
         setHasOptionsMenu(true);
         
@@ -86,6 +111,8 @@ public class RecipeListFragment extends ListFragment
     {
         super.onActivityCreated(savedInstanceState);
 
+        Log.d(LogsManager.TAG, "RecipeListFragment: onActivityCreated.");
+
         getListView().setOnScrollListener(new ShowHideFastScrollListener());
     }
 
@@ -98,7 +125,7 @@ public class RecipeListFragment extends ListFragment
         super.onSaveInstanceState(outState);
 
         outState.putSerializable(SettingsFragment.EXTRA_SETTINGS, this.settings);
-        //outState.putSerializable(EXTRA_LIST, this.list);
+        outState.putSerializable(EXTRA_LIST, this.list);
 
         Log.d(LogsManager.TAG, "RecipeListFragment: onSaveInstanceState");
     }
@@ -115,23 +142,35 @@ public class RecipeListFragment extends ListFragment
             return;
         }
         
-        Log.d(LogsManager.TAG, "VocabularyListFragment: onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
-        LogsManager.addToLogs("VocabularyListFragment: onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
+        Log.d(LogsManager.TAG, "RecipeListFragment: onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
+        LogsManager.addToLogs("RecipeListFragment: onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
 
         // Update action bar menu processing result
-        if(requestCode == REQUEST_UPDATE)// && data.hasExtra(UpdateFragment.EXTRA_VOCABULARY_LIST))
+        if(requestCode == REQUEST_UPDATE && data.hasExtra(UpdateFragment.EXTRA_RECIPE_LIST))
         {
-            //this.updateListOnUiThread(this.list);
+            // But we are sure of its type
+            @SuppressWarnings("unchecked")
+            ArrayList<Recipe> list = (ArrayList<Recipe>) data.getSerializableExtra(UpdateFragment.EXTRA_RECIPE_LIST);
+
+            // Handles occasional NullPointerException.
+            if(list != null)
+            {
+                this.list = list;
+            }
+
+            this.updateListOnUiThread(this.list);
         }
         else if(requestCode == REQUEST_SETTINGS && data.hasExtra(SettingsFragment.EXTRA_SETTINGS))
         {
             this.settings = (Settings) data.getSerializableExtra(SettingsFragment.EXTRA_SETTINGS);
 
+            this.list = this.recipeManager.getRecipesFromDisk();
+            this.updateListOnUiThread(this.list);
         }
         else if(requestCode == REQUEST_ABOUT)
         {
-            //this.list = this.vocabularyManager.getVocabulariesFromDisk();
-            //this.updateListOnUiThread(this.list);
+            this.list = this.recipeManager.getRecipesFromDisk();
+            this.updateListOnUiThread(this.list);
         }
     }
 
@@ -163,7 +202,11 @@ public class RecipeListFragment extends ListFragment
                 public void afterTextChanged(Editable arg0)
                 {
                     String searched = searchTextfield.getText().toString();
-
+                    RecipeAdapter recipeAdapter = (RecipeAdapter) getListAdapter();
+                    recipeAdapter.filter(searched);
+                    recipeAdapter.notifyDataSetChanged();
+                    
+                    Log.d(LogsManager.TAG, "RecipeListFragment: onCreateOptionsMenu(afterTextChanged). searched=" + searched);
                 }
 
                 @Override
@@ -240,11 +283,11 @@ public class RecipeListFragment extends ListFragment
                 @Override
                 public void run()
                 {
-                    //VocabularyAdapter vocabularyAdapter = new VocabularyAdapter(getActivity(), list, settings);
-                    //setListAdapter(vocabularyAdapter);
+                    RecipeAdapter recipeAdapter = new RecipeAdapter(getActivity(), list, settings);
+                    setListAdapter(recipeAdapter);
     
-                    Log.d(LogsManager.TAG, "VocabularyListFragment: updateListOnUiThread(run). settings=" + settings + " list=" + list);
-                    LogsManager.addToLogs("VocabularyListFragment: updateListOnUiThread(run). settings=" + settings + " list_size=" + list.size());
+                    Log.d(LogsManager.TAG, "RecipeListFragment: updateListOnUiThread(run). settings=" + settings + " list=" + list);
+                    LogsManager.addToLogs("RecipeListFragment: updateListOnUiThread(run). settings=" + settings + " list_size=" + list.size());
                 }
             });
     }
