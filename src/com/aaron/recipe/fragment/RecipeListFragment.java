@@ -74,7 +74,7 @@ public class RecipeListFragment extends ListFragment
             this.settings = new Settings();
         }
 
-        this.recipeManager = new RecipeManager(getActivity());
+        this.recipeManager = new RecipeManager(getActivity(), this.settings.getCategory());
 
         if(this.list == null)
         {
@@ -238,7 +238,7 @@ public class RecipeListFragment extends ListFragment
             }
             case R.id.menu_update:
             {
-                UpdateFragment updateDialog = new UpdateFragment();
+                UpdateFragment updateDialog = UpdateFragment.newInstance(this.settings);
                 updateDialog.setTargetFragment(this, REQUEST_UPDATE);
                 updateDialog.show(fm, DIALOG_UPDATE);
 
@@ -278,6 +278,11 @@ public class RecipeListFragment extends ListFragment
      */
     private void updateListOnUiThread(final ArrayList<Recipe> list)
     {
+        if(list == null)
+        {
+            return;
+        }
+
         this.getActivity().runOnUiThread(new Runnable()
             {
                 @Override

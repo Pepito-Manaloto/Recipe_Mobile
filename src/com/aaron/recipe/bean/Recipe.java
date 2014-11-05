@@ -4,13 +4,15 @@ import java.io.Serializable;
 
 public class Recipe implements Serializable
 {
-    private static final long serialVersionUID = -5459850328047759190L;
+    private static final long serialVersionUID = 3783918997340685575L;
+    public static final Category[] CATEGORY_ARRAY = Category.values();
 
     /**
      * Enum for recipe category list.
      */
     public enum Category
     {
+        All,
         Beef,
         Chicken,
         Pork,

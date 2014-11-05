@@ -40,7 +40,7 @@ public class RecipeAdapter extends ArrayAdapter<Recipe>
     {
         super(context, 0, recipeList);
 
-        this.recipeManager = new RecipeManager(context);
+        this.recipeManager = new RecipeManager(context, settings.getCategory());
 
         this.activity = context;
         this.recipeList = recipeList;

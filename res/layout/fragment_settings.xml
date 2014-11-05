@@ -4,9 +4,21 @@
     android:layout_height="match_parent" >
 
     <TextView
+        android:id="@+id/textview_category"
+        style="@style/TextView_settings"
+        android:layout_marginTop="15dp"
+        android:text="@string/text_category" />
+
+    <Spinner
+        android:id="@+id/spinner_category"
+        style="@style/Spinner_settings"
+        android:layout_below="@id/textview_category" />
+
+    <TextView
         android:id="@+id/textview_font"
         style="@style/TextView_settings"
         android:layout_marginTop="10dp"
+        android:layout_below="@id/spinner_category"
         android:text="@string/text_font" />
 
     <Spinner

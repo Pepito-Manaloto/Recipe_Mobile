@@ -8,6 +8,7 @@ import java.util.Locale;
 import org.apache.http.HttpStatus;
 
 import com.aaron.recipe.bean.Recipe;
+import com.aaron.recipe.bean.Recipe.Category;
 import com.aaron.recipe.model.MySQLiteHelper;
 import com.aaron.recipe.R;
 
@@ -34,6 +35,7 @@ public class RecipeManager
 
     private MySQLiteHelper dbHelper;
     private Date curDate;
+    private Category selectedCategory;
 
     public RecipeManager(final Activity activity)
     {
@@ -43,6 +45,12 @@ public class RecipeManager
         this.curDate = new Date();
     }
 
+    public RecipeManager(final Activity activity, final Category category)
+    {
+        this(activity);
+        this.selectedCategory = category;
+    }
+    
     public ArrayList<Recipe> getRecipesFromWeb()
     {
         // TODO Auto-generated method stub

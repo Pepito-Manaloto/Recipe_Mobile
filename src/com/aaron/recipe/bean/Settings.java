@@ -2,6 +2,8 @@ package com.aaron.recipe.bean;
 
 import java.io.Serializable;
 
+import com.aaron.recipe.bean.Recipe.Category;
+
 import android.graphics.Typeface;
 
 /**
@@ -9,7 +11,7 @@ import android.graphics.Typeface;
  */
 public class Settings implements Serializable
 {
-    private static final long serialVersionUID = 6966172676451089989L;
+    private static final long serialVersionUID = -8674493096543909252L;
 
     /**
      * Enum for the list of default font name.
@@ -33,6 +35,7 @@ public class Settings implements Serializable
         Bold_Italic,
     }
 
+    private Category category;
     private FontName fontName;
     private FontStyle fontStyle;
     private int fontSize;
@@ -42,9 +45,28 @@ public class Settings implements Serializable
      */
     public Settings()
     {
+        this.category = Category.All;
         this.fontName = FontName.Default;
         this.fontStyle = FontStyle.Normal;
         this.fontSize = 14;
+    }
+
+    /**
+     * Getter for Category.
+     * @return Category
+     */
+    public Category getCategory()
+    {
+        return this.category;
+    }
+
+    /**
+     * Getter for Category's index.
+     * @return Category index
+     */
+    public int getCategoryIndex()
+    {
+        return this.category.ordinal();
     }
 
     /**
@@ -108,7 +130,8 @@ public class Settings implements Serializable
     @Override
     public String toString()
     {
-        return " Font name: " + this.fontName +
+        return " Category: " + this.category +
+               " Font name: " + this.fontName +
                " Font style: " + this.fontStyle +
                " Font size: " + this.fontSize;
     }
@@ -134,6 +157,17 @@ public class Settings implements Serializable
         }
         
         return Typeface.create(family, this.getFontStyleIndex());
+    }
+
+    /**
+     * Sets the category new value.
+     * @param Category
+     * @return the settings object being updated
+     */
+    public Settings setCategory(final Category category)
+    {
+        this.category = category;
+        return this;
     }
 
     /**

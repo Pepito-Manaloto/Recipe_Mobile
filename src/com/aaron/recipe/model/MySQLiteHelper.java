@@ -20,7 +20,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
     public static final String[] COLUMN_COUNT = new String[]{"COUNT(*)",};
 
     /**
-     * The database's column names.
+     * The database's recipe table column names.
      */
     public enum ColumnRecipe
     {
@@ -34,13 +34,54 @@ public class MySQLiteHelper extends SQLiteOpenHelper
         date_in,
     }
 
+    /**
+     * The database's ingredients table column names.
+     */
+    public enum ColumnIngredients
+    {
+        title,
+        quantity,
+        measurement,
+        ingredient,
+        comment_,
+    }
+
+    /**
+     * The database's instructions table column names.
+     */
+    public enum ColumnInstructions
+    {
+        title,
+        instruction,
+    }
+
     private static final String CREATE_TABLE_RECIPE = "CREATE TABLE " + TABLE_RECIPE +
-                                               "(" + 
-                                                ColumnRecipe.id.name() + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                                                      "(" + 
+                                                       ColumnRecipe.title.name() + " TEXT NOT NULL, " +
+                                                       ColumnRecipe.category.name() + " TEXT NOT NULL, " +
+                                                       ColumnRecipe.preparation_time.name() + " INTEGER NOT NULL, " +
+                                                       ColumnRecipe.description.name() + " TEXT NOT NULL, " +
+                                                       ColumnRecipe.servings.name() + " INTEGER NOT NULL, " +
+                                                       ColumnRecipe.author.name() + " TEXT NOT NULL, " +
+                                                       ColumnRecipe.date_in.name() + " TEXT NOT NULL, " +
+                                                      ");";
 
-                                                ColumnRecipe.date_in.name() + " TEXT NOT NULL, " +
+    private static final String CREATE_TABLE_INGREDIENTS = "CREATE TABLE " + TABLE_INGREDIENTS +
+                                                       "(" + 
+                                                        ColumnIngredients.title.name() + " TEXT NOT NULL, " +
+                                                        ColumnIngredients.quantity.name() + " REAL NOT NULL, " +
+                                                        ColumnIngredients.measurement.name() + " INTEGER NOT NULL, " +
+                                                        ColumnIngredients.ingredient.name() + " TEXT NOT NULL, " +
+                                                        ColumnIngredients.comment_.name() + " INTEGER NOT NULL, " +
+                                                        "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) " +
+                                                       ");";
 
-                                               ");";
+    private static final String CREATE_TABLE_INSTRUCTIONS = "CREATE TABLE " + TABLE_INSTRUCTIONS +
+                                                       "(" + 
+                                                        ColumnInstructions.title.name() + " TEXT NOT NULL, " +
+                                                        ColumnInstructions.instruction.name() + " TEXT NOT NULL, " +
+                                                        "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) " +
+                                                       ");";
 
     /**
      * Default constructor.
@@ -59,6 +100,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper
         Log.d(LogsManager.TAG, "MySQLiteHelper: onCreate. query=" + CREATE_TABLE_RECIPE);
 
         database.execSQL(CREATE_TABLE_RECIPE);
+        database.execSQL(CREATE_TABLE_INGREDIENTS);
+        database.execSQL(CREATE_TABLE_INSTRUCTIONS);
     }
 
     /**

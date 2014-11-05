@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.aaron.recipe.R;
 import com.aaron.recipe.bean.Recipe;
+import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
 
@@ -29,6 +30,22 @@ public class UpdateFragment extends DialogFragment
     private RecipeRetrieverThread recipeRetrieverThread;
 
     /**
+     * Creates a new UpdateFragment and sets its arguments.
+     * @return UpdateFragment
+     */
+    public static UpdateFragment newInstance(final Settings settings)
+    {
+        Bundle args = new Bundle();
+        args.putSerializable(SettingsFragment.EXTRA_SETTINGS, settings);
+        UpdateFragment fragment = new UpdateFragment();
+        fragment.setArguments(args);
+
+        Log.d(LogsManager.TAG, "UpdateFragment: newInstance. settings=" + settings);
+
+        return fragment;
+    }
+
+    /**
      * Creates the update dialog box.
      */
     @Override
@@ -39,7 +56,8 @@ public class UpdateFragment extends DialogFragment
         progressDialog.setMessage(getString(R.string.dialog_update_message));
         progressDialog.setIndeterminate(true);
 
-        this.recipeManager = new RecipeManager(getActivity());
+        Settings settings = (Settings) getArguments().getSerializable(SettingsFragment.EXTRA_SETTINGS);
+        this.recipeManager = new RecipeManager(getActivity(), settings.getCategory());
         this.recipeRetrieverThread = new RecipeRetrieverThread();
 
         Log.d(LogsManager.TAG, "UpdateFragment: onCreateDialog.");
