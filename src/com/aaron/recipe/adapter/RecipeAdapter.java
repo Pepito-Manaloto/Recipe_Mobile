@@ -9,14 +9,11 @@ import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -61,7 +58,6 @@ public class RecipeAdapter extends ArrayAdapter<Recipe>
             convertView = this.activity.getLayoutInflater().inflate(R.layout.fragment_recipe_list_row, parent, false);
             
             holder = new ViewHolder();
-            holder.recipeImage = (ImageView) convertView.findViewById(R.id.image_row_icon);
             holder.titleText = (TextView) convertView.findViewById(R.id.text_row_title);
             holder.servingsText = (TextView) convertView.findViewById(R.id.text_row_servings);
             holder.categoryText = (TextView) convertView.findViewById(R.id.text_row_category);
@@ -75,11 +71,7 @@ public class RecipeAdapter extends ArrayAdapter<Recipe>
         }
 
         Recipe recipe = getItem(position);
-
-        byte[] image = recipe.getImage();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-        holder.recipeImage.setImageBitmap(bitmap);
-        
+    
         holder.titleText.setText(recipe.getTitle());
         holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
         holder.titleText.setTypeface(this.settings.getTypeface());
@@ -136,7 +128,6 @@ public class RecipeAdapter extends ArrayAdapter<Recipe>
      */
     private static class ViewHolder
     {
-        public ImageView recipeImage;
         public TextView titleText;
         public TextView servingsText;
         public TextView categoryText;

@@ -1,43 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" 
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp" >
+    android:useDefaultMargins="true"
+    android:alignmentMode="alignBounds"
+    android:layout_marginTop="5dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="10dp" >
 
-    <ImageView 
-        android:id="@+id/image_row_icon"
-        android:src="@drawable/default_preview"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/textlabel_row_title"
+        style="@style/TextView_list_row"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/image_alt" />
+        android:layout_row="0"
+        android:layout_column="0"
+        android:layout_gravity="left"
+        android:text="Title: " />
 
     <TextView
         android:id="@+id/text_row_title"
         style="@style/TextView_list_row"
-        android:layout_marginTop="7dp"
-        android:layout_toRightOf="@id/image_row_icon"
-        android:text="Title: "/>
-    
+        android:text="title" />
+
     <TextView
-        android:id="@+id/text_row_servings"
+        android:id="@+id/textlabel_row_preparation_time"
         style="@style/TextView_list_row"
-        android:layout_toRightOf="@id/image_row_icon"
-        android:layout_below="@id/text_row_title"
-        android:text="Servings: " />
-    
-    <TextView
-        android:id="@+id/text_row_category"
-        style="@style/TextView_list_row"
-        android:layout_marginTop="7dp"
-        android:layout_toRightOf="@id/text_row_title"
-        android:text="Category: " />
-    
+        android:layout_row="1"
+        android:layout_column="0"
+        
+        android:layout_gravity="left"
+        android:text="Preparation Time: " />
+
     <TextView
         android:id="@+id/text_row_preparation_time"
         style="@style/TextView_list_row"
-        android:layout_toRightOf="@id/text_row_servings"
-        android:layout_below="@id/text_row_category"
-        android:text="Preparation Time: " />
+        android:text="time" />
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/textlabel_row_category"
+        style="@style/TextView_list_row"
+        android:layout_row="0"
+        android:layout_column="2"
+        android:layout_gravity="left"
+        android:text="Category: " />
+
+    <TextView
+        android:id="@+id/text_row_category"
+        style="@style/TextView_list_row"
+        android:text="category" />
+
+    <TextView
+        android:id="@+id/textlabel_row_servings"
+        style="@style/TextView_list_row"
+        android:layout_gravity="left"
+        android:layout_row="1"
+        android:layout_column="2"
+        android:text="Servings: " />
+
+    <TextView
+        android:id="@+id/text_row_servings"
+        style="@style/TextView_list_row"
+        android:layout_below="@id/text_row_title"
+        android:text="servings" />
+
+</GridLayout>

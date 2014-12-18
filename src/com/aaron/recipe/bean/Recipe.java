@@ -24,7 +24,6 @@ public class Recipe implements Serializable
         Dessert,
     }
 
-    private byte[] image;
     private String title;
     private String servings;
     private Category category;
@@ -33,22 +32,12 @@ public class Recipe implements Serializable
     /**
      * Default constructor.
      */
-    public Recipe(final byte[] image, final String title, final String servings, final Category category, final String preparationTime)
+    public Recipe(final String title, final String servings, final Category category, final String preparationTime)
     {
-        this.image = image;
         this.title = title;
         this.servings = servings;
         this.category = category;
         this.preparationTime = preparationTime;
-    }
-
-    /**
-     * Gets the image.
-     * @return byte[]
-     */
-    public byte[] getImage()
-    {
-        return this.image;
     }
 
     /**

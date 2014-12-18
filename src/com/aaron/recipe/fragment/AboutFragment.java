@@ -87,7 +87,7 @@ public class AboutFragment extends Fragment
         LogsManager.addToLogs("AboutFragment: promptUserOnDelete.");
 
         AlertDialog.Builder prompt = new AlertDialog.Builder(getActivity());
-        prompt.setMessage("Delete vocabularies from disk?");
+        prompt.setMessage("Delete recipes from disk?");
 
         prompt.setPositiveButton("Yes", new DialogInterface.OnClickListener()
             {
