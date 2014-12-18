@@ -25,19 +25,52 @@ public class Recipe implements Serializable
     }
 
     private String title;
-    private String servings;
+    private int servings;
     private Category category;
     private String preparationTime;
 
     /**
      * Default constructor.
      */
-    public Recipe(final String title, final String servings, final Category category, final String preparationTime)
+    public Recipe(final String title, final int servings, final Category category, final int preparationTime)
     {
         this.title = title;
         this.servings = servings;
         this.category = category;
-        this.preparationTime = preparationTime;
+        this.preparationTime = formatPreperationTime(preparationTime);
+    }
+
+    /**
+     * Formats the given preparation time from minutes into hours + minutes. The given time is always assume to be in minutes.
+     * @param minutes the minutes to convert
+     * @return the converted minutes
+     */
+    private String formatPreperationTime(final int minutes)
+    {
+        int minutesTmp = minutes;
+        int hrs = minutesTmp / 60;
+        int mins = minutesTmp % 60;
+        String formattedPreparationTime = mins + "";
+
+        if(hrs == 1)
+        {
+            formattedPreparationTime = hrs + " hr " + formattedPreparationTime;
+        }
+        else if(hrs > 1)
+        {
+            formattedPreparationTime = hrs + " hrs " + formattedPreparationTime;
+        }
+        
+        if(mins == 1)
+        {
+            formattedPreparationTime += " min";
+        }
+        else if(mins > 1)
+        {
+            formattedPreparationTime += " mins";
+        }
+
+        return formattedPreparationTime;
     }
 
     /**
@@ -51,9 +84,9 @@ public class Recipe implements Serializable
 
     /**
      * Gets the servings
-     * @return String
+     * @return int
      */
-    public String getServings()
+    public int getServings()
     {
         return this.servings;
     }
@@ -93,7 +126,7 @@ public class Recipe implements Serializable
             Recipe that = (Recipe) o;
             
             return this.title.equals(that.getTitle()) && 
-                   this.servings.equals(that.getServings()) &&
+                   this.servings == that.getServings() &&
                    this.category.name().equals(that.getCategory()) &&
                    this.preparationTime.equals(that.getPreparationTime());
         }
@@ -108,7 +141,7 @@ public class Recipe implements Serializable
     {
         int hash = 3;
         hash = 47 * hash + this.title.hashCode();
-        hash = 47 * hash + this.servings.hashCode();
+        hash = 47 * hash + this.servings;
         hash = 47 * hash + this.category.hashCode();
         hash = 47 * hash + this.preparationTime.hashCode();
 

@@ -10,6 +10,7 @@ import com.aaron.recipe.activity.SettingsActivity;
 import com.aaron.recipe.adapter.RecipeAdapter;
 import com.aaron.recipe.fragment.SettingsFragment;
 import com.aaron.recipe.bean.Recipe;
+import com.aaron.recipe.bean.Recipe.Category;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
@@ -81,6 +82,11 @@ public class RecipeListFragment extends ListFragment
             this.list = this.recipeManager.getRecipesFromDisk();
         }
 
+        this.list = new ArrayList<Recipe>();
+        this.list.add(new Recipe("Something beefy", 10, Category.Beef, 60));
+        this.list.add(new Recipe("Long pasta", 5, Category.Pasta, 45));
+        this.list.add(new Recipe("Veggies", 20, Category.Vegetable, 150));
+        
         this.updateListOnUiThread(this.list);
 
         setHasOptionsMenu(true);
