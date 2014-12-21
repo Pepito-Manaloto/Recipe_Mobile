@@ -2,9 +2,12 @@ package com.aaron.recipe.bean;
 
 import java.io.Serializable;
 
+/**
+ * Recipe class.
+ */
 public class Recipe implements Serializable
 {
-    private static final long serialVersionUID = 3783918997340685575L;
+    private static final long serialVersionUID = 5455732827456969313L;
     public static final Category[] CATEGORY_ARRAY = Category.values();
 
     /**
@@ -25,19 +28,26 @@ public class Recipe implements Serializable
     }
 
     private String title;
-    private int servings;
     private Category category;
     private String preparationTime;
+    private int servings;
+    private String description;
+    private Ingredients ingredients;
+    private Instructions instructions;
 
     /**
      * Default constructor.
      */
-    public Recipe(final String title, final int servings, final Category category, final int preparationTime)
+    public Recipe(final String title, final Category category, final int preparationTime, final int servings,
+                  final String description, final Ingredients ingredients, final Instructions instructions)
     {
         this.title = title;
-        this.servings = servings;
         this.category = category;
         this.preparationTime = formatPreperationTime(preparationTime);
+        this.servings = servings;
+        this.description = description;
+        this.ingredients = ingredients;
+        this.instructions = instructions;
     }
 
     /**
@@ -108,7 +118,34 @@ public class Recipe implements Serializable
     {
         return this.preparationTime;
     }
-    
+
+    /**
+     * Gets the description.
+     * @return String
+     */
+    public String getDescription()
+    {
+        return this.description;
+    }
+
+    /**
+     * Gets the description.
+     * @return String
+     */
+    public Ingredients getIngredients()
+    {
+        return this.ingredients;
+    }
+
+    /**
+     * Gets the description.
+     * @return String
+     */
+    public Instructions getInstructions()
+    {
+        return this.instructions;
+    }
+
     /**
      * Checks all attribute for equality.
      * @param o Recipe to compare
@@ -124,11 +161,14 @@ public class Recipe implements Serializable
         else
         {
             Recipe that = (Recipe) o;
-            
+
             return this.title.equals(that.getTitle()) && 
                    this.servings == that.getServings() &&
                    this.category.name().equals(that.getCategory()) &&
-                   this.preparationTime.equals(that.getPreparationTime());
+                   this.preparationTime.equals(that.getPreparationTime()) &&
+                   this.description.equals(that.getDescription()) &&
+                   this.ingredients.equals(that.getIngredients()) &&
+                   this.instructions.equals(that.getInstructions());
         }
     }
 
@@ -141,9 +181,12 @@ public class Recipe implements Serializable
     {
         int hash = 3;
         hash = 47 * hash + this.title.hashCode();
-        hash = 47 * hash + this.servings;
         hash = 47 * hash + this.category.hashCode();
         hash = 47 * hash + this.preparationTime.hashCode();
+        hash = 47 * hash + this.servings;
+        hash = 47 * hash + this.description.hashCode();
+        hash = 47 * hash + this.ingredients.hashCode();
+        hash = 47 * hash + this.instructions.hashCode();
 
         return hash;
     }
@@ -155,9 +198,12 @@ public class Recipe implements Serializable
     @Override
     public String toString()
     {
-        return "Title: " + this.title + " " +
-               "Category: " + this.category + " " + 
-               "Servings: " + this.servings + " " +
-               "Preparation Time: " + this.preparationTime + " ";
+        return "Title: " + this.title +
+               " Category: " + this.category + 
+               " Preparation Time: " + this.preparationTime +
+               " Servings: " + this.servings +
+               " Description: " + this.description +
+               "Ingredients: " + this.ingredients.toString() +
+               "Instructions: " + this.instructions.toString();
     }
 }

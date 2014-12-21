@@ -82,11 +82,6 @@ public class RecipeListFragment extends ListFragment
             this.list = this.recipeManager.getRecipesFromDisk();
         }
 
-        this.list = new ArrayList<Recipe>();
-        this.list.add(new Recipe("Something beefy", 10, Category.Beef, 60));
-        this.list.add(new Recipe("Long pasta", 5, Category.Pasta, 45));
-        this.list.add(new Recipe("Veggies", 20, Category.Vegetable, 150));
-        
         this.updateListOnUiThread(this.list);
 
         setHasOptionsMenu(true);

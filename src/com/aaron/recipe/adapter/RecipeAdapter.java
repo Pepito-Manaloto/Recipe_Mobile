@@ -59,9 +59,9 @@ public class RecipeAdapter extends ArrayAdapter<Recipe>
             
             holder = new ViewHolder();
             holder.titleText = (TextView) convertView.findViewById(R.id.text_row_title);
-            holder.servingsText = (TextView) convertView.findViewById(R.id.text_row_servings);
             holder.categoryText = (TextView) convertView.findViewById(R.id.text_row_category);
             holder.preparationTimeText = (TextView) convertView.findViewById(R.id.text_row_preparation_time);
+            holder.servingsText = (TextView) convertView.findViewById(R.id.text_row_servings);
 
             convertView.setTag(holder);
         }
@@ -76,10 +76,6 @@ public class RecipeAdapter extends ArrayAdapter<Recipe>
         holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
         holder.titleText.setTypeface(this.settings.getTypeface());
 
-        holder.servingsText.setText(recipe.getServings());
-        holder.servingsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
-        holder.servingsText.setTypeface(this.settings.getTypeface());
-
         holder.categoryText.setText(recipe.getCategory());
         holder.categoryText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
         holder.categoryText.setTypeface(this.settings.getTypeface());
@@ -87,6 +83,10 @@ public class RecipeAdapter extends ArrayAdapter<Recipe>
         holder.preparationTimeText.setText(recipe.getPreparationTime());
         holder.preparationTimeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
         holder.preparationTimeText.setTypeface(this.settings.getTypeface());
+        
+        holder.servingsText.setText(recipe.getServings());
+        holder.servingsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
+        holder.servingsText.setTypeface(this.settings.getTypeface());
 
         return convertView;
     }
@@ -129,8 +129,8 @@ public class RecipeAdapter extends ArrayAdapter<Recipe>
     private static class ViewHolder
     {
         public TextView titleText;
-        public TextView servingsText;
         public TextView categoryText;
         public TextView preparationTimeText;
+        public TextView servingsText;
     }
 }
