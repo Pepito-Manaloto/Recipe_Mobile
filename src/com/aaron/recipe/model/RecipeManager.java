@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.aaron.recipe.bean.Ingredients;
+import com.aaron.recipe.bean.Ingredients.Ingredient;
 import com.aaron.recipe.bean.Instructions;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Recipe.Category;
@@ -32,6 +33,7 @@ import com.aaron.recipe.model.MySQLiteHelper;
 import com.aaron.recipe.R;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -230,7 +232,74 @@ public class RecipeManager
      */
     private boolean saveToDisk(final HashMap<Category, ArrayList<Recipe>> recipeMap)
     {
-        return false;
+        SQLiteDatabase db = this.dbHelper.getWritableDatabase();
+        ArrayList<Recipe> listTemp;
+        ContentValues recipeValues = new ContentValues();
+        ContentValues ingredientsValues = new ContentValues();
+        ContentValues instructionsValues = new ContentValues();
+
+        dateFormatter.applyPattern(DATE_FORMAT_LONG);
+        db.beginTransaction();
+
+        try
+        {
+            // Delete recipes. To ensure no duplicates, if existing recipes are modified in the server.
+            db.delete(TABLE_RECIPE, "1", null);
+
+            // Iterate each category
+            for(Category category: recipeMap.keySet())
+            {
+                listTemp = recipeMap.get(category);
+
+                // Iterate each recipe of a particular category
+                for(Recipe recipe: listTemp)
+                {
+                    String title = recipe.getTitle();
+
+                    recipeValues.put(ColumnRecipe.title.name(), title);
+                    recipeValues.put(ColumnRecipe.category.name(), recipe.getCategory());
+                    recipeValues.put(ColumnRecipe.preparation_time.name(), recipe.getPreparationTime());
+                    recipeValues.put(ColumnRecipe.servings.name(), recipe.getServings());
+                    recipeValues.put(ColumnRecipe.description.name(), recipe.getDescription());
+                    recipeValues.put(ColumnRecipe.date_in.name(), dateFormatter.format(this.curDate));
+
+                    db.insert(TABLE_RECIPE, null, recipeValues);
+                    
+                    // Iterate over all ingredients of a recipe
+                    for(Ingredient ingredient: recipe.getIngredients().getIngredientsList())
+                    {
+                        ingredientsValues.put(ColumnIngredients.title.name(), title);
+                        ingredientsValues.put(ColumnIngredients.quantity.name(), ingredient.getQuantity());
+                        ingredientsValues.put(ColumnIngredients.measurement.name(), ingredient.getMeasurement());
+                        ingredientsValues.put(ColumnIngredients.ingredient.name(), ingredient.getIngredient());
+                        ingredientsValues.put(ColumnIngredients.comment_.name(), ingredient.getComment());
+
+                        db.insert(TABLE_INGREDIENTS, null, ingredientsValues);
+                    }
+
+                    // Iterate over all instructions of a recipe
+                    for(String instruction: recipe.getInstructions().getInstructionsList())
+                    {
+                        instructionsValues.put(ColumnInstructions.title.name(), title);
+                        instructionsValues.put(ColumnInstructions.instruction.name(), instruction);
+
+                        db.insert(TABLE_INSTRUCTIONS, null, ingredientsValues);
+                    }
+                }
+            }
+
+            db.setTransactionSuccessful();
+        }
+        finally
+        {
+            db.endTransaction();
+            db.close();
+            this.dbHelper.close();
+        }
+
+        Log.d(LogsManager.TAG, "RecipeManager: saveToDisk.");
+
+        return true;
     }
     
     /**
@@ -323,7 +392,7 @@ public class RecipeManager
      * Sets the selected category.
      * @param category the current selected category
      */
-    public void setSelectedCategocategorycategoryry(final Category category)
+    public void setSelectedCategory(final Category category)
     {
         this.selectedCategory = category;
     }
@@ -363,7 +432,7 @@ public class RecipeManager
      */
     public ArrayList<Recipe> getRecipesFromDisk()
     {
-        SQLiteDatabase db = this.dbHelper.getWritableDatabase();
+        SQLiteDatabase db = this.dbHelper.getReadableDatabase();
         
         String[] columns = new String[]{ColumnRecipe.title.name(),
                                         ColumnRecipe.category.name(),

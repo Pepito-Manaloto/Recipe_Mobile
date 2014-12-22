@@ -30,7 +30,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper
         preparation_time,
         description,
         servings,
-        author,
         date_in,
     }
 
@@ -62,7 +61,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper
                                                        ColumnRecipe.preparation_time.name() + " INTEGER NOT NULL, " +
                                                        ColumnRecipe.description.name() + " TEXT NOT NULL, " +
                                                        ColumnRecipe.servings.name() + " INTEGER NOT NULL, " +
-                                                       ColumnRecipe.author.name() + " TEXT NOT NULL, " +
                                                        ColumnRecipe.date_in.name() + " TEXT NOT NULL" +
                                                       ");";
 
