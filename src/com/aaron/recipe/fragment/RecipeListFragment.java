@@ -7,10 +7,9 @@ import com.aaron.recipe.activity.LogsActivity;
 import com.aaron.recipe.activity.AboutActivity;
 import com.aaron.recipe.fragment.UpdateFragment;
 import com.aaron.recipe.activity.SettingsActivity;
-import com.aaron.recipe.adapter.RecipeAdapter;
+import com.aaron.recipe.adapter.RecipeListRowAdapter;
 import com.aaron.recipe.fragment.SettingsFragment;
 import com.aaron.recipe.bean.Recipe;
-import com.aaron.recipe.bean.Recipe.Category;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
@@ -203,7 +202,7 @@ public class RecipeListFragment extends ListFragment
                 public void afterTextChanged(Editable arg0)
                 {
                     String searched = searchTextfield.getText().toString();
-                    RecipeAdapter recipeAdapter = (RecipeAdapter) getListAdapter();
+                    RecipeListRowAdapter recipeAdapter = (RecipeListRowAdapter) getListAdapter();
                     recipeAdapter.filter(searched);
                     recipeAdapter.notifyDataSetChanged();
                     
@@ -289,7 +288,7 @@ public class RecipeListFragment extends ListFragment
                 @Override
                 public void run()
                 {
-                    RecipeAdapter recipeAdapter = new RecipeAdapter(getActivity(), list, settings);
+                    RecipeListRowAdapter recipeAdapter = new RecipeListRowAdapter(getActivity(), list, settings);
                     setListAdapter(recipeAdapter);
     
                     Log.d(LogsManager.TAG, "RecipeListFragment: updateListOnUiThread(run). settings=" + settings + " list=" + list);

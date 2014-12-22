@@ -24,6 +24,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.aaron.recipe.bean.Ingredients;
+import com.aaron.recipe.bean.Instructions;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Recipe.Category;
 import com.aaron.recipe.model.MySQLiteHelper;
@@ -167,42 +169,58 @@ public class RecipeManager
      */
     private HashMap<Category, ArrayList<Recipe>> parseJsonObject(final JSONObject jsonObject) throws JSONException
     {
+        HashMap<Category, ArrayList<Recipe>> map = new HashMap<>();
+        
+        for(Category cat: Category.values())
+        {
+            map.put(cat, new ArrayList<Recipe>());
+        }
+
         Iterator<String> jsonIterator = jsonObject.keys();
+
         while(jsonIterator.hasNext())
         {
             String title = jsonIterator.next();
-            System.out.println("title = " + title);
             JSONArray jsonArray = jsonObject.getJSONArray(title);
 
-            JSONArray arr0 = jsonArray.getJSONArray(0);
-            JSONObject obj = arr0.getJSONObject(0);
-            System.out.println("preparation_time = " + obj.getInt(ColumnRecipe.preparation_time.name()));
-            System.out.println("servings = " + obj.getInt(ColumnRecipe.servings.name()));
-            System.out.println("description = " + obj.getString(ColumnRecipe.description.name()));
-            System.out.println("category = " + obj.getString(ColumnRecipe.category.name()));
+            JSONArray recipeJsonArray = jsonArray.getJSONArray(0);
+            JSONObject recipeJsonObj = recipeJsonArray.getJSONObject(0);
 
-            JSONArray arr1 = jsonArray.getJSONArray(1);
-            int arr1Size = arr1.length();
-            for(int i=0; i < arr1Size; i++)
+            Category category = Category.valueOf(recipeJsonObj.getString(ColumnRecipe.category.name()));
+            int preparationTime = recipeJsonObj.getInt(ColumnRecipe.preparation_time.name());
+            int servings = recipeJsonObj.getInt(ColumnRecipe.servings.name());
+            String description = recipeJsonObj.getString(ColumnRecipe.description.name());
+
+            JSONArray ingredientsJsonArray = jsonArray.getJSONArray(1);
+            int ingredientsJsonArraySize = ingredientsJsonArray.length();
+            Ingredients ingredients = new Ingredients(title, ingredientsJsonArraySize);
+
+            for(int i=0; i < ingredientsJsonArraySize; i++)
             {
-                JSONObject arr1Obj = arr1.getJSONObject(i);
-                System.out.println("quantity = " + arr1Obj.getDouble(ColumnIngredients.quantity.name()));
-                System.out.println("measurement = " + arr1Obj.getString(ColumnIngredients.measurement.name()));
-                System.out.println("ingredient = " + arr1Obj.getString(ColumnIngredients.ingredient.name()));
-                System.out.println("comment_ = " + arr1Obj.getString(ColumnIngredients.comment_.name()));
+                JSONObject ingredientsJsonObj = ingredientsJsonArray.getJSONObject(i);
+
+                ingredients.addIngredient(new Ingredients.Ingredient(ingredientsJsonObj.getDouble(ColumnIngredients.quantity.name()), 
+                                                                     ingredientsJsonObj.getString(ColumnIngredients.measurement.name()),
+                                                                     ingredientsJsonObj.getString(ColumnIngredients.ingredient.name()),
+                                                                     ingredientsJsonObj.getString(ColumnIngredients.comment_.name())));
             }
             
-            JSONArray arr2 = jsonArray.getJSONArray(2);
-            int arr2Size = arr2.length();
-            for(int i=0; i < arr2Size; i++)
+            JSONArray instructionsJsonArray = jsonArray.getJSONArray(2);
+            int instructionsJsonArraySize = instructionsJsonArray.length();
+            Instructions instructions = new Instructions(title, instructionsJsonArraySize);
+            for(int i=0; i < instructionsJsonArraySize; i++)
             {
-                JSONObject arr2Obj = arr2.getJSONObject(i);
-                
-                System.out.println("instruction = " + arr2Obj.getString(ColumnInstructions.instruction.name()));
+                JSONObject instructionsJsonObj = instructionsJsonArray.getJSONObject(i);
+
+                instructions.addInstruction(instructionsJsonObj.getString(ColumnInstructions.instruction.name()));
             }
+            
+            Recipe recipe = new Recipe(title, category, preparationTime, servings, description, ingredients, instructions);
+            ArrayList<Recipe> listTemp = map.get(category);
+            listTemp.add(recipe);
         }
 
-        return null;
+        return map;
     }
 
     /**

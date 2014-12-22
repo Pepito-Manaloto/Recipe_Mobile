@@ -19,7 +19,7 @@ import android.widget.TextView;
 /**
  * ListView adapter for recipe list.
  */
-public class RecipeAdapter extends ArrayAdapter<Recipe>
+public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
 {
     public static final String TAG = "RecipeAdapter";
     private Activity activity;
@@ -33,7 +33,7 @@ public class RecipeAdapter extends ArrayAdapter<Recipe>
      * @param context the current context
      * @param vocabularyList the vocabulary list
      */
-    public RecipeAdapter(final Activity context, final ArrayList<Recipe> recipeList, final Settings settings)
+    public RecipeListRowAdapter(final Activity context, final ArrayList<Recipe> recipeList, final Settings settings)
     {
         super(context, 0, recipeList);
 
