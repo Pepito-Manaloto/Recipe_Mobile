@@ -264,7 +264,7 @@ public class RecipeManager
                     recipeValues.put(ColumnRecipe.date_in.name(), dateFormatter.format(this.curDate));
 
                     db.insert(TABLE_RECIPE, null, recipeValues);
-                    
+
                     // Iterate over all ingredients of a recipe
                     for(Ingredient ingredient: recipe.getIngredients().getIngredientsList())
                     {
@@ -444,7 +444,7 @@ public class RecipeManager
         
         Cursor cursor = db.query(TABLE_RECIPE, columns, whereClause, whereArgs, null, null, null);
         ArrayList<Recipe> list = new ArrayList<>(cursor.getCount());
-        
+
         if(cursor.moveToFirst())
         {
             do
@@ -476,7 +476,7 @@ public class RecipeManager
         int servings = cursor.getInt(3);
         String description = cursor.getString(4);
 
-        return new Recipe(title, category, preparationTime, servings, description);
+        return new Recipe(title, category, preparationTime, servings, description, null, null);
     }
 
     /**
