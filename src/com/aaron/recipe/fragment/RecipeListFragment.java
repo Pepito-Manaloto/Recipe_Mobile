@@ -84,7 +84,7 @@ public class RecipeListFragment extends ListFragment
         this.updateListOnUiThread(this.list);
 
         setHasOptionsMenu(true);
-        
+
         Log.d(LogsManager.TAG, "RecipeListFragment: onCreate. settings=" + this.settings);
         LogsManager.addToLogs("RecipeListFragment: onCreate. settings=" + this.settings);
 
@@ -336,7 +336,7 @@ public class RecipeListFragment extends ListFragment
                 this.view = view;
 
                 // Adds the runnable to the message queue, will run after the DELAY.
-                // Hides the fast-scroll after two seconds of no scrolling.
+                // Hides the fast-scroll after one seconds of no scrolling.
                 this.handler.postDelayed(this.runnable, DELAY); 
             }
         }

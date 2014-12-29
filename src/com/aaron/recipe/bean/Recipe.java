@@ -29,8 +29,8 @@ public class Recipe implements Serializable
 
     private String title;
     private Category category;
-    private String preparationTime;
     private int servings;
+    private String preparationTime;
     private String description;
     private Ingredients ingredients;
     private Instructions instructions;
@@ -38,13 +38,13 @@ public class Recipe implements Serializable
     /**
      * Default constructor.
      */
-    public Recipe(final String title, final Category category, final int preparationTime, final int servings,
+    public Recipe(final String title, final Category category, final int servings, final int preparationTime,
                   final String description, final Ingredients ingredients, final Instructions instructions)
     {
         this.title = title;
         this.category = category;
-        this.preparationTime = formatPreperationTime(preparationTime);
         this.servings = servings;
+        this.preparationTime = formatPreperationTime(preparationTime);
         this.description = description;
         this.ingredients = ingredients;
         this.instructions = instructions;
@@ -182,8 +182,8 @@ public class Recipe implements Serializable
         int hash = 3;
         hash = 47 * hash + this.title.hashCode();
         hash = 47 * hash + this.category.hashCode();
-        hash = 47 * hash + this.preparationTime.hashCode();
         hash = 47 * hash + this.servings;
+        hash = 47 * hash + this.preparationTime.hashCode();
         hash = 47 * hash + this.description.hashCode();
         hash = 47 * hash + this.ingredients.hashCode();
         hash = 47 * hash + this.instructions.hashCode();
@@ -200,8 +200,8 @@ public class Recipe implements Serializable
     {
         return "Title: " + this.title +
                " Category: " + this.category + 
-               " Preparation Time: " + this.preparationTime +
                " Servings: " + this.servings +
+               " Preparation Time: " + this.preparationTime +
                " Description: " + this.description +
                "Ingredients: " + this.ingredients.toString() +
                "Instructions: " + this.instructions.toString();

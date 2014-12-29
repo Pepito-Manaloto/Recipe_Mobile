@@ -114,10 +114,6 @@ public class Settings implements Serializable
                 return 3;
             case 18:
                 return 4;
-            case 19: 
-                return 5;
-            case 20: 
-                return 6;
             default: 
                 throw new AssertionError();
         }
@@ -138,9 +134,10 @@ public class Settings implements Serializable
 
     /**
      * Returns the typeface of this recipe.
+     * @param isBold checker if typeface will return bold regardless of the selected settings
      * @return Typeface
      */
-    public Typeface getTypeface()
+    public Typeface getTypeface(final boolean isBold)
     {
         Typeface family;
 
@@ -156,7 +153,14 @@ public class Settings implements Serializable
             default: family = Typeface.DEFAULT;
         }
         
-        return Typeface.create(family, this.getFontStyleIndex());
+        int style = this.getFontStyleIndex();
+
+        if(isBold)
+        {
+            style = 1;
+        }
+
+        return Typeface.create(family, style);
     }
 
     /**

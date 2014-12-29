@@ -53,6 +53,7 @@ public class RecipeManager
 
     private final String url;
     private static final String AUTH_KEY = "449a36b6689d841d7d27f31b4b7cc73a";
+    private static final String RECENTLY_ADDED_COUNT = "recently_added_count";
 
     public static final String TAG = "RecipeManager";
 
@@ -105,9 +106,9 @@ public class RecipeManager
         {
             HttpClient httpclient = new DefaultHttpClient(httpParams);
             String params = "?last_updated=" + URLEncoder.encode(this.getLastUpdated(DATE_FORMAT_SHORT_24), "UTF-8");
-    
-            Log.d(LogsManager.TAG, "RecipeManager: getRecipesFromWeb. params=" + params);
-            LogsManager.addToLogs("RecipeManager: getRecipesFromWeb. params=" + params);
+
+            Log.d(LogsManager.TAG, "RecipeManager: getRecipesFromWeb. params=" + this.url + params);
+            LogsManager.addToLogs("RecipeManager: getRecipesFromWeb. params=" + this.url + params);
 
             HttpGet httpGet = new HttpGet(this.url + params);
             httpGet.addHeader("Authorization", AUTH_KEY);
@@ -119,6 +120,11 @@ public class RecipeManager
             {
                 HttpEntity httpEntity = response.getEntity();
 
+                if(httpEntity.getContentLength() >= 0 && httpEntity.getContentLength() <= 2) // Response is empty
+                {
+                    return new ArrayList<>(0);
+                }
+                
                 String responseString = EntityUtils.toString(httpEntity); // Response body
 
                 JSONObject jsonObject = new JSONObject(responseString); // Response body in JSON object
@@ -139,7 +145,21 @@ public class RecipeManager
 
                 // Entity is already consumed by EntityUtils; thus is already closed.
 
-                return map.get(this.selectedCategory);
+                if(Category.All.equals(this.selectedCategory)) // Combines all ArrayList<Recipe> into a single ArrayList
+                {
+                    ArrayList<Recipe> allRecipeList = new ArrayList<>(this.recentlyAddedCount);
+
+                    for(ArrayList<Recipe> list: map.values())
+                    {
+                        allRecipeList.addAll(list);
+                    }
+
+                    return allRecipeList;
+                }
+                else
+                {
+                    return map.get(this.selectedCategory);
+                }
             }
 
             // Closes the connection/ Consume the entity.
@@ -177,6 +197,9 @@ public class RecipeManager
         {
             map.put(cat, new ArrayList<Recipe>());
         }
+
+        this.recentlyAddedCount = jsonObject.getInt(RECENTLY_ADDED_COUNT);
+        jsonObject.remove(RECENTLY_ADDED_COUNT);
 
         Iterator<String> jsonIterator = jsonObject.keys();
 
@@ -217,7 +240,7 @@ public class RecipeManager
                 instructions.addInstruction(instructionsJsonObj.getString(ColumnInstructions.instruction.name()));
             }
             
-            Recipe recipe = new Recipe(title, category, preparationTime, servings, description, ingredients, instructions);
+            Recipe recipe = new Recipe(title, category, servings, preparationTime, description, ingredients, instructions);
             ArrayList<Recipe> listTemp = map.get(category);
             listTemp.add(recipe);
         }
@@ -283,7 +306,7 @@ public class RecipeManager
                         instructionsValues.put(ColumnInstructions.title.name(), title);
                         instructionsValues.put(ColumnInstructions.instruction.name(), instruction);
 
-                        db.insert(TABLE_INSTRUCTIONS, null, ingredientsValues);
+                        db.insert(TABLE_INSTRUCTIONS, null, instructionsValues);
                     }
                 }
             }
@@ -350,7 +373,7 @@ public class RecipeManager
      */
     public String getLastUpdated(final String format)
     {
-        String lastUpdatedDate = "";
+        String lastUpdatedDate = "1950-01-01 00:00:00";
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
         String[] columns = new String[]{ColumnRecipe.date_in.name(),};
         String orderBy = "date_in DESC";
@@ -362,8 +385,7 @@ public class RecipeManager
         {
             lastUpdatedDate = cursor.getString(0);
         }
-
-        if(lastUpdatedDate.length() <= 0)
+        else
         {
             return lastUpdatedDate;
         }
@@ -441,7 +463,13 @@ public class RecipeManager
                                         ColumnRecipe.description.name()};
         String whereClause = "category = ?";
         String[] whereArgs = new String[]{this.selectedCategory.name()};
-        
+
+        if(Category.All.equals(this.selectedCategory))
+        {
+            whereClause = null;
+            whereArgs = null;
+        }
+
         Cursor cursor = db.query(TABLE_RECIPE, columns, whereClause, whereArgs, null, null, null);
         ArrayList<Recipe> list = new ArrayList<>(cursor.getCount());
         
@@ -457,8 +485,8 @@ public class RecipeManager
         db.close();
         this.dbHelper.close();
 
-        Log.d(LogsManager.TAG, "RecipeManager: getRecipesFromDisk. list=" + list);
-        LogsManager.addToLogs("RecipeManager: getRecipesFromDisk. list_size=" + list.size());
+        Log.d(LogsManager.TAG, "RecipeManager: getRecipesFromDisk. category=" + this.selectedCategory.name());
+        LogsManager.addToLogs("RecipeManager: getRecipesFromDisk. category=" + this.selectedCategory.name());
 
         return list;
     }
@@ -476,7 +504,47 @@ public class RecipeManager
         int servings = cursor.getInt(3);
         String description = cursor.getString(4);
 
-        return new Recipe(title, category, preparationTime, servings, description);
+        SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+
+        String[] ingredientsColumns = new String[]{ColumnIngredients.quantity.name(),
+                                                   ColumnIngredients.measurement.name(),
+                                                   ColumnIngredients.ingredient.name(),
+                                                   ColumnIngredients.comment_.name()};
+        String[] instructionsColumns = new String[]{ColumnInstructions.instruction.name()};
+        String whereClause = "title = ?";
+        String[] whereArgs = new String[]{title};
+
+        Cursor ingredientCursor = db.query(TABLE_INGREDIENTS, ingredientsColumns, whereClause, whereArgs, null, null, null);
+        Ingredients ingredients = new Ingredients(title, ingredientCursor.getCount());
+
+        if(ingredientCursor.moveToFirst())
+        {
+            do
+            {
+                double quantity = ingredientCursor.getDouble(0);
+                String measurement = ingredientCursor.getString(1);
+                String ingredient = ingredientCursor.getString(2);
+                String comment = ingredientCursor.getString(3);
+
+                ingredients.addIngredient(new Ingredient(quantity, measurement, ingredient, comment));
+            }
+            while(ingredientCursor.moveToNext());
+        }
+
+        Cursor instructionCursor = db.query(TABLE_INSTRUCTIONS, instructionsColumns, whereClause, whereArgs, null, null, null);
+        Instructions instructions = new Instructions(title, instructionCursor.getCount());
+
+        if(instructionCursor.moveToFirst())
+        {
+            do
+            {
+                String instruction = instructionCursor.getString(0);
+                instructions.addInstruction(instruction);
+            }
+            while(instructionCursor.moveToNext());
+        }
+
+        return new Recipe(title, category, servings, preparationTime, description, ingredients, instructions);
     }
 
     /**

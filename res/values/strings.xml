@@ -30,6 +30,7 @@
     <string name="text_last_updated">Last Updated</string>
     <string name="text_category">Category</string>
     <string name="text_font">Font</string>
+    <string name="text_recipes">Recipes</string>
 
     <!-- COMBO BOX ITEMS -->
     <string-array name="font_name_arrays">
@@ -52,8 +53,6 @@
         <item>16</item>
         <item>17</item>
         <item>18</item>
-        <item>19</item>
-        <item>20</item>
     </string-array>
 
 </resources>

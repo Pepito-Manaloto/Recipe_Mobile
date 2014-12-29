@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" 
     android:useDefaultMargins="true"
-    android:alignmentMode="alignBounds"
     android:layout_marginTop="5dp"
     android:layout_marginLeft="5dp"
     android:layout_marginRight="10dp" >
@@ -11,7 +10,6 @@
     <TextView
         android:id="@+id/textlabel_row_title"
         style="@style/TextView_list_row"
-        android:layout_height="wrap_content"
         android:layout_row="0"
         android:layout_column="0"
         android:layout_gravity="left"
@@ -20,21 +18,23 @@
     <TextView
         android:id="@+id/text_row_title"
         style="@style/TextView_list_row"
+        android:textStyle="bold"
+        android:layout_gravity="left"
         android:text="title" />
 
     <TextView
-        android:id="@+id/textlabel_row_preparation_time"
+        android:id="@+id/textlabel_row_servings"
         style="@style/TextView_list_row"
+        android:layout_gravity="left"
         android:layout_row="1"
         android:layout_column="0"
-        
-        android:layout_gravity="left"
-        android:text="Preparation Time: " />
+        android:text="Servings: " />
 
     <TextView
-        android:id="@+id/text_row_preparation_time"
+        android:id="@+id/text_row_servings"
         style="@style/TextView_list_row"
-        android:text="time" />
+        android:layout_gravity="left"
+        android:text="servings" />
 
     <TextView
         android:id="@+id/textlabel_row_category"
@@ -47,20 +47,21 @@
     <TextView
         android:id="@+id/text_row_category"
         style="@style/TextView_list_row"
+        android:layout_gravity="left"
         android:text="category" />
 
     <TextView
-        android:id="@+id/textlabel_row_servings"
+        android:id="@+id/textlabel_row_preparation_time"
         style="@style/TextView_list_row"
-        android:layout_gravity="left"
         android:layout_row="1"
         android:layout_column="2"
-        android:text="Servings: " />
+        android:layout_gravity="right"
+        android:text="Preparation Time: " />
 
     <TextView
-        android:id="@+id/text_row_servings"
+        android:id="@+id/text_row_preparation_time"
         style="@style/TextView_list_row"
-        android:layout_below="@id/text_row_title"
-        android:text="servings" />
+        android:layout_gravity="left"
+        android:text="time" />
 
 </GridLayout>

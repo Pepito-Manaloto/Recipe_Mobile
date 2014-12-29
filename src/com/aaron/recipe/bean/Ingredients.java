@@ -95,8 +95,9 @@ public class Ingredients implements Serializable
     /**
      * Helper class, a single ingredient.
      */
-    public static class Ingredient
+    public static class Ingredient implements Serializable
     {
+        private static final long serialVersionUID = -618537983872529668L;
         private double quantity;
         private String measurement;
         private String ingredient;

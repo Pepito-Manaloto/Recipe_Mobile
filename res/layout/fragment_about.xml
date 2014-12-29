@@ -26,4 +26,19 @@
         style="@style/TextView_sub_about"
         android:text="@string/text_last_updated" />
 
+    <View
+        style="@style/Divider_about" />
+
+    <TextView
+        style="@style/TextView_about"
+        android:text="@string/text_recipes" />
+
+    <GridLayout
+        android:id="@+id/gridlayout_count"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="15dp" >
+
+    </GridLayout>
+
 </LinearLayout>

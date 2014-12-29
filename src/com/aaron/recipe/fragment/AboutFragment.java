@@ -1,6 +1,9 @@
 package com.aaron.recipe.fragment;
 
+import java.util.HashMap;
+
 import com.aaron.recipe.R;
+import com.aaron.recipe.bean.Recipe.Category;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
 
@@ -14,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 import android.widget.TextView;
 
 import static com.aaron.recipe.model.RecipeManager.*;
@@ -68,9 +72,39 @@ public class AboutFragment extends Fragment
 
         String buildNumber = getActivity().getString(R.string.build_num);
         String lastUpdated = this.recipeManager.getLastUpdated(DATE_FORMAT_LONG);
+        HashMap<Category, Integer> recipesCount = this.recipeManager.getRecipesCount();
 
         buildNumberTextView.setText(buildNumber);
         lastUpdatedTextView.setText(lastUpdated);
+
+        GridLayout grid = (GridLayout) view.findViewById(R.id.gridlayout_count);
+        grid.setColumnCount(2);
+        grid.setRowCount(recipesCount.keySet().size());
+
+        int ctr = 0;
+        for(Category key: recipesCount.keySet())
+        {
+            // Label
+            GridLayout.LayoutParams layoutParamLabel = new GridLayout.LayoutParams(GridLayout.spec(ctr, GridLayout.LEFT),
+                                                                                   GridLayout.spec(0, GridLayout.LEFT));
+
+            TextView label = new TextView(getActivity());
+            label.setText(key.name());
+            label.setTextAppearance(getActivity(), R.style.TextView_sub_about);
+
+            // Count
+            GridLayout.LayoutParams layoutParamCount = new GridLayout.LayoutParams(GridLayout.spec(ctr, GridLayout.LEFT),
+                                                                                   GridLayout.spec(1, GridLayout.LEFT));
+            layoutParamCount.setMargins(75, 0, 0, 0);
+            TextView count = new TextView(getActivity());
+            count.setText(String.valueOf(recipesCount.get(key)));
+            count.setTextAppearance(getActivity(), R.style.TextView_sub_about);
+
+            grid.addView(label, layoutParamLabel);
+            grid.addView(count, layoutParamCount);
+            
+            ctr++;
+        }
 
         Log.d(LogsManager.TAG, "AboutFragment: onCreateView.");
 

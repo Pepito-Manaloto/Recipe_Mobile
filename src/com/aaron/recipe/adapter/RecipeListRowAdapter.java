@@ -1,12 +1,12 @@
 package com.aaron.recipe.adapter;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import com.aaron.recipe.R;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
-import com.aaron.recipe.model.RecipeManager;
 
 import android.app.Activity;
 import android.util.Log;
@@ -26,7 +26,6 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
     private ArrayList<Recipe> recipeList;
     private ArrayList<Recipe> recipeListTemporaryholder;
     private Settings settings;
-    private RecipeManager recipeManager;
 
     /**
      * Default constructor. 0 is passed to the resource id, because we will be creating our own custom layout.
@@ -37,11 +36,9 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
     {
         super(context, 0, recipeList);
 
-        this.recipeManager = new RecipeManager(context, settings.getCategory());
-
         this.activity = context;
         this.recipeList = recipeList;
-        this.recipeListTemporaryholder = this.recipeManager.getRecipesFromDisk();
+        this.recipeListTemporaryholder = new ArrayList<>(recipeList);
         this.settings = settings;
     }
 
@@ -60,8 +57,8 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
             holder = new ViewHolder();
             holder.titleText = (TextView) convertView.findViewById(R.id.text_row_title);
             holder.categoryText = (TextView) convertView.findViewById(R.id.text_row_category);
-            holder.preparationTimeText = (TextView) convertView.findViewById(R.id.text_row_preparation_time);
             holder.servingsText = (TextView) convertView.findViewById(R.id.text_row_servings);
+            holder.preparationTimeText = (TextView) convertView.findViewById(R.id.text_row_preparation_time);
 
             convertView.setTag(holder);
         }
@@ -74,19 +71,19 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
     
         holder.titleText.setText(recipe.getTitle());
         holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
-        holder.titleText.setTypeface(this.settings.getTypeface());
+        holder.titleText.setTypeface(this.settings.getTypeface(true));
 
         holder.categoryText.setText(recipe.getCategory());
         holder.categoryText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
-        holder.categoryText.setTypeface(this.settings.getTypeface());
-        
+        holder.categoryText.setTypeface(this.settings.getTypeface(false));
+
+        holder.servingsText.setText(String.valueOf(recipe.getServings()));
+        holder.servingsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
+        holder.servingsText.setTypeface(this.settings.getTypeface(false));
+
         holder.preparationTimeText.setText(recipe.getPreparationTime());
         holder.preparationTimeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
-        holder.preparationTimeText.setTypeface(this.settings.getTypeface());
-        
-        holder.servingsText.setText(recipe.getServings());
-        holder.servingsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
-        holder.servingsText.setTypeface(this.settings.getTypeface());
+        holder.preparationTimeText.setTypeface(this.settings.getTypeface(false));
 
         return convertView;
     }
@@ -109,9 +106,9 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         {
             for(Recipe recipe: this.recipeListTemporaryholder)
             {
-                titleWord = recipe.getTitle();
+                titleWord = recipe.getTitle().toLowerCase(Locale.getDefault());
 
-                if(titleWord.startsWith(searchedText))
+                if(titleWord.startsWith(searchedText.toLowerCase(Locale.getDefault())))
                 {
                     this.recipeList.add(recipe);
                 }
@@ -130,7 +127,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
     {
         public TextView titleText;
         public TextView categoryText;
-        public TextView preparationTimeText;
         public TextView servingsText;
+        public TextView preparationTimeText;
     }
 }
