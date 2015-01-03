@@ -132,7 +132,7 @@ public class RecipeManager
                 HashMap<Category, ArrayList<Recipe>> map = this.parseJsonObject(jsonObject);
 
                 boolean saveToDiskSuccess = this.saveToDisk(map);
-                
+
                 if(!saveToDiskSuccess)
                 {
                     this.responseCode = HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -244,6 +244,8 @@ public class RecipeManager
             ArrayList<Recipe> listTemp = map.get(category);
             listTemp.add(recipe);
         }
+
+        Log.d(LogsManager.TAG, "RecipeManager: parseJsonObject. map=" + map);
 
         return map;
     }

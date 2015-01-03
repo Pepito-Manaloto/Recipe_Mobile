@@ -4,17 +4,25 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import com.aaron.recipe.R;
+import com.aaron.recipe.activity.RecipeActivity;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.HorizontalScrollView;
 import android.widget.TextView;
+
+import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_RECIPE;
+import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 
 /**
  * ListView adapter for recipe list.
@@ -59,6 +67,8 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
             holder.categoryText = (TextView) convertView.findViewById(R.id.text_row_category);
             holder.servingsText = (TextView) convertView.findViewById(R.id.text_row_servings);
             holder.preparationTimeText = (TextView) convertView.findViewById(R.id.text_row_preparation_time);
+            holder.description = (TextView) convertView.findViewById(R.id.text_row_description);
+            holder.scroll = (HorizontalScrollView) convertView.findViewById(R.id.horizontalscroll_list_row);
 
             convertView.setTag(holder);
         }
@@ -68,7 +78,9 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         }
 
         Recipe recipe = getItem(position);
-    
+
+        holder.scroll.setOnTouchListener(new RecipeListRowTouchListener(recipe));
+
         holder.titleText.setText(recipe.getTitle());
         holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
         holder.titleText.setTypeface(this.settings.getTypeface(true));
@@ -84,6 +96,10 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         holder.preparationTimeText.setText(recipe.getPreparationTime());
         holder.preparationTimeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
         holder.preparationTimeText.setTypeface(this.settings.getTypeface(false));
+
+        holder.description.setText(recipe.getDescription());
+        holder.description.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
+        holder.description.setTypeface(this.settings.getTypeface(false));
 
         return convertView;
     }
@@ -129,5 +145,66 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         public TextView categoryText;
         public TextView servingsText;
         public TextView preparationTimeText;
+        public TextView description;
+        public HorizontalScrollView scroll;
     }
+
+    /**
+     * Helper class for handling Recipe selection and Recipe list row scrolling.
+     */
+    private class RecipeListRowTouchListener implements OnTouchListener
+    {
+        private Recipe selectedRecipe;
+        private float historicX;
+
+        /**
+         * Default constructor.
+         * @param recipe the selected recipe
+         */
+        public RecipeListRowTouchListener(final Recipe recipe)
+        {
+            this.selectedRecipe = recipe;
+        }
+
+        /**
+         * If the touch moves MORE than 15 pixels horizontally then the gesture will be treated as a scrolling event,
+         * else it will be treated as selecting the row which will start RecipeActivity. 
+         */
+        @Override
+        public boolean onTouch(View v, MotionEvent event)
+        {
+            switch (event.getAction()) 
+            {
+                case MotionEvent.ACTION_DOWN:
+                {
+                    this.historicX = event.getX();
+                    break;
+                }
+                case MotionEvent.ACTION_UP:
+                {
+                    boolean touchMovedLessThan10Pixels = Math.abs(this.historicX - event.getX()) < 15;
+
+                    if(touchMovedLessThan10Pixels)
+                    {
+                        Intent intent = new Intent(activity, RecipeActivity.class);
+                        intent.putExtra(EXTRA_RECIPE, this.selectedRecipe);
+                        intent.putExtra(EXTRA_SETTINGS, RecipeListRowAdapter.this.settings);
+                        RecipeListRowAdapter.this.activity.startActivity(intent);
+                    }
+
+                    // Removes compiler warning
+                    v.performClick();
+
+                    break;
+                }
+                default:
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
 }

@@ -12,6 +12,7 @@ import com.aaron.recipe.fragment.SettingsFragment;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
+import com.aaron.recipe.model.MySQLiteHelper;
 import com.aaron.recipe.model.RecipeManager;
 
 import android.app.Activity;
@@ -46,6 +47,7 @@ public class RecipeListFragment extends ListFragment
     private RecipeManager recipeManager;
 
     public static final String EXTRA_LIST = "com.aaron.recipe.fragment.list";
+    public static final String EXTRA_RECIPE = "com.aaron.recipe.fragment.recipe";
 
     /**
      * Initializes non-fragment user interface.
@@ -91,7 +93,7 @@ public class RecipeListFragment extends ListFragment
     }
 
     /**
-     * Initializes the fragment's user interface.
+     * Initializes the fragment's view.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState)
@@ -111,9 +113,9 @@ public class RecipeListFragment extends ListFragment
     {
         super.onActivityCreated(savedInstanceState);
 
-        Log.d(LogsManager.TAG, "RecipeListFragment: onActivityCreated.");
-
         getListView().setOnScrollListener(new ShowHideFastScrollListener());
+
+        Log.d(LogsManager.TAG, "RecipeListFragment: onActivityCreated.");
     }
 
     /**

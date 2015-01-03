@@ -129,7 +129,7 @@ public class Recipe implements Serializable
     }
 
     /**
-     * Gets the description.
+     * Gets the ingredients.
      * @return String
      */
     public Ingredients getIngredients()
@@ -138,7 +138,7 @@ public class Recipe implements Serializable
     }
 
     /**
-     * Gets the description.
+     * Gets the instructions.
      * @return String
      */
     public Instructions getInstructions()
@@ -203,7 +203,7 @@ public class Recipe implements Serializable
                " Servings: " + this.servings +
                " Preparation Time: " + this.preparationTime +
                " Description: " + this.description +
-               "Ingredients: " + this.ingredients.toString() +
-               "Instructions: " + this.instructions.toString();
+               " Ingredients: " + this.ingredients.toString() +
+               " Instructions: " + this.instructions.toString();
     }
 }

@@ -114,6 +114,10 @@ public class Settings implements Serializable
                 return 3;
             case 18:
                 return 4;
+            case 19:
+                return 5;
+            case 20:
+                return 6;
             default: 
                 throw new AssertionError();
         }

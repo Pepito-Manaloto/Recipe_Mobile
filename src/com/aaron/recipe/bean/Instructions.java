@@ -88,6 +88,6 @@ public class Instructions implements Serializable
     public String toString()
     {
         return "title: " + this.title +
-               "instructions: " + this.instructionsList;
+               " instructions: " + this.instructionsList;
     }
 }

@@ -71,6 +71,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
                                                         ColumnIngredients.measurement.name() + " TEXT NOT NULL, " +
                                                         ColumnIngredients.ingredient.name() + " TEXT NOT NULL, " +
                                                         ColumnIngredients.comment_.name() + " TEXT NOT NULL, " +
+                                                        "UNIQUE(" + ColumnIngredients.title.name() + ", " + ColumnIngredients.ingredient.name() + ") ON CONFLICT REPLACE, " +
                                                         "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) ON UPDATE CASCADE ON DELETE CASCADE" +
                                                        ");";
 
@@ -78,6 +79,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
                                                        "(" + 
                                                         ColumnInstructions.title.name() + " TEXT NOT NULL, " +
                                                         ColumnInstructions.instruction.name() + " TEXT NOT NULL, " +
+                                                        "UNIQUE(" + ColumnInstructions.title.name() + ", " + ColumnInstructions.instruction.name() + ") ON CONFLICT REPLACE, " +
                                                         "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) ON UPDATE CASCADE ON DELETE CASCADE" +
                                                        ");";
 
@@ -96,6 +98,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase database)
     {
         Log.d(LogsManager.TAG, "MySQLiteHelper: onCreate. query=" + CREATE_TABLE_RECIPE);
+        Log.d(LogsManager.TAG, "MySQLiteHelper: onCreate. query=" + CREATE_TABLE_INGREDIENTS);
+        Log.d(LogsManager.TAG, "MySQLiteHelper: onCreate. query=" + CREATE_TABLE_INSTRUCTIONS);
 
         database.execSQL(CREATE_TABLE_RECIPE);
         database.execSQL(CREATE_TABLE_INGREDIENTS);

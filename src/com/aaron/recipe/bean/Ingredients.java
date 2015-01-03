@@ -89,7 +89,7 @@ public class Ingredients implements Serializable
     public String toString()
     {
         return "title: " + this.title +
-               "ingredients: " + this.ingredientsList;
+               " ingredients: " + this.ingredientsList;
     }
 
     /**
@@ -195,10 +195,10 @@ public class Ingredients implements Serializable
         @Override
         public String toString()
         {
-            return "quantity: " + this.quantity +
-                   "measurement: " + this.measurement +
-                   "ingredient: " + this.ingredient +
-                   "comment: " + this.comment;
+            return this.quantity + " " +
+                   this.measurement + " " +
+                   this.ingredient + " " +
+                   this.comment;
         }
     }
 }
