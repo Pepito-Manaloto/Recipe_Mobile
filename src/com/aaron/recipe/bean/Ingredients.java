@@ -195,10 +195,16 @@ public class Ingredients implements Serializable
         @Override
         public String toString()
         {
-            return this.quantity + " " +
-                   this.measurement + " " +
-                   this.ingredient + " " +
-                   this.comment;
+            Fraction quantityInFraction = new Fraction(this.quantity);
+
+            String toReturn = quantityInFraction.getFraction()  + " " + this.measurement + " " + this.ingredient;
+
+            if(this.comment.length() > 0)
+            {
+                toReturn += "(" + this.comment + ")";
+            }
+
+            return toReturn;
         }
     }
 }
