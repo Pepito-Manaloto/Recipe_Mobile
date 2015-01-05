@@ -77,7 +77,7 @@ public class Fraction implements Serializable
             }
         }
 
-        return String.valueOf(number);
+        return String.valueOf((int)number); // Cast to int to remove decimal point
     }
 
     /**

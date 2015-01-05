@@ -201,7 +201,7 @@ public class Ingredients implements Serializable
 
             if(this.comment.length() > 0)
             {
-                toReturn += "(" + this.comment + ")";
+                toReturn += " (" + this.comment + ")";
             }
 
             return toReturn;

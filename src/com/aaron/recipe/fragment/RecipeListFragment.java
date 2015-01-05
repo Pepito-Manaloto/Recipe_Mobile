@@ -12,7 +12,6 @@ import com.aaron.recipe.fragment.SettingsFragment;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
-import com.aaron.recipe.model.MySQLiteHelper;
 import com.aaron.recipe.model.RecipeManager;
 
 import android.app.Activity;
