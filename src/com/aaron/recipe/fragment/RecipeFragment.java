@@ -1,5 +1,7 @@
 package com.aaron.recipe.fragment;
 
+import java.util.ArrayList;
+
 import com.aaron.recipe.R;
 import com.aaron.recipe.bean.Ingredients.Ingredient;
 import com.aaron.recipe.bean.Recipe;
@@ -19,7 +21,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import static android.widget.LinearLayout.LayoutParams;
-import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_RECIPE;
+import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_LIST;
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 
 /**
@@ -28,9 +30,12 @@ import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 public class RecipeFragment extends Fragment
 {
     public static final String TAG = "RecipeFragment";
+    public static final String EXTRA_PAGE = "com.aaron.recipe.fragment.page";
 
-    private Recipe recipe;
+    private int page;
+    private ArrayList<Recipe> recipeList;
     private Settings settings;
+    private Recipe recipe;
 
     /**
      * Creates a new RecipeFragment instance and stores the passed Recipe data as arguments.
@@ -39,34 +44,40 @@ public class RecipeFragment extends Fragment
      *       That is why this static initializer is used.
      * @param Recipe the recipe object to be used later 
      */
-    public static RecipeFragment newInstance(final Recipe recipe, final Settings settings)
+    public static RecipeFragment newInstance(final int page, final ArrayList<Recipe> recipeList, final Settings settings)
     {
         Bundle bundle = new Bundle();
-        bundle.putSerializable(EXTRA_RECIPE, recipe);
+        bundle.putInt(EXTRA_PAGE, page);
+        bundle.putSerializable(EXTRA_LIST, recipeList);
         bundle.putSerializable(EXTRA_SETTINGS, settings);
 
         RecipeFragment recipeFragment = new RecipeFragment();
         recipeFragment.setArguments(bundle);
 
-        Log.d(LogsManager.TAG, "RecipeFragment: newInstance. recipe=" + recipe);
+        Log.d(LogsManager.TAG, "RecipeFragment: newInstance. page=" + page);
 
         return recipeFragment;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        this.recipe = (Recipe) getArguments().getSerializable(EXTRA_RECIPE);
+        this.page = getArguments().getInt(EXTRA_PAGE);
+        this.recipeList = (ArrayList<Recipe>) getArguments().getSerializable(EXTRA_LIST);
         this.settings = (Settings) getArguments().getSerializable(EXTRA_SETTINGS);
 
+        this.recipe = this.recipeList.get(this.page);
+        String title = this.recipe.getTitle();
+        
         setHasOptionsMenu(true);
-        getActivity().setTitle(this.recipe.getTitle());
+        getActivity().setTitle(title);
         getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Log.d(LogsManager.TAG, "RecipeFragment: onCreate. title=" + this.recipe.getTitle());
-        LogsManager.addToLogs("RecipeFragment: onCreate. title=" + this.recipe.getTitle());
+        Log.d(LogsManager.TAG, "RecipeFragment: onCreate. title=" + title);
+        LogsManager.addToLogs("RecipeFragment: onCreate. title=" + title);
     }
     
     @Override

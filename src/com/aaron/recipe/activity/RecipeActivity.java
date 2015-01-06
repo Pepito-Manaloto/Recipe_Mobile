@@ -1,16 +1,19 @@
 package com.aaron.recipe.activity;
 
+import java.util.ArrayList;
+
 import com.aaron.recipe.R;
+import com.aaron.recipe.adapter.RecipePagerAdapter;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
-import com.aaron.recipe.fragment.RecipeFragment;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 
-import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_RECIPE;
+import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_LIST;
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 
 /**
@@ -25,18 +28,13 @@ public class RecipeActivity extends FragmentActivity
         setContentView(R.layout.activity_fragment_container);
 
         FragmentManager fm = getSupportFragmentManager();
-        Fragment recipeFragment = fm.findFragmentById(R.id.fragment_container);
 
-        if(recipeFragment == null)
-        {
-            Recipe recipe = (Recipe) this.getIntent().getSerializableExtra(EXTRA_RECIPE);
-            Settings settings = (Settings) this.getIntent().getSerializableExtra(EXTRA_SETTINGS);
+        @SuppressWarnings("unchecked")
+        ArrayList<Recipe> recipeList = (ArrayList<Recipe>) this.getIntent().getSerializableExtra(EXTRA_LIST);
+        Settings settings = (Settings) this.getIntent().getSerializableExtra(EXTRA_SETTINGS);
 
-            recipeFragment = RecipeFragment.newInstance(recipe, settings);
-
-            fm.beginTransaction()
-                .add(R.id.fragment_container, recipeFragment)
-                .commit();
-        }
+        ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
+        FragmentPagerAdapter pagerAdapter = new RecipePagerAdapter(fm, recipeList, settings);
+        viewPager.setAdapter(pagerAdapter);
     }
 }

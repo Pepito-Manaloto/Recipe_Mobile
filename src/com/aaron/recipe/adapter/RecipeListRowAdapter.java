@@ -21,7 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
-import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_RECIPE;
+import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_LIST;
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 
 /**
@@ -79,7 +79,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
 
         Recipe recipe = getItem(position);
 
-        holder.scroll.setOnTouchListener(new RecipeListRowTouchListener(recipe));
+        holder.scroll.setOnTouchListener(new RecipeListRowTouchListener());
 
         holder.titleText.setText(recipe.getTitle());
         holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
@@ -154,17 +154,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
      */
     private class RecipeListRowTouchListener implements OnTouchListener
     {
-        private Recipe selectedRecipe;
         private float historicX;
-
-        /**
-         * Default constructor.
-         * @param recipe the selected recipe
-         */
-        public RecipeListRowTouchListener(final Recipe recipe)
-        {
-            this.selectedRecipe = recipe;
-        }
 
         /**
          * If the touch moves MORE than 15 pixels horizontally then the gesture will be treated as a scrolling event,
@@ -187,7 +177,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
                     if(touchMovedLessThan10Pixels)
                     {
                         Intent intent = new Intent(activity, RecipeActivity.class);
-                        intent.putExtra(EXTRA_RECIPE, this.selectedRecipe);
+                        intent.putExtra(EXTRA_LIST, RecipeListRowAdapter.this.recipeList);
                         intent.putExtra(EXTRA_SETTINGS, RecipeListRowAdapter.this.settings);
                         RecipeListRowAdapter.this.activity.startActivity(intent);
                     }
