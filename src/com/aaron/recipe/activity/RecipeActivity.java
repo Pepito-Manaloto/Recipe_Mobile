@@ -35,6 +35,7 @@ public class RecipeActivity extends FragmentActivity
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         FragmentPagerAdapter pagerAdapter = new RecipePagerAdapter(fm, recipeList, settings);
+
         viewPager.setAdapter(pagerAdapter);
     }
 }

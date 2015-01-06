@@ -3,7 +3,7 @@
 
     <string name="app_name">Recipe</string>
     <!-- &#8211; is the unicode html_entity of "-" -->
-    <string name="build_num">master&#8211;25&#8211;c321f62</string>
+    <string name="build_num">master&#8211;27&#8211;9b048a5</string>
     <string name="image_alt">Img</string>
 
     <!-- MENU LABELS -->
