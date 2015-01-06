@@ -465,6 +465,7 @@ public class RecipeManager
                                         ColumnRecipe.description.name()};
         String whereClause = "category = ?";
         String[] whereArgs = new String[]{this.selectedCategory.name()};
+        String orderBy = "title ASC";
 
         if(Category.All.equals(this.selectedCategory))
         {
@@ -472,7 +473,7 @@ public class RecipeManager
             whereArgs = null;
         }
 
-        Cursor cursor = db.query(TABLE_RECIPE, columns, whereClause, whereArgs, null, null, null);
+        Cursor cursor = db.query(TABLE_RECIPE, columns, whereClause, whereArgs, null, null, orderBy);
         ArrayList<Recipe> list = new ArrayList<>(cursor.getCount());
 
         if(cursor.moveToFirst())

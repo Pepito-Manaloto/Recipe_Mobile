@@ -71,7 +71,7 @@ public class RecipeFragment extends Fragment
 
         this.recipe = this.recipeList.get(this.page);
         String title = this.recipe.getTitle();
-        
+
         setHasOptionsMenu(true);
         getActivity().setTitle(title);
         getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
