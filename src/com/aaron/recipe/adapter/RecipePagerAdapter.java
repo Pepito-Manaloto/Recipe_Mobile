@@ -15,6 +15,8 @@ import android.support.v4.app.FragmentPagerAdapter;
  */
 public class RecipePagerAdapter extends FragmentPagerAdapter
 {
+    public static String EXTRA_PAGE = "com.aaron.recipe.adapter.page";
+
     private ArrayList<Recipe> recipeList;
     private Settings settings;
 
@@ -48,5 +50,4 @@ public class RecipePagerAdapter extends FragmentPagerAdapter
     {
         return this.recipeList.size();
     }
-    
 }

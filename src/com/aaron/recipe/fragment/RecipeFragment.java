@@ -21,6 +21,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import static android.widget.LinearLayout.LayoutParams;
+import static com.aaron.recipe.adapter.RecipePagerAdapter.EXTRA_PAGE;
 import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_LIST;
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 
@@ -30,7 +31,6 @@ import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 public class RecipeFragment extends Fragment
 {
     public static final String TAG = "RecipeFragment";
-    public static final String EXTRA_PAGE = "com.aaron.recipe.fragment.page";
 
     private int page;
     private ArrayList<Recipe> recipeList;
@@ -69,7 +69,13 @@ public class RecipeFragment extends Fragment
         this.recipeList = (ArrayList<Recipe>) getArguments().getSerializable(EXTRA_LIST);
         this.settings = (Settings) getArguments().getSerializable(EXTRA_SETTINGS);
 
-        this.recipe = this.recipeList.get(this.page);
+        int currentSelected = this.page - 1; // ViewPager automatically creates the 2nd/next fragment for sliding to work. So deduct 1 from the position to get the current fragment.
+        if(currentSelected < 0)
+        {
+            currentSelected = 0;
+        }
+
+        this.recipe = this.recipeList.get(currentSelected);
         String title = this.recipe.getTitle();
 
         setHasOptionsMenu(true);
@@ -79,7 +85,7 @@ public class RecipeFragment extends Fragment
         Log.d(LogsManager.TAG, "RecipeFragment: onCreate. title=" + title);
         LogsManager.addToLogs("RecipeFragment: onCreate. title=" + title);
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState)
     {
@@ -122,7 +128,7 @@ public class RecipeFragment extends Fragment
 
         return scroll;
     }
-    
+
     private TextView createTextView(final String text)
     {
         TextView textView = new TextView(getActivity());

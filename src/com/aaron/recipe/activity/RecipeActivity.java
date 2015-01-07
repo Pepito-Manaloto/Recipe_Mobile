@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 
+import static com.aaron.recipe.adapter.RecipePagerAdapter.EXTRA_PAGE;
 import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_LIST;
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 
@@ -32,10 +33,12 @@ public class RecipeActivity extends FragmentActivity
         @SuppressWarnings("unchecked")
         ArrayList<Recipe> recipeList = (ArrayList<Recipe>) this.getIntent().getSerializableExtra(EXTRA_LIST);
         Settings settings = (Settings) this.getIntent().getSerializableExtra(EXTRA_SETTINGS);
+        int page = this.getIntent().getIntExtra(EXTRA_PAGE, 0);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         FragmentPagerAdapter pagerAdapter = new RecipePagerAdapter(fm, recipeList, settings);
 
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setCurrentItem(page);
     }
 }
