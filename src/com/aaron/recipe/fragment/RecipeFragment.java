@@ -36,6 +36,7 @@ public class RecipeFragment extends Fragment
     private ArrayList<Recipe> recipeList;
     private Settings settings;
     private Recipe recipe;
+    public static int previousPageLoaded;
 
     /**
      * Creates a new RecipeFragment instance and stores the passed Recipe data as arguments.
@@ -69,21 +70,12 @@ public class RecipeFragment extends Fragment
         this.recipeList = (ArrayList<Recipe>) getArguments().getSerializable(EXTRA_LIST);
         this.settings = (Settings) getArguments().getSerializable(EXTRA_SETTINGS);
 
-        int currentSelected = this.page - 1; // ViewPager automatically creates the 2nd/next fragment for sliding to work. So deduct 1 from the position to get the current fragment.
-        if(currentSelected < 0)
-        {
-            currentSelected = 0;
-        }
-
-        this.recipe = this.recipeList.get(currentSelected);
-        String title = this.recipe.getTitle();
+        this.recipe = this.recipeList.get(this.page);
 
         setHasOptionsMenu(true);
-        getActivity().setTitle(title);
         getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Log.d(LogsManager.TAG, "RecipeFragment: onCreate. title=" + title);
-        LogsManager.addToLogs("RecipeFragment: onCreate. title=" + title);
+        Log.d(LogsManager.TAG, "RecipeFragment: onCreate.");
     }
 
     @Override
@@ -91,7 +83,28 @@ public class RecipeFragment extends Fragment
     {
         LinearLayout view = (LinearLayout) inflater.inflate(R.layout.fragment_recipe, parent, false);
 
-        Log.d(LogsManager.TAG, "RecipeFragment: onCreateView.");
+        if(previousPageLoaded == 0 && this.page == (this.recipeList.size() - 1)) // Last item is selected
+        {
+            previousPageLoaded = this.page;
+        }
+        else if(previousPageLoaded < this.page) // Swipe to the right
+        {
+            previousPageLoaded = this.page - 1;
+        }
+        else if(previousPageLoaded > this.page) // swipe to the left
+        {
+            previousPageLoaded = this.page + 1;
+        }
+        else
+        {
+            previousPageLoaded = this.page;
+        }
+
+        String title = this.recipeList.get(previousPageLoaded).getTitle();
+        getActivity().setTitle(title);
+
+        Log.d(LogsManager.TAG, "RecipeFragment: onCreateView. title=" + title);
+        LogsManager.addToLogs("RecipeFragment: onCreateView. title=" + title);
 
         LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(0, 10, 5, 0);
