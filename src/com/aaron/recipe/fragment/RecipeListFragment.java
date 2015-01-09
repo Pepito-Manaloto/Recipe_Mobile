@@ -8,7 +8,6 @@ import com.aaron.recipe.activity.AboutActivity;
 import com.aaron.recipe.fragment.UpdateFragment;
 import com.aaron.recipe.activity.SettingsActivity;
 import com.aaron.recipe.adapter.RecipeListRowAdapter;
-import com.aaron.recipe.fragment.SettingsFragment;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
@@ -33,6 +32,8 @@ import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.AbsListView.OnScrollListener;
 
+import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
+
 public class RecipeListFragment extends ListFragment
 {
     public static final String TAG = "RecipeListFragment";
@@ -40,6 +41,7 @@ public class RecipeListFragment extends ListFragment
     private static final int REQUEST_UPDATE = 0;
     private static final int REQUEST_SETTINGS = 1;
     private static final int REQUEST_ABOUT = 2;
+    private static final int REQUEST_LOGS = 3;
 
     private ArrayList<Recipe> list;
     private Settings settings;
@@ -51,6 +53,7 @@ public class RecipeListFragment extends ListFragment
     /**
      * Initializes non-fragment user interface.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -58,16 +61,10 @@ public class RecipeListFragment extends ListFragment
 
         if(savedInstanceState != null)
         {
-            this.settings = (Settings) savedInstanceState.getSerializable(SettingsFragment.EXTRA_SETTINGS);
+            this.settings = (Settings) savedInstanceState.getSerializable(EXTRA_SETTINGS);
 
             // But we are sure of its type
-            @SuppressWarnings("unchecked")
-            ArrayList<Recipe> listTemp = (ArrayList<Recipe>) savedInstanceState.getSerializable(EXTRA_LIST);
-
-            if(listTemp != null)
-            {
-                this.list = listTemp;
-            }
+            this.list = (ArrayList<Recipe>) savedInstanceState.getSerializable(EXTRA_LIST);
         }
 
         if(this.settings == null)
@@ -125,7 +122,7 @@ public class RecipeListFragment extends ListFragment
     {
         super.onSaveInstanceState(outState);
 
-        outState.putSerializable(SettingsFragment.EXTRA_SETTINGS, this.settings);
+        outState.putSerializable(EXTRA_SETTINGS, this.settings);
         outState.putSerializable(EXTRA_LIST, this.list);
 
         Log.d(LogsManager.TAG, "RecipeListFragment: onSaveInstanceState");
@@ -142,7 +139,7 @@ public class RecipeListFragment extends ListFragment
         {
             return;
         }
-        
+
         Log.d(LogsManager.TAG, "RecipeListFragment: onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
         LogsManager.addToLogs("RecipeListFragment: onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
 
@@ -161,9 +158,10 @@ public class RecipeListFragment extends ListFragment
 
             this.updateListOnUiThread(this.list);
         }
-        else if(requestCode == REQUEST_SETTINGS && data.hasExtra(SettingsFragment.EXTRA_SETTINGS))
+        else if((requestCode == REQUEST_SETTINGS || requestCode == REQUEST_ABOUT || requestCode == REQUEST_LOGS) &&
+                data.hasExtra(EXTRA_SETTINGS))
         {
-            this.settings = (Settings) data.getSerializableExtra(SettingsFragment.EXTRA_SETTINGS);
+            this.settings = (Settings) data.getSerializableExtra(EXTRA_SETTINGS);
 
             this.list = this.recipeManager.getRecipesFromDisk();
             this.updateListOnUiThread(this.list);
@@ -206,7 +204,7 @@ public class RecipeListFragment extends ListFragment
                     RecipeListRowAdapter recipeAdapter = (RecipeListRowAdapter) getListAdapter();
                     recipeAdapter.filter(searched);
                     recipeAdapter.notifyDataSetChanged();
-                    
+
                     Log.d(LogsManager.TAG, "RecipeListFragment: onCreateOptionsMenu(afterTextChanged). searched=" + searched);
                 }
 
@@ -248,7 +246,7 @@ public class RecipeListFragment extends ListFragment
             case R.id.menu_settings:
             {
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
-                intent.putExtra(SettingsFragment.EXTRA_SETTINGS, this.settings);
+                intent.putExtra(EXTRA_SETTINGS, this.settings);
                 startActivityForResult(intent, REQUEST_SETTINGS);
 
                 return true;
@@ -256,6 +254,7 @@ public class RecipeListFragment extends ListFragment
             case R.id.menu_about:
             {
                 Intent intent = new Intent(getActivity(), AboutActivity.class);
+                intent.putExtra(EXTRA_SETTINGS, this.settings);
                 startActivityForResult(intent, REQUEST_ABOUT);
 
                 return true;
@@ -263,7 +262,9 @@ public class RecipeListFragment extends ListFragment
             case R.id.menu_logs:
             {
                 Intent intent = new Intent(getActivity(), LogsActivity.class);
-                startActivity(intent);
+                intent.putExtra(EXTRA_SETTINGS, this.settings);
+                startActivityForResult(intent, REQUEST_LOGS);
+
                 return true;
             }
             default:

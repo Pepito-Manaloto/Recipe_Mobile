@@ -43,6 +43,7 @@ public class RecipeFragment extends Fragment
      * Note: Android will call no-argument constructor of a fragment when it decides to recreate the fragment;
      *       hence, overloading a fragment constructor for data passing will not be able to save the passed data.
      *       That is why this static initializer is used.
+     *       There is also no way to pass data to RecipePageAdapter through savedInstanceState intent, that is why we pass data through instance creation.
      * @param Recipe the recipe object to be used later 
      */
     public static RecipeFragment newInstance(final int page, final ArrayList<Recipe> recipeList, final Settings settings)
