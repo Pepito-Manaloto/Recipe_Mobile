@@ -36,7 +36,6 @@ public class RecipeFragment extends Fragment
     private ArrayList<Recipe> recipeList;
     private Settings settings;
     private Recipe recipe;
-    public static int previousPageLoaded;
 
     /**
      * Creates a new RecipeFragment instance and stores the passed Recipe data as arguments.
@@ -84,29 +83,6 @@ public class RecipeFragment extends Fragment
     {
         LinearLayout view = (LinearLayout) inflater.inflate(R.layout.fragment_recipe, parent, false);
 
-        if(previousPageLoaded == 0 && this.page == (this.recipeList.size() - 1)) // Last item is selected
-        {
-            previousPageLoaded = this.page;
-        }
-        else if(previousPageLoaded < this.page) // Swipe to the right
-        {
-            previousPageLoaded = this.page - 1;
-        }
-        else if(previousPageLoaded > this.page) // swipe to the left
-        {
-            previousPageLoaded = this.page + 1;
-        }
-        else
-        {
-            previousPageLoaded = this.page;
-        }
-
-        String title = this.recipeList.get(previousPageLoaded).getTitle();
-        getActivity().setTitle(title);
-
-        Log.d(LogsManager.TAG, "RecipeFragment: onCreateView. title=" + title);
-        LogsManager.addToLogs("RecipeFragment: onCreateView. title=" + title);
-
         LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(0, 10, 5, 0);
 
@@ -140,9 +116,16 @@ public class RecipeFragment extends Fragment
         ScrollView scroll = new ScrollView(getActivity());
         scroll.addView(view);
 
+        Log.d(LogsManager.TAG, "RecipeFragment: onCreateView.");
+
         return scroll;
     }
 
+    /**
+     * Creates a TextView with the given text and current selected settings.
+     * @param text
+     * @return TextView
+     */
     private TextView createTextView(final String text)
     {
         TextView textView = new TextView(getActivity());

@@ -6,16 +6,13 @@ import com.aaron.recipe.R;
 import com.aaron.recipe.adapter.RecipePagerAdapter;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
-import com.aaron.recipe.fragment.RecipeFragment;
-import com.aaron.recipe.model.LogsManager;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.MenuItem;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 
 import static com.aaron.recipe.adapter.RecipePagerAdapter.EXTRA_PAGE;
 import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_LIST;
@@ -35,47 +32,38 @@ public class RecipeActivity extends FragmentActivity
         FragmentManager fm = getSupportFragmentManager();
 
         @SuppressWarnings("unchecked")
-        ArrayList<Recipe> recipeList = (ArrayList<Recipe>) this.getIntent().getSerializableExtra(EXTRA_LIST);
+        final ArrayList<Recipe> recipeList = (ArrayList<Recipe>) this.getIntent().getSerializableExtra(EXTRA_LIST);
         Settings settings = (Settings) this.getIntent().getSerializableExtra(EXTRA_SETTINGS);
         int page = this.getIntent().getIntExtra(EXTRA_PAGE, 0);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         FragmentPagerAdapter pagerAdapter = new RecipePagerAdapter(fm, recipeList, settings);
-
+    
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(page);
-    }
 
-    /**
-     * This method is called when the user pressed back button
-     * Resets previousPageLoaded because user exits the Recipe view pager.
-     */
-    @Override
-    public void onBackPressed()
-    {
-        super.onBackPressed();
-        RecipeFragment.previousPageLoaded = 0;
-
-        Log.d(LogsManager.TAG, "RecipeActivity: onBackPressed.");
-    }
-
-    /**
-     * This method is called when the user selects Home button.
-     * Resets previousPageLoaded because user exits the Recipe view pager.
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch(item.getItemId())
-        {
-            case android.R.id.home:
+        viewPager.setOnPageChangeListener(new OnPageChangeListener()
             {
-                RecipeFragment.previousPageLoaded = 0;
-            }
-        }
-
-        Log.d(LogsManager.TAG, "RecipeActivity: onOptionsItemSelected.");
-
-        return super.onOptionsItemSelected(item);
+                @Override
+                public void onPageScrollStateChanged(int state)
+                {}
+    
+                /**
+                 * Sets the activity's title depending on the selected recipe.
+                 */
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+                {
+                    if(positionOffsetPixels == 0) // Change title after fully swiping to another recipe 
+                    {
+                        setTitle(recipeList.get(position).getTitle());
+                    }
+                }
+    
+                @Override
+                public void onPageSelected(int position)
+                {}
+            });
+        
     }
 }
