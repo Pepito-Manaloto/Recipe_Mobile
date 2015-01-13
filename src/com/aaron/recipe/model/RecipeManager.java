@@ -48,7 +48,7 @@ import static com.aaron.recipe.bean.Recipe.*;
 public class RecipeManager
 {
     private int responseCode = HttpStatus.SC_INTERNAL_SERVER_ERROR;
-    private String responseText;
+    private String responseText = "Success";
     private int recentlyAddedCount;
 
     private final String url;
@@ -131,6 +131,11 @@ public class RecipeManager
 
                 HashMap<Category, ArrayList<Recipe>> map = this.parseJsonObject(jsonObject);
 
+                if(this.recentlyAddedCount <= 0) // No need to save to disk, because there are no new data entries.
+                {
+                    return new ArrayList<>(0);
+                }
+
                 boolean saveToDiskSuccess = this.saveToDisk(map);
 
                 if(!saveToDiskSuccess)
@@ -140,8 +145,6 @@ public class RecipeManager
                     
                     return new ArrayList<>(0);
                 }
-
-                this.responseText = "Success";
 
                 // Entity is already consumed by EntityUtils; thus is already closed.
 
@@ -323,6 +326,7 @@ public class RecipeManager
         }
 
         Log.d(LogsManager.TAG, "RecipeManager: saveToDisk.");
+        LogsManager.addToLogs("RecipeManager: saveToDisk.");
 
         return true;
     }
@@ -442,8 +446,8 @@ public class RecipeManager
             }
         }
 
-        Log.d(LogsManager.TAG, "RecipeManager: getRecipesCount. keys=" + map.keySet() + " values=" + map.values());
-        LogsManager.addToLogs("RecipeManager: getRecipesCount. keys=" + map.keySet() + " values_size=" + map.values().size());
+        Log.d(LogsManager.TAG, "RecipeManager: getRecipesCount. values=" + map.values());
+        LogsManager.addToLogs("RecipeManager: getRecipesCount. values_size=" + map.values().size());
 
         return map;
     }

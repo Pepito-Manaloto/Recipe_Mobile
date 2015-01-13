@@ -33,6 +33,7 @@ import android.widget.EditText;
 import android.widget.AbsListView.OnScrollListener;
 
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
+import static com.aaron.recipe.fragment.UpdateFragment.EXTRA_RECIPE_LIST;
 
 public class RecipeListFragment extends ListFragment
 {
@@ -144,22 +145,26 @@ public class RecipeListFragment extends ListFragment
         LogsManager.addToLogs("RecipeListFragment: onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
 
         // Update action bar menu processing result
-        if(requestCode == REQUEST_UPDATE && data.hasExtra(UpdateFragment.EXTRA_RECIPE_LIST))
+        if(requestCode == REQUEST_UPDATE && data != null && data.hasExtra(EXTRA_RECIPE_LIST))
         {
             // But we are sure of its type
             @SuppressWarnings("unchecked")
-            ArrayList<Recipe> list = (ArrayList<Recipe>) data.getSerializableExtra(UpdateFragment.EXTRA_RECIPE_LIST);
+            ArrayList<Recipe> list = (ArrayList<Recipe>) data.getSerializableExtra(EXTRA_RECIPE_LIST);
 
             // Handles occasional NullPointerException.
-            if(list != null)
+            if(list != null && list.size() > 0)
             {
                 this.list = list;
+            }
+            else
+            {
+                this.list = this.recipeManager.getRecipesFromDisk();
             }
 
             this.updateListOnUiThread(this.list);
         }
         else if((requestCode == REQUEST_SETTINGS || requestCode == REQUEST_ABOUT || requestCode == REQUEST_LOGS) &&
-                data.hasExtra(EXTRA_SETTINGS))
+                (data != null && data.hasExtra(EXTRA_SETTINGS)))
         {
             this.settings = (Settings) data.getSerializableExtra(EXTRA_SETTINGS);
 

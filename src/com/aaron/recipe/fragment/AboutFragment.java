@@ -163,8 +163,7 @@ public class AboutFragment extends Fragment
                     LogsManager.addToLogs("AboutFragment: promptUserOnDelete. Yes selected.");
 
                     recipeManager.deleteRecipeFromDisk();
-                    getActivity().setResult(Activity.RESULT_OK);
-                    getActivity().finish();
+                    setFragmentAcivityResult();
                 }
             });
         prompt.setNegativeButton("No", new DialogInterface.OnClickListener()
