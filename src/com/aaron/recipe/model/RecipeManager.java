@@ -293,6 +293,7 @@ public class RecipeManager
 
                     db.insert(TABLE_RECIPE, null, recipeValues);
 
+                    int count = 1;
                     // Iterate over all ingredients of a recipe
                     for(Ingredient ingredient: recipe.getIngredients().getIngredientsList())
                     {
@@ -301,15 +302,19 @@ public class RecipeManager
                         ingredientsValues.put(ColumnIngredients.measurement.name(), ingredient.getMeasurement());
                         ingredientsValues.put(ColumnIngredients.ingredient.name(), ingredient.getIngredient());
                         ingredientsValues.put(ColumnIngredients.comment_.name(), ingredient.getComment());
+                        ingredientsValues.put(ColumnIngredients.count.name(), count++);
 
                         db.insert(TABLE_INGREDIENTS, null, ingredientsValues);
                     }
+
+                    count = 1; // reset count
 
                     // Iterate over all instructions of a recipe
                     for(String instruction: recipe.getInstructions().getInstructionsList())
                     {
                         instructionsValues.put(ColumnInstructions.title.name(), title);
                         instructionsValues.put(ColumnInstructions.instruction.name(), instruction);
+                        instructionsValues.put(ColumnInstructions.count.name(), count++);
 
                         db.insert(TABLE_INSTRUCTIONS, null, instructionsValues);
                     }
@@ -382,7 +387,7 @@ public class RecipeManager
         String lastUpdatedDate = "1950-01-01 00:00:00";
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
         String[] columns = new String[]{ColumnRecipe.date_in.name(),};
-        String orderBy = "date_in DESC";
+        String orderBy = ColumnRecipe.date_in.name() + " DESC";
         String limit = "1";
 
         Cursor cursor = db.query(TABLE_RECIPE, columns, null, null, null, null, orderBy, limit);
@@ -433,7 +438,7 @@ public class RecipeManager
     {
         HashMap<Category, Integer> map = new HashMap<>();
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
-        String whereClause = "category = ?";
+        String whereClause = ColumnRecipe.category.name() + " = ?";
         Cursor cursor;
         
         for(Category category: CATEGORY_ARRAY)
@@ -467,9 +472,9 @@ public class RecipeManager
                                         ColumnRecipe.preparation_time.name(),
                                         ColumnRecipe.servings.name(),
                                         ColumnRecipe.description.name()};
-        String whereClause = "category = ?";
+        String whereClause = ColumnRecipe.category.name() + " = ?";
         String[] whereArgs = new String[]{this.selectedCategory.name()};
-        String orderBy = "title ASC";
+        String orderBy = ColumnRecipe.title.name() + " ASC";
 
         if(Category.All.equals(this.selectedCategory))
         {
@@ -510,6 +515,7 @@ public class RecipeManager
         int preparationTime = cursor.getInt(2);
         int servings = cursor.getInt(3);
         String description = cursor.getString(4);
+        String orderBy = ColumnIngredients.count.name() + " ASC";
 
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
 
@@ -518,10 +524,10 @@ public class RecipeManager
                                                    ColumnIngredients.ingredient.name(),
                                                    ColumnIngredients.comment_.name()};
         String[] instructionsColumns = new String[]{ColumnInstructions.instruction.name()};
-        String whereClause = "title = ?";
+        String whereClause = ColumnRecipe.title.name() + " = ?";
         String[] whereArgs = new String[]{title};
 
-        Cursor ingredientCursor = db.query(TABLE_INGREDIENTS, ingredientsColumns, whereClause, whereArgs, null, null, null);
+        Cursor ingredientCursor = db.query(TABLE_INGREDIENTS, ingredientsColumns, whereClause, whereArgs, null, null, orderBy);
         Ingredients ingredients = new Ingredients(title, ingredientCursor.getCount());
 
         if(ingredientCursor.moveToFirst())
@@ -538,7 +544,7 @@ public class RecipeManager
             while(ingredientCursor.moveToNext());
         }
 
-        Cursor instructionCursor = db.query(TABLE_INSTRUCTIONS, instructionsColumns, whereClause, whereArgs, null, null, null);
+        Cursor instructionCursor = db.query(TABLE_INSTRUCTIONS, instructionsColumns, whereClause, whereArgs, null, null, orderBy);
         Instructions instructions = new Instructions(title, instructionCursor.getCount());
 
         if(instructionCursor.moveToFirst())
@@ -546,6 +552,7 @@ public class RecipeManager
             do
             {
                 String instruction = instructionCursor.getString(0);
+
                 instructions.addInstruction(instruction);
             }
             while(instructionCursor.moveToNext());

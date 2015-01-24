@@ -43,6 +43,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
         measurement,
         ingredient,
         comment_,
+        count,
     }
 
     /**
@@ -52,6 +53,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
     {
         title,
         instruction,
+        count,
     }
 
     private static final String CREATE_TABLE_RECIPE = "CREATE TABLE " + TABLE_RECIPE +
@@ -71,6 +73,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
                                                         ColumnIngredients.measurement.name() + " TEXT NOT NULL, " +
                                                         ColumnIngredients.ingredient.name() + " TEXT NOT NULL, " +
                                                         ColumnIngredients.comment_.name() + " TEXT NOT NULL, " +
+                                                        ColumnIngredients.count.name() + " INTEGER NOT NULL, " +
                                                         "UNIQUE(" + ColumnIngredients.title.name() + ", " + ColumnIngredients.ingredient.name() + ") ON CONFLICT REPLACE, " +
                                                         "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) ON UPDATE CASCADE ON DELETE CASCADE" +
                                                        ");";
@@ -79,6 +82,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
                                                        "(" + 
                                                         ColumnInstructions.title.name() + " TEXT NOT NULL, " +
                                                         ColumnInstructions.instruction.name() + " TEXT NOT NULL, " +
+                                                        ColumnInstructions.count.name() + " INTEGER NOT NULL, " +
                                                         "UNIQUE(" + ColumnInstructions.title.name() + ", " + ColumnInstructions.instruction.name() + ") ON CONFLICT REPLACE, " +
                                                         "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) ON UPDATE CASCADE ON DELETE CASCADE" +
                                                        ");";
