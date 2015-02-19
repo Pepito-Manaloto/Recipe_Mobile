@@ -91,7 +91,7 @@ public class RecipeFragment extends Fragment
 
         view.addView(createTextView("Title: " + this.recipe.getTitle()), layoutParams);
         view.addView(createTextView("Category: " + this.recipe.getCategory()), layoutParams);
-        view.addView(createTextView("Preparation Time: " + this.recipe.getPreparationTime()), layoutParams);
+        view.addView(createTextView("Preparation Time: " + this.recipe.getPreparationTimeString()), layoutParams);
         view.addView(createTextView("Servings: " + this.recipe.getServings()), layoutParams);
         view.addView(createTextView("Description: " + this.recipe.getDescription()), layoutParams);
 

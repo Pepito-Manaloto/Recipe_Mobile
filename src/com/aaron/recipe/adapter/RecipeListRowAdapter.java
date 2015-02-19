@@ -94,7 +94,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         holder.servingsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
         holder.servingsText.setTypeface(this.settings.getTypeface(false));
 
-        holder.preparationTimeText.setText(recipe.getPreparationTime());
+        holder.preparationTimeText.setText(recipe.getPreparationTimeString());
         holder.preparationTimeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
         holder.preparationTimeText.setTypeface(this.settings.getTypeface(false));
 
