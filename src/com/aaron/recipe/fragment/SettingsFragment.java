@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 /**
@@ -36,6 +37,8 @@ public class SettingsFragment extends Fragment
     private Spinner fontNameSpinner;
     private Spinner fontStyleSpinner;
     private Spinner fontSizeSpinner;
+
+    private EditText serverURLEditText;
 
     /**
      * Returns a new SettingsFragment with the given settings as arguments.
@@ -88,34 +91,26 @@ public class SettingsFragment extends Fragment
         this.fontNameSpinner = (Spinner) view.findViewById(R.id.spinner_font_name);
         this.fontStyleSpinner = (Spinner) view.findViewById(R.id.spinner_font_style);
         this.fontSizeSpinner = (Spinner) view.findViewById(R.id.spinner_font_size);
+        this.serverURLEditText = (EditText) view.findViewById(R.id.edittext_server_url);
 
         this.categorySpinner.setSelection(this.settings.getCategoryIndex());
         this.fontNameSpinner.setSelection(this.settings.getFontNameIndex());
         this.fontStyleSpinner.setSelection(this.settings.getFontStyleIndex());
         this.fontSizeSpinner.setSelection(this.settings.getFontSizeIndex());
 
+        String serverUrl = this.settings.getServerURL();
+        
+        if(serverUrl.isEmpty())
+        {
+            serverUrl = getActivity().getString(R.string.url_address_default);
+        }
+
+        this.serverURLEditText.setText(serverUrl);
+
         view.setFocusableInTouchMode(true);
         view.requestFocus();
-        view.setOnKeyListener(new View.OnKeyListener()
-            {
-                /**
-                 * Handles back button.
-                 */
-                @Override
-                public boolean onKey(View v, int keyCode, KeyEvent event) 
-                {
-                    // For back button
-                    if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
-                    {
-                        setFragmentAcivityResult();
-                        return true;
-                    } 
-                    else 
-                    {
-                        return false;
-                    }
-                }
-            });
+        view.setOnKeyListener(new BackButtonListener());
+        this.serverURLEditText.setOnKeyListener(new BackButtonListener());
 
         Log.d(LogsManager.TAG, "SettingsFragment: onCreateView");
 
@@ -154,11 +149,13 @@ public class SettingsFragment extends Fragment
         FontName fontName = FontName.valueOf(this.fontNameSpinner.getSelectedItem().toString());
         FontStyle fontStyle = FontStyle.valueOf(this.fontStyleSpinner.getSelectedItem().toString());
         int fontSize = Integer.parseInt(this.fontSizeSpinner.getSelectedItem().toString());
+        String serverURL = this.serverURLEditText.getText().toString();
 
         this.settings.setCategory(category)
                      .setFontName(fontName)
                      .setFontStyle(fontStyle)
-                     .setFontSize(fontSize);
+                     .setFontSize(fontSize)
+                     .setServerURL(serverURL);
 
         data.putExtra(EXTRA_SETTINGS, this.settings);
         getActivity().setResult(Activity.RESULT_OK, data);
@@ -166,5 +163,26 @@ public class SettingsFragment extends Fragment
 
         Log.d(LogsManager.TAG, "SettingsFragment: setFragmentAcivityResult. New settings -> " + this.settings);
         LogsManager.addToLogs("SettingsFragment: setFragmentAcivityResult. New settings -> " + this.settings);
+    }
+
+    private class BackButtonListener implements View.OnKeyListener
+    {
+        /**
+         * Handles back button.
+         */
+        @Override
+        public boolean onKey(View v, int keyCode, KeyEvent event) 
+        {
+            // For back button
+            if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
+            {
+                setFragmentAcivityResult();
+                return true;
+            } 
+            else 
+            {
+                return false;
+            }
+        }
     }
 }

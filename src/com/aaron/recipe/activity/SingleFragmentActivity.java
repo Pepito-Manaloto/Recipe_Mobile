@@ -24,7 +24,7 @@ public abstract class SingleFragmentActivity extends Activity
 
         FragmentManager fm = getFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-        
+
         if(fragment == null)
         {
             fragment = this.createFragment();

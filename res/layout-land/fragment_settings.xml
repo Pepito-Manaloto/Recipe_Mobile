@@ -46,4 +46,19 @@
         android:layout_toRightOf="@id/spinner_font_style"
         android:entries="@array/font_size_arrays" />
 
+    <TextView
+        android:id="@+id/textview_server_url"
+        style="@style/TextView_settings"
+        android:layout_below="@id/spinner_font_size"
+        android:layout_marginTop="5dp"
+        android:text="@string/text_server" />
+
+    <EditText
+        android:id="@+id/edittext_server_url"
+        style="@style/EditText_settings"
+        android:text="@string/url_address_default"
+        android:layout_marginLeft="0dp"
+        android:layout_below="@id/spinner_font_size"
+        android:layout_toRightOf="@id/textview_server_url"
+        android:layout_alignLeft="@id/spinner_category" />
 </RelativeLayout>

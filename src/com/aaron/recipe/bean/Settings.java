@@ -39,6 +39,7 @@ public class Settings implements Serializable
     private FontName fontName;
     private FontStyle fontStyle;
     private int fontSize;
+    private String serverURL;
 
     /**
      * Default constructor, initializes with default values.
@@ -49,6 +50,7 @@ public class Settings implements Serializable
         this.fontName = FontName.Default;
         this.fontStyle = FontStyle.Normal;
         this.fontSize = 14;
+        this.serverURL = "";
     }
 
     /**
@@ -124,6 +126,15 @@ public class Settings implements Serializable
     }
 
     /**
+     * Getter for Server URL.
+     * @return Server URL
+     */
+    public String getServerURL()
+    {
+        return this.serverURL;
+    }
+
+    /**
      * Returns the content of the Settings object in a formatted String.
      * @return String
      */
@@ -133,7 +144,8 @@ public class Settings implements Serializable
         return " Category: " + this.category +
                " Font name: " + this.fontName +
                " Font style: " + this.fontStyle +
-               " Font size: " + this.fontSize;
+               " Font size: " + this.fontSize +
+               " Server URL: " + this.serverURL;
     }
 
     /**
@@ -208,6 +220,17 @@ public class Settings implements Serializable
     public Settings setFontSize(final int fontSize)
     {
         this.fontSize = fontSize;
+        return this;
+    }
+
+    /**
+     * Sets the serverURL new value.
+     * @param Server URL
+     * @return the settings object being updated
+     */
+    public Settings setServerURL(final String serverURL)
+    {
+        this.serverURL = serverURL;
         return this;
     }
 }
