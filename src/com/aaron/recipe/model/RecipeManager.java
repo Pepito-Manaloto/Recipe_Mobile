@@ -1,11 +1,15 @@
 package com.aaron.recipe.model;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -52,7 +56,7 @@ public class RecipeManager
     private int recentlyAddedCount;
 
     private final String url;
-    private static final String AUTH_KEY = "449a36b6689d841d7d27f31b4b7cc73a";
+    private static final String AUTH_KEY = getAuthKey();
     private static final String RECENTLY_ADDED_COUNT = "recently_added_count";
 
     public static final String TAG = "RecipeManager";
@@ -65,6 +69,28 @@ public class RecipeManager
     private Date curDate;
     private Category selectedCategory;
 
+    /**
+     * Returns the auth key derived from md5 of the given plain text.
+     * @return String
+     */
+    private static String getAuthKey()
+    {
+        String result = "";
+
+        try
+        {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] digest = md.digest("aaron".getBytes("UTF-8"));
+            result = new String(digest, "UTF-8");
+        }
+        catch (NoSuchAlgorithmException | UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+    
     /**
      * Constructor initializes the url.
      * @param Activity the caller activity
@@ -129,7 +155,7 @@ public class RecipeManager
 
                 JSONObject jsonObject = new JSONObject(responseString); // Response body in JSON object
 
-                HashMap<Category, ArrayList<Recipe>> map = this.parseJsonObject(jsonObject);
+                EnumMap<Category, ArrayList<Recipe>> map = this.parseJsonObject(jsonObject);
 
                 if(this.recentlyAddedCount <= 0) // No need to save to disk, because there are no new data entries.
                 {
@@ -192,9 +218,9 @@ public class RecipeManager
      * @throws JSONException
      * @return jsonObject converted into a hashmap
      */
-    private HashMap<Category, ArrayList<Recipe>> parseJsonObject(final JSONObject jsonObject) throws JSONException
+    private EnumMap<Category, ArrayList<Recipe>> parseJsonObject(final JSONObject jsonObject) throws JSONException
     {
-        HashMap<Category, ArrayList<Recipe>> map = new HashMap<>();
+        EnumMap<Category, ArrayList<Recipe>> map = new EnumMap<>(Category.class);
         
         for(Category cat: Category.values())
         {
@@ -258,7 +284,7 @@ public class RecipeManager
      * @param recipeMap the recipe map to be stored
      * @return true on success, else false
      */
-    private boolean saveToDisk(final HashMap<Category, ArrayList<Recipe>> recipeMap)
+    private boolean saveToDisk(final EnumMap<Category, ArrayList<Recipe>> recipeMap)
     {
         SQLiteDatabase db = this.dbHelper.getWritableDatabase();
         ArrayList<Recipe> listTemp;
