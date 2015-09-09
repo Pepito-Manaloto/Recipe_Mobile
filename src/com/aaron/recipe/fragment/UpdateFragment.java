@@ -57,7 +57,7 @@ public class UpdateFragment extends DialogFragment
         progressDialog.setIndeterminate(true);
 
         Settings settings = (Settings) getArguments().getSerializable(SettingsFragment.EXTRA_SETTINGS);
-        this.recipeManager = new RecipeManager(getActivity(), settings.getCategory());
+        this.recipeManager = new RecipeManager(getActivity(), settings);
         this.recipeRetrieverThread = new RecipeRetrieverThread();
 
         Log.d(LogsManager.TAG, "UpdateFragment: onCreateDialog.");

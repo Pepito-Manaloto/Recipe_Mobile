@@ -73,7 +73,7 @@ public class RecipeListFragment extends ListFragment
             this.settings = new Settings();
         }
 
-        this.recipeManager = new RecipeManager(getActivity(), this.settings.getCategory());
+        this.recipeManager = new RecipeManager(getActivity(), this.settings);
 
         if(this.list == null)
         {

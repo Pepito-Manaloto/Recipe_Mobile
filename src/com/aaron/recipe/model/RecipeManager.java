@@ -33,6 +33,7 @@ import com.aaron.recipe.bean.Ingredients.Ingredient;
 import com.aaron.recipe.bean.Instructions;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Recipe.Category;
+import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.MySQLiteHelper;
 import com.aaron.recipe.R;
 
@@ -55,7 +56,7 @@ public class RecipeManager
     private String responseText = "Success";
     private int recentlyAddedCount;
 
-    private final String url;
+    private String url;
     private static final String AUTH_KEY = getAuthKey();
     private static final String RECENTLY_ADDED_COUNT = "recently_added_count";
 
@@ -97,7 +98,7 @@ public class RecipeManager
      */
     public RecipeManager(final Activity activity)
     {
-        this.url = "http://" + activity.getString(R.string.url_address) + activity.getString(R.string.url_resource);
+        this.url = "http://" + activity.getString(R.string.url_address_default) + activity.getString(R.string.url_resource);
 
         this.dbHelper = new MySQLiteHelper(activity);
         this.curDate = new Date();
@@ -109,10 +110,15 @@ public class RecipeManager
      * @param activity the caller activity
      * @param settings the current settings
      */
-    public RecipeManager(final Activity activity, final Category category)
+    public RecipeManager(final Activity activity, final Settings settings)
     {
         this(activity);
-        this.selectedCategory = category;
+        this.selectedCategory = settings.getCategory();
+
+        if (settings.getServerURL() != null && !settings.getServerURL().isEmpty())
+        {
+            this.url = "http://" + settings.getServerURL() + activity.getString(R.string.url_resource);
+        }
     }
 
     /**
@@ -194,12 +200,19 @@ public class RecipeManager
             // Closes the connection/ Consume the entity.
             response.getEntity().getContent().close();
         }
-        catch(final IOException | JSONException e)
+        catch(final IOException | IllegalArgumentException | JSONException e)
         {
             Log.e(LogsManager.TAG, "RecipeManager: getRecipesFromWeb. " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
             LogsManager.addToLogs("RecipeManager: getRecipesFromWeb. Exception=" + e.getClass().getSimpleName() + " trace=" + e.getStackTrace());
 
+            if (e instanceof IllegalArgumentException)
+            {
+                this.responseText = this.url + " is not a valid host name.";
+            }
+            else
+            {
             this.responseText = e.getMessage();
+        }
         }
         finally
         {
