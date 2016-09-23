@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- http://stackoverflow.com/questions/27901446/getactionview-of-my-menuitem-return-null-in-appcompat -->
+    <item
+        android:id="@+id/menu_search"
+        style="@style/Item_menu_search"
+        android:title="" />
+
+    <item
+        android:id="@+id/menu_update"
+        android:showAsAction="never"
+        android:title="@string/menu_update"/>
+
+    <item
+        android:id="@+id/menu_settings"
+        android:showAsAction="never"
+        android:title="@string/menu_settings"/>
+
+    <item
+        android:id="@+id/menu_about"
+        android:showAsAction="never"
+        android:title="@string/menu_about"/>
+    
+    <item
+        android:id="@+id/menu_logs"
+        android:showAsAction="never"
+        android:title="@string/menu_logs"/>
+
+</menu>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="sysBlack">#FF000000</color>
+    <color name="sysBlue">#FF0000FF</color>
+    <color name="sysCyan">#FF00FFFF</color>
+    <color name="sysDarkGray">#FF444444</color>
+    <color name="sysGray">#FF888888</color>
+    <color name="sysGreen">#FF00FF00</color>
+    <color name="sysLightGray">#FFCCCCCC</color>
+    <color name="sysMagenta">#FFFF00FF</color>
+    <color name="sysRed">#FFFF0000</color>
+    <color name="sysTransparent">#00000000</color>
+    <color name="sysWhite">#FFFFFFFF</color>
+    <color name="sysYellow">#FFFFFF00</color>
+
+    <color name="CornflowerBlueDark">#4668A6</color>
+    <color name="ForestGreenDark">#186118</color>
+</resources>
