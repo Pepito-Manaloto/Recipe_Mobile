@@ -12,6 +12,7 @@ public class SettingsActivity extends SingleFragmentActivity
 {
     /**
      * Returns a settings fragment.
+     *
      * @return a fragment to be added.
      */
     @Override

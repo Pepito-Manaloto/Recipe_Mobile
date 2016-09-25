@@ -11,7 +11,7 @@ public class Instructions implements Serializable
     private static final long serialVersionUID = 5879474962110261190L;
     private String title;
     private ArrayList<String> instructionsList;
-    
+
     /**
      * Default constructor.
      */
@@ -23,6 +23,7 @@ public class Instructions implements Serializable
 
     /**
      * Adds an instruction to the instructionsList.
+     *
      * @param instruction an instruction
      */
     public void addInstruction(final String instruction)
@@ -32,6 +33,7 @@ public class Instructions implements Serializable
 
     /**
      * Gets the instructionList.
+     *
      * @return ArrayList<String>
      */
     public ArrayList<String> getInstructionsList()
@@ -41,6 +43,7 @@ public class Instructions implements Serializable
 
     /**
      * Gets the title.
+     *
      * @return String
      */
     public String getTitle()
@@ -50,6 +53,7 @@ public class Instructions implements Serializable
 
     /**
      * Checks for equality, only checks the title of the instructions.
+     *
      * @param obj Instruction object to compare to
      * @return boolean true if equal, else false
      */
@@ -69,6 +73,7 @@ public class Instructions implements Serializable
 
     /**
      * Returns the hashcode of this object. Derived from title.
+     *
      * @return int
      */
     @Override
@@ -82,12 +87,13 @@ public class Instructions implements Serializable
 
     /**
      * Returns a string representation of the object.
+     *
      * @return String
      */
     @Override
     public String toString()
     {
         return "title: " + this.title +
-               " instructions: " + this.instructionsList;
+                " instructions: " + this.instructionsList;
     }
 }

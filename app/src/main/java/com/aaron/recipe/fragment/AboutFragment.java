@@ -1,5 +1,6 @@
 package com.aaron.recipe.fragment;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -23,10 +24,10 @@ import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
-import static com.aaron.recipe.model.RecipeManager.*;
 import static com.aaron.recipe.model.RecipeManager.DATE_FORMAT_LONG;
 
 /**
@@ -34,7 +35,7 @@ import static com.aaron.recipe.model.RecipeManager.DATE_FORMAT_LONG;
  */
 public class AboutFragment extends Fragment
 {
-    public static final String TAG = "AboutFragment";
+    public static final String CLASS_NAME = AboutFragment.class.getSimpleName();
     private RecipeManager recipeManager;
     private Settings settings;
 
@@ -50,11 +51,16 @@ public class AboutFragment extends Fragment
 
         setHasOptionsMenu(true);
         getActivity().setTitle(R.string.menu_about);
-        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        ActionBar actionBar = getActivity().getActionBar();
+        if(actionBar != null)
+        {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         this.recipeManager = new RecipeManager(getActivity());
 
-        Log.d(LogsManager.TAG, "AboutFragment: onCreate.");
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate.");
     }
 
     /**
@@ -63,67 +69,71 @@ public class AboutFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState)
     {
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateView.");
+
         View view = inflater.inflate(R.layout.fragment_about, parent, false);
 
         view.setFocusableInTouchMode(true);
         view.requestFocus();
         view.setOnKeyListener(new View.OnKeyListener()
+        {
+            /**
+             * Handles back button.
+             */
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event)
             {
-                /**
-                 * Handles back button.
-                 */
-                @Override
-                public boolean onKey(View v, int keyCode, KeyEvent event) 
+                // For back button
+                if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
                 {
-                    // For back button
-                    if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
-                    {
-                        setFragmentAcivityResult();
-                        return true;
-                    } 
-                    else 
-                    {
-                        return false;
-                    }
-                }
-            });
-
-        view.setOnLongClickListener(new OnLongClickListener()
-            {
-                /**
-                 * If yes is selected, vocabularies on disk will be deleted.
-                 */
-                @Override
-                public boolean onLongClick(View arg0)
-                {
-                    promptUserOnDelete();
+                    setFragmentActivityResult();
                     return true;
                 }
-            });
+                else
+                {
+                    return false;
+                }
+            }
+        });
+
+        view.setOnLongClickListener(new OnLongClickListener()
+        {
+            /**
+             * If yes is selected, vocabularies on disk will be deleted.
+             */
+            @Override
+            public boolean onLongClick(View arg0)
+            {
+                promptUserOnDelete();
+                return true;
+            }
+        });
 
         final TextView buildNumberTextView = (TextView) view.findViewById(R.id.text_build_number);
         TextView lastUpdatedTextView = (TextView) view.findViewById(R.id.text_last_updated);
 
         String buildNumber = getActivity().getString(R.string.build_num);
         String lastUpdated = this.recipeManager.getLastUpdated(DATE_FORMAT_LONG);
-        HashMap<Category, Integer> recipesCount = this.recipeManager.getRecipesCount();
+        Map<Category, Integer> recipesCount = this.recipeManager.getRecipesCount();
 
         buildNumberTextView.setText(buildNumber);
         lastUpdatedTextView.setText(lastUpdated);
 
         GridLayout grid = (GridLayout) view.findViewById(R.id.gridlayout_count);
         grid.setColumnCount(2);
-        grid.setRowCount(recipesCount.keySet().size());
+
+        Set<Map.Entry<Category, Integer>> entrySet = recipesCount.entrySet();
+        grid.setRowCount(entrySet.size());
 
         int ctr = 0;
-        for(Category key: recipesCount.keySet())
+        for(Map.Entry<Category, Integer> entry : entrySet)
         {
             // Label
-            GridLayout.LayoutParams layoutParamLabel = new GridLayout.LayoutParams(GridLayout.spec(ctr, GridLayout.LEFT),
-                                                                                   GridLayout.spec(0, GridLayout.LEFT));
+            GridLayout.LayoutParams layoutParamLabel = new GridLayout.LayoutParams(GridLayout.spec(ctr, GridLayout.LEFT), GridLayout.spec(0, GridLayout.LEFT));
 
             TextView label = new TextView(getActivity());
-            label.setText(key.name());
+            label.setText(entry.getKey().name());
+
             if(Build.VERSION.SDK_INT < 23)
             {
                 label.setTextAppearance(getActivity(), R.style.TextView_sub_about);
@@ -134,11 +144,10 @@ public class AboutFragment extends Fragment
             }
 
             // Count
-            GridLayout.LayoutParams layoutParamCount = new GridLayout.LayoutParams(GridLayout.spec(ctr, GridLayout.LEFT),
-                                                                                   GridLayout.spec(1, GridLayout.LEFT));
+            GridLayout.LayoutParams layoutParamCount = new GridLayout.LayoutParams(GridLayout.spec(ctr, GridLayout.LEFT), GridLayout.spec(1, GridLayout.LEFT));
             layoutParamCount.setMargins(75, 0, 0, 0);
             TextView count = new TextView(getActivity());
-            count.setText(String.valueOf(recipesCount.get(key)));
+            count.setText(String.valueOf(entry.getValue()));
             if(Build.VERSION.SDK_INT < 23)
             {
                 count.setTextAppearance(getActivity(), R.style.TextView_sub_about);
@@ -150,51 +159,48 @@ public class AboutFragment extends Fragment
 
             grid.addView(label, layoutParamLabel);
             grid.addView(count, layoutParamCount);
-            
+
             ctr++;
         }
-
-        Log.d(LogsManager.TAG, "AboutFragment: onCreateView.");
 
         return view;
     }
 
     /**
      * Pops-up a prompt dialog with 'yes' or 'no' button.
-     * Selecting 'yes' will delete all recipes from disk. 
+     * Selecting 'yes' will delete all recipes from disk.
      */
     private void promptUserOnDelete()
     {
-        Log.d(LogsManager.TAG, "AboutFragment: promptUserOnDelete.");
-        LogsManager.addToLogs("AboutFragment: promptUserOnDelete.");
+        Log.d(LogsManager.TAG, CLASS_NAME + ": promptUserOnDelete.");
+        LogsManager.addToLogs(CLASS_NAME + ": promptUserOnDelete.");
 
         AlertDialog.Builder prompt = new AlertDialog.Builder(getActivity());
         prompt.setMessage("Delete recipes from disk?");
 
         prompt.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int id)
             {
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    Log.d(LogsManager.TAG, "AboutFragment: promptUserOnDelete. Yes selected.");
-                    LogsManager.addToLogs("AboutFragment: promptUserOnDelete. Yes selected.");
+                Log.d(LogsManager.TAG, CLASS_NAME + ": promptUserOnDelete. Yes selected.");
+                LogsManager.addToLogs(CLASS_NAME + ": promptUserOnDelete. Yes selected.");
 
-                    recipeManager.deleteRecipeFromDisk();
-                    setFragmentAcivityResult();
-                }
-            });
+                recipeManager.deleteRecipeFromDisk();
+                setFragmentActivityResult();
+            }
+        });
         prompt.setNegativeButton("No", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int id)
             {
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    Log.d(LogsManager.TAG, "AboutFragment: promptUserOnDelete. No selected.");
-                    LogsManager.addToLogs("AboutFragment: promptUserOnDelete. No selected.");
+                Log.d(LogsManager.TAG, CLASS_NAME + ": promptUserOnDelete. No selected.");
+                LogsManager.addToLogs(CLASS_NAME + ": promptUserOnDelete. No selected.");
 
-                    dialog.cancel();
-                }
-            });
+                dialog.cancel();
+            }
+        });
 
-        prompt.create()
-              .show();
+        prompt.create().show();
     }
 
     /**
@@ -207,7 +213,7 @@ public class AboutFragment extends Fragment
         {
             case android.R.id.home:
             {
-                this.setFragmentAcivityResult();
+                this.setFragmentActivityResult();
                 return true;
             }
             default:
@@ -220,7 +226,7 @@ public class AboutFragment extends Fragment
     /**
      * Sets the current settings and sends it to the main activity fragment.
      */
-    private void setFragmentAcivityResult()
+    private void setFragmentActivityResult()
     {
         Intent data = new Intent();
 
@@ -228,7 +234,7 @@ public class AboutFragment extends Fragment
         getActivity().setResult(Activity.RESULT_OK, data);
         getActivity().finish();
 
-        Log.d(LogsManager.TAG, "LogsFragment: setFragmentAcivityResult. Current settings -> " + this.settings);
-        LogsManager.addToLogs("LogsFragment: setFragmentAcivityResult. Current settings -> " + this.settings);
+        Log.d(LogsManager.TAG, "LogsFragment: setFragmentActivityResult. Current settings -> " + this.settings);
+        LogsManager.addToLogs("LogsFragment: setFragmentActivityResult. Current settings -> " + this.settings);
     }
 }

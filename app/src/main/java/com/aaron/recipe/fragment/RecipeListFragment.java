@@ -32,11 +32,10 @@ import com.aaron.recipe.model.RecipeManager;
 import java.util.ArrayList;
 
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
-import static com.aaron.recipe.fragment.UpdateFragment.EXTRA_RECIPE_LIST;
 
 public class RecipeListFragment extends ListFragment
 {
-    public static final String TAG = "RecipeListFragment";
+    public static final String CLASS_NAME = RecipeListFragment.class.getSimpleName();
     private static final String DIALOG_UPDATE = "update";
     private static final int REQUEST_UPDATE = 0;
     private static final int REQUEST_SETTINGS = 1;
@@ -47,8 +46,7 @@ public class RecipeListFragment extends ListFragment
     private Settings settings;
     private RecipeManager recipeManager;
 
-    public static final String EXTRA_LIST = "com.aaron.recipe.fragment.list";
-    public static final String EXTRA_RECIPE = "com.aaron.recipe.fragment.recipe";
+    public static final String EXTRA_RECIPE_LIST = "com.aaron.recipe.fragment.list.recipe";
 
     /**
      * Initializes non-fragment user interface.
@@ -64,7 +62,7 @@ public class RecipeListFragment extends ListFragment
             this.settings = (Settings) savedInstanceState.getSerializable(EXTRA_SETTINGS);
 
             // But we are sure of its type
-            this.list = (ArrayList<Recipe>) savedInstanceState.getSerializable(EXTRA_LIST);
+            this.list = (ArrayList<Recipe>) savedInstanceState.getSerializable(EXTRA_RECIPE_LIST);
         }
 
         if(this.settings == null)
@@ -72,19 +70,19 @@ public class RecipeListFragment extends ListFragment
             this.settings = new Settings();
         }
 
-        this.recipeManager = new RecipeManager(getActivity(), this.settings);
+        this.recipeManager = new RecipeManager(getActivity());
 
         if(this.list == null)
         {
-            this.list = this.recipeManager.getRecipesFromDisk();
+            this.list = this.recipeManager.getRecipesFromDisk(this.settings.getCategory());
         }
 
         this.updateListOnUiThread(this.list);
 
         setHasOptionsMenu(true);
 
-        Log.d(LogsManager.TAG, "RecipeListFragment: onCreate. settings=" + this.settings);
-        LogsManager.addToLogs("RecipeListFragment: onCreate. settings=" + this.settings);
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate. settings=" + this.settings);
+        LogsManager.addToLogs(CLASS_NAME + ": onCreate. settings=" + this.settings);
 
     }
 
@@ -96,7 +94,7 @@ public class RecipeListFragment extends ListFragment
     {
         View view = inflater.inflate(R.layout.fragment_recipe_list, parent, false);
 
-        Log.d(LogsManager.TAG, "RecipeListFragment: onCreateView.");
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateView.");
 
         return view;
     }
@@ -111,7 +109,7 @@ public class RecipeListFragment extends ListFragment
 
         getListView().setOnScrollListener(new ShowHideFastScrollListener());
 
-        Log.d(LogsManager.TAG, "RecipeListFragment: onActivityCreated.");
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onActivityCreated.");
     }
 
     /**
@@ -123,9 +121,9 @@ public class RecipeListFragment extends ListFragment
         super.onSaveInstanceState(outState);
 
         outState.putSerializable(EXTRA_SETTINGS, this.settings);
-        outState.putSerializable(EXTRA_LIST, this.list);
+        outState.putSerializable(EXTRA_RECIPE_LIST, this.list);
 
-        Log.d(LogsManager.TAG, "RecipeListFragment: onSaveInstanceState");
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onSaveInstanceState");
     }
 
     /**
@@ -140,15 +138,14 @@ public class RecipeListFragment extends ListFragment
             return;
         }
 
-        Log.d(LogsManager.TAG, "RecipeListFragment: onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
-        LogsManager.addToLogs("RecipeListFragment: onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
+        LogsManager.addToLogs(CLASS_NAME + ": onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
 
         // Update action bar menu processing result
-        if(requestCode == REQUEST_UPDATE && data != null && data.hasExtra(EXTRA_RECIPE_LIST))
+        if(requestCode == REQUEST_UPDATE && data != null && data.hasExtra(UpdateFragment.EXTRA_RECIPE_LIST))
         {
             // But we are sure of its type
-            @SuppressWarnings("unchecked")
-            ArrayList<Recipe> list = (ArrayList<Recipe>) data.getSerializableExtra(EXTRA_RECIPE_LIST);
+            @SuppressWarnings("unchecked") ArrayList<Recipe> list = (ArrayList<Recipe>) data.getSerializableExtra(UpdateFragment.EXTRA_RECIPE_LIST);
 
             // Handles occasional NullPointerException.
             if(list != null && list.size() > 0)
@@ -157,22 +154,16 @@ public class RecipeListFragment extends ListFragment
             }
             else
             {
-                this.list = this.recipeManager.getRecipesFromDisk();
+                this.list = this.recipeManager.getRecipesFromDisk(this.settings.getCategory());
             }
 
             this.updateListOnUiThread(this.list);
         }
-        else if((requestCode == REQUEST_SETTINGS || requestCode == REQUEST_ABOUT || requestCode == REQUEST_LOGS) &&
-                (data != null && data.hasExtra(EXTRA_SETTINGS)))
+        else if((requestCode == REQUEST_SETTINGS || requestCode == REQUEST_ABOUT || requestCode == REQUEST_LOGS) && (data != null && data.hasExtra(EXTRA_SETTINGS)))
         {
             this.settings = (Settings) data.getSerializableExtra(EXTRA_SETTINGS);
 
-            this.list = this.recipeManager.getRecipesFromDisk();
-            this.updateListOnUiThread(this.list);
-        }
-        else if(requestCode == REQUEST_ABOUT)
-        {
-            this.list = this.recipeManager.getRecipesFromDisk();
+            this.list = this.recipeManager.getRecipesFromDisk(this.settings.getCategory());
             this.updateListOnUiThread(this.list);
         }
     }
@@ -198,31 +189,31 @@ public class RecipeListFragment extends ListFragment
         searchTextfield.setHint(R.string.hint_recipe);
 
         searchTextfield.addTextChangedListener(new TextWatcher()
+        {
+            /**
+             * Handles search on text update.
+             */
+            @Override
+            public void afterTextChanged(Editable arg0)
             {
-                /**
-                 * Handles search on text update.
-                 */
-                @Override
-                public void afterTextChanged(Editable arg0)
-                {
-                    String searched = searchTextfield.getText().toString();
-                    RecipeListRowAdapter recipeAdapter = (RecipeListRowAdapter) getListAdapter();
-                    recipeAdapter.filter(searched);
-                    recipeAdapter.notifyDataSetChanged();
+                String searched = searchTextfield.getText().toString();
+                RecipeListRowAdapter recipeAdapter = (RecipeListRowAdapter) getListAdapter();
+                recipeAdapter.filter(searched);
+                recipeAdapter.notifyDataSetChanged();
 
-                    Log.d(LogsManager.TAG, "RecipeListFragment: onCreateOptionsMenu(afterTextChanged). searched=" + searched);
-                }
+                Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateOptionsMenu(afterTextChanged). searched=" + searched);
+            }
 
-                @Override
-                public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
-                {
-                }
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
+            {
+            }
 
-                @Override
-                public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
-                {
-                }
-            });
+            @Override
+            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
+            {
+            }
+        });
     }
 
     /**
@@ -281,6 +272,7 @@ public class RecipeListFragment extends ListFragment
 
     /**
      * Updates the list view on UI thread.
+     *
      * @param list the new list
      */
     private void updateListOnUiThread(final ArrayList<Recipe> list)
@@ -291,17 +283,17 @@ public class RecipeListFragment extends ListFragment
         }
 
         this.getActivity().runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
             {
-                @Override
-                public void run()
-                {
-                    RecipeListRowAdapter recipeAdapter = new RecipeListRowAdapter(getActivity(), list, settings);
-                    setListAdapter(recipeAdapter);
-    
-                    Log.d(LogsManager.TAG, "RecipeListFragment: updateListOnUiThread(run). settings=" + settings + " list=" + list);
-                    LogsManager.addToLogs("RecipeListFragment: updateListOnUiThread(run). settings=" + settings + " list_size=" + list.size());
-                }
-            });
+                RecipeListRowAdapter recipeAdapter = new RecipeListRowAdapter(getActivity(), list, settings);
+                setListAdapter(recipeAdapter);
+
+                Log.d(LogsManager.TAG, CLASS_NAME + ": updateListOnUiThread(run). settings=" + settings + " list=" + list);
+                LogsManager.addToLogs(CLASS_NAME + ": updateListOnUiThread(run). settings=" + settings + " list_size=" + list.size());
+            }
+        });
     }
 
     /**
@@ -315,14 +307,14 @@ public class RecipeListFragment extends ListFragment
         private Handler handler = new Handler();
         // Runnable for handler object.
         private Runnable runnable = new Runnable()
+        {
+            @Override
+            public void run()
             {
-                @Override
-                public void run()
-                {
-                    view.setFastScrollAlwaysVisible(false);
-                    view = null;
-                }
-            };
+                view.setFastScrollAlwaysVisible(false);
+                view = null;
+            }
+        };
 
         /**
          * Show fast-scroll thumb if scrolling, and hides fast-scroll thumb if not scrolling.
@@ -333,7 +325,7 @@ public class RecipeListFragment extends ListFragment
             if(scrollState != SCROLL_STATE_IDLE)
             {
                 view.setFastScrollAlwaysVisible(true);
-                
+
                 // Removes the runnable from the message queue.
                 // Stops the handler from hiding the fast-scroll.
                 this.handler.removeCallbacks(this.runnable);
@@ -344,12 +336,13 @@ public class RecipeListFragment extends ListFragment
 
                 // Adds the runnable to the message queue, will run after the DELAY.
                 // Hides the fast-scroll after one seconds of no scrolling.
-                this.handler.postDelayed(this.runnable, DELAY); 
+                this.handler.postDelayed(this.runnable, DELAY);
             }
         }
 
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
-        {}
+        {
+        }
     }
 }

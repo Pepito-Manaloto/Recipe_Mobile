@@ -11,6 +11,7 @@ public class RecipeListActivity extends SingleFragmentActivity
 {
     /**
      * Returns a recipe list fragment.
+     *
      * @return a fragment to be added.
      */
     @Override

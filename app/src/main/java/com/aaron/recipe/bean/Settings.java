@@ -55,6 +55,7 @@ public class Settings implements Serializable
 
     /**
      * Getter for Category.
+     *
      * @return Category
      */
     public Category getCategory()
@@ -64,6 +65,7 @@ public class Settings implements Serializable
 
     /**
      * Getter for Category's index.
+     *
      * @return Category index
      */
     public int getCategoryIndex()
@@ -73,6 +75,7 @@ public class Settings implements Serializable
 
     /**
      * Getter for fontSize.
+     *
      * @return int
      */
     public int getFontSize()
@@ -82,6 +85,7 @@ public class Settings implements Serializable
 
     /**
      * Getter for FontName's index.
+     *
      * @return FontName index
      */
     public int getFontNameIndex()
@@ -91,6 +95,7 @@ public class Settings implements Serializable
 
     /**
      * Getter for FontStyle's index.
+     *
      * @return FontStyle index
      */
     public int getFontStyleIndex()
@@ -100,17 +105,18 @@ public class Settings implements Serializable
 
     /**
      * Getter for fontSize's index.
+     *
      * @return FontSize index
      */
     public int getFontSizeIndex()
     {
         switch(this.fontSize)
         {
-            case 14: 
+            case 14:
                 return 0;
-            case 15: 
+            case 15:
                 return 1;
-            case 16: 
+            case 16:
                 return 2;
             case 17:
                 return 3;
@@ -120,13 +126,14 @@ public class Settings implements Serializable
                 return 5;
             case 20:
                 return 6;
-            default: 
+            default:
                 throw new AssertionError();
         }
     }
 
     /**
      * Getter for Server URL.
+     *
      * @return Server URL
      */
     public String getServerURL()
@@ -135,21 +142,8 @@ public class Settings implements Serializable
     }
 
     /**
-     * Returns the content of the Settings object in a formatted String.
-     * @return String
-     */
-    @Override
-    public String toString()
-    {
-        return " Category: " + this.category +
-               " Font name: " + this.fontName +
-               " Font style: " + this.fontStyle +
-               " Font size: " + this.fontSize +
-               " Server URL: " + this.serverURL;
-    }
-
-    /**
      * Returns the typeface of this recipe.
+     *
      * @param isBold checker if typeface will return bold regardless of the selected settings
      * @return Typeface
      */
@@ -159,16 +153,20 @@ public class Settings implements Serializable
 
         switch(this.fontName)
         {
-            case Serif:      family = Typeface.SERIF; 
-                             break;
-            case Sans_Serif: family = Typeface.SANS_SERIF; 
-                             break;
-            case Monospace:  family = Typeface.MONOSPACE; 
-                             break;
+            case Serif:
+                family = Typeface.SERIF;
+                break;
+            case Sans_Serif:
+                family = Typeface.SANS_SERIF;
+                break;
+            case Monospace:
+                family = Typeface.MONOSPACE;
+                break;
 
-            default: family = Typeface.DEFAULT;
+            default:
+                family = Typeface.DEFAULT;
         }
-        
+
         int style = this.getFontStyleIndex();
 
         if(isBold)
@@ -181,7 +179,8 @@ public class Settings implements Serializable
 
     /**
      * Sets the category new value.
-     * @param Category
+     *
+     * @param category
      * @return the settings object being updated
      */
     public Settings setCategory(final Category category)
@@ -192,6 +191,7 @@ public class Settings implements Serializable
 
     /**
      * Sets the fontName new value.
+     *
      * @param fontName
      * @return the settings object being updated
      */
@@ -203,7 +203,8 @@ public class Settings implements Serializable
 
     /**
      * Sets the fontStyle new value.
-     * @param FontStyle
+     *
+     * @param fontStyle
      * @return the settings object being updated
      */
     public Settings setFontStyle(final FontStyle fontStyle)
@@ -214,6 +215,7 @@ public class Settings implements Serializable
 
     /**
      * Sets the fontSize new value.
+     *
      * @param fontSize
      * @return the settings object being updated
      */
@@ -225,12 +227,67 @@ public class Settings implements Serializable
 
     /**
      * Sets the serverURL new value.
-     * @param Server URL
+     *
+     * @param serverURL
      * @return the settings object being updated
      */
     public Settings setServerURL(final String serverURL)
     {
         this.serverURL = serverURL;
         return this;
+    }
+
+    /**
+     * Returns the content of the Settings object in a formatted String.
+     *
+     * @return String
+     */
+    @Override
+    public String toString()
+    {
+        return "Category: " + this.category +
+                " Font name: " + this.fontName +
+                " Font style: " + this.fontStyle +
+                " Font size: " + this.fontSize +
+                " Server URL: " + this.serverURL;
+    }
+
+    /**
+     * Checks all attribute for equality.
+     *
+     * @param o Settings to compare
+     * @return true if equals, else false
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if(!(o instanceof Settings))
+        {
+            return false;
+        }
+        else
+        {
+            Settings settings = (Settings) o;
+
+            return fontSize != settings.fontSize || category != settings.category ||
+                    fontName != settings.fontName || fontStyle != settings.fontStyle ||
+                    (serverURL != null ? serverURL.equals(settings.serverURL) : settings.serverURL == null);
+        }
+    }
+
+    /**
+     * Returns a unique hash code of the Settings object.
+     *
+     * @return int
+     */
+    @Override
+    public int hashCode()
+    {
+        int result = category != null ? category.hashCode() : 0;
+        result = 31 * result + (fontName != null ? fontName.hashCode() : 0);
+        result = 31 * result + (fontStyle != null ? fontStyle.hashCode() : 0);
+        result = 31 * result + fontSize;
+        result = 31 * result + (serverURL != null ? serverURL.hashCode() : 0);
+        return result;
     }
 }

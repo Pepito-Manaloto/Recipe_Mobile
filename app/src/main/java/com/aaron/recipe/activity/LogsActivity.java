@@ -11,6 +11,7 @@ public class LogsActivity extends SingleFragmentActivity
 {
     /**
      * Returns a logs fragment.
+     *
      * @return a fragment to be added.
      */
     @Override

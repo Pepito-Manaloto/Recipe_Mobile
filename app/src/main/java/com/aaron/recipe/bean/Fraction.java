@@ -37,7 +37,7 @@ public class Fraction implements Serializable
         {
             return this.code;
         }
-        
+
         public double getValue()
         {
             return this.value;
@@ -48,7 +48,8 @@ public class Fraction implements Serializable
 
     /**
      * Default constructor.
-     * @param number the decimal number to be converted to fractional form 
+     *
+     * @param number the decimal number to be converted to fractional form
      */
     public Fraction(double number)
     {
@@ -57,6 +58,7 @@ public class Fraction implements Serializable
 
     /**
      * Getter for fraction.
+     *
      * @return String
      */
     public String getFraction()
@@ -65,14 +67,15 @@ public class Fraction implements Serializable
     }
 
     /**
-     * Converts the given decimal number to its fractional form with regards to CommonFraction enum. If the number is not found in CommonFraction then it will not be converted. 
-     * @param number the decimal number
+     * Converts the given decimal number to its fractional form with regards to CommonFraction enum. If the number is not found in CommonFraction then it will not be converted.
+     *
+     * @param decimalNumber the decimal number
      * @return String
      */
-    private String convertToFraction(final double number)
+    private String convertToFraction(final double decimalNumber)
     {
-        int wholeNumber = (int) number;
-        double decimal = MathUtils.round(number - wholeNumber, 3);
+        int wholeNumber = (int) decimalNumber;
+        double decimal = MathUtils.round(decimalNumber - wholeNumber, 3);
         String fraction = "";
 
         for(CommonFraction cf : CommonFraction.values())
@@ -85,7 +88,14 @@ public class Fraction implements Serializable
 
         if(fraction.isEmpty())
         {
-            return String.valueOf((int)number);
+            if(decimal == 0)
+            {
+                return String.valueOf(wholeNumber);
+            }
+            else
+            {
+                return String.valueOf(decimalNumber);
+            }
         }
         else
         {
@@ -95,6 +105,7 @@ public class Fraction implements Serializable
 
     /**
      * Returns the fractional form.
+     *
      * @return String
      */
     @Override

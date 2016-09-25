@@ -12,20 +12,22 @@ public class LogsManager
      * Default constructor
      */
     public LogsManager()
-    {}
+    {
+    }
 
     /**
      * Adds the given message to the string builder logs.
+     *
      * @param text the message to add
      */
     public static void addToLogs(final String text)
     {
-        logs.append(text)
-            .append("\n");
+        logs.append(text).append("\n");
     }
 
     /**
      * Returns the StringBuilder object into a single String
+     *
      * @return String
      */
     public String getLogs()
@@ -35,28 +37,29 @@ public class LogsManager
 
     /**
      * Returns the filtered StringBuilder String
+     *
      * @param keyWord the word used in filtering
      */
     public String getLogs(final String keyWord)
     {
-        String[] lines = logs.toString().split("\n");
+        String[] lines = logs.toString().split(System.lineSeparator());
         StringBuilder sb = new StringBuilder();
 
-        for(String line: lines)
+        for(String line : lines)
         {
             if(line.contains(keyWord))
             {
-                sb.append(line)
-                  .append("\n");
+                sb.append(line).append("\n");
             }
         }
-        
+
         return sb.toString();
     }
 
     /**
      * Saves the logs to the local disk.
-     * @return true on success, else false 
+     *
+     * @return true on success, else false
      */
     public boolean saveToDisk()
     {

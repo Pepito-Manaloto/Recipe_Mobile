@@ -13,24 +13,30 @@ import android.widget.Toast;
 
 import com.aaron.recipe.R;
 import com.aaron.recipe.bean.Recipe;
+import com.aaron.recipe.bean.ResponseRecipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.EnumMap;
 
 /**
- * The update dialog fragment that retrieves recipe list from the server. 
+ * The update dialog fragment that retrieves recipe list from the server.
  */
 public class UpdateFragment extends DialogFragment
 {
-    public static final String TAG = "UpdateFragment";
+    public static final String CLASS_NAME = RecipeManager.class.getSimpleName();
     public static final String EXTRA_RECIPE_LIST = "com.aaron.recipe.fragment.recipe_list";
     private RecipeManager recipeManager;
+    private Settings settings;
+    private String url;
     private RecipeRetrieverThread recipeRetrieverThread;
 
     /**
      * Creates a new UpdateFragment and sets its arguments.
+     *
      * @return UpdateFragment
      */
     public static UpdateFragment newInstance(final Settings settings)
@@ -40,7 +46,7 @@ public class UpdateFragment extends DialogFragment
         UpdateFragment fragment = new UpdateFragment();
         fragment.setArguments(args);
 
-        Log.d(LogsManager.TAG, "UpdateFragment: newInstance. settings=" + settings);
+        Log.d(LogsManager.TAG, CLASS_NAME + ": newInstance. settings=" + settings);
 
         return fragment;
     }
@@ -51,17 +57,27 @@ public class UpdateFragment extends DialogFragment
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
-        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        Activity activity = getActivity();
+        ProgressDialog progressDialog = new ProgressDialog(activity);
         progressDialog.setTitle(getString(R.string.dialog_update_title));
         progressDialog.setMessage(getString(R.string.dialog_update_message));
         progressDialog.setIndeterminate(true);
 
-        Settings settings = (Settings) getArguments().getSerializable(SettingsFragment.EXTRA_SETTINGS);
-        this.recipeManager = new RecipeManager(getActivity(), settings);
+        this.settings = (Settings) getArguments().getSerializable(SettingsFragment.EXTRA_SETTINGS);
+        if(settings.getServerURL() != null && !settings.getServerURL().isEmpty())
+        {
+            this.url = "http://" + settings.getServerURL() + activity.getString(R.string.url_resource);
+        }
+        else
+        {
+            this.url = "http://" + activity.getString(R.string.url_address_default) + activity.getString(R.string.url_resource);
+        }
+
+        this.recipeManager = new RecipeManager(activity);
         this.recipeRetrieverThread = new RecipeRetrieverThread();
 
-        Log.d(LogsManager.TAG, "UpdateFragment: onCreateDialog.");
-        LogsManager.addToLogs("UpdateFragment: onCreateDialog.");
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateDialog.");
+        LogsManager.addToLogs(CLASS_NAME + ": onCreateDialog.");
 
         return progressDialog;
     }
@@ -74,7 +90,7 @@ public class UpdateFragment extends DialogFragment
     {
         super.onStart();
         this.recipeRetrieverThread.execute();
-        Log.d(LogsManager.TAG, "UpdateFragment: onStart");
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onStart");
     }
 
     /**
@@ -93,7 +109,8 @@ public class UpdateFragment extends DialogFragment
     {
         /**
          * Encapsulates the recipe list and response to an intent and sends the intent + resultCode to VocaublaryListFragment.
-         * @param vocabList the retrieved recipe list
+         *
+         * @param vocabList  the retrieved recipe list
          * @param resultCode the result of the operation
          */
         private void sendResult(final ArrayList<Recipe> vocabList, final int resultCode)
@@ -107,49 +124,57 @@ public class UpdateFragment extends DialogFragment
             data.putExtra(EXTRA_RECIPE_LIST, vocabList);
             getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, data);
 
-            Log.d(LogsManager.TAG, "UpdateFragment(recipeRetrieverThread): sendResult. list=" + vocabList);
-            LogsManager.addToLogs("UpdateFragment(recipeRetrieverThread): sendResult. list_size=" + vocabList.size());
+            Log.d(LogsManager.TAG, CLASS_NAME + "(recipeRetrieverThread): sendResult. list=" + vocabList);
+            LogsManager.addToLogs(CLASS_NAME + "(recipeRetrieverThread): sendResult. list_size=" + vocabList.size());
         }
 
         /**
-         * Retrieves data from server (also save to local disk) then returns the data, encapsulated in the intent, to VocaublaryListFragment.
+         * Retrieves data from server (also save to local disk) then returns the data, encapsulated in the intent, to RecipeListFragment.
          */
         @Override
         protected String doInBackground(Void... arg0)
         {
-            ArrayList<Recipe> list = recipeManager.getAndPersistRecipesFromWeb();
-            String responseCode = recipeManager.getStatusText();
-            String responseText = recipeManager.getResponseText();
-
-            this.sendResult(list, Activity.RESULT_OK);
-
-            int newCount = recipeManager.getRecentlyAddedCount();
+            ResponseRecipe response = recipeManager.getRecipesFromWeb(url);
             String message;
 
-            if("Ok".equals(responseCode))
+            if(response.getStatusCode() == HttpURLConnection.HTTP_OK)
             {
-                if(!"Success".equals(responseText))
+                EnumMap<Recipe.Category, ArrayList<Recipe>> map = response.getRecipeMap();
+                if(map == null || map.isEmpty())
                 {
-                    message = responseText;
-                }
-                else if(newCount > 1)
-                {
-                    message = newCount + " new recipes added.";
-                }
-                else if(newCount == 1)
-                {
-                    message = newCount + " new recipe added.";
+                    message = "No new recipes available.";
                 }
                 else
                 {
-                    message = "No new recipes available.";
+                    boolean saveToDiskSuccess = recipeManager.saveRecipesToDisk(map.values());
+                    if(saveToDiskSuccess)
+                    {
+                        int newCount = response.getRecentlyAddedCount();
+                        if(newCount > 1)
+                        {
+                            message = newCount + " new recipes added.";
+                        }
+                        else
+                        {
+                            message = newCount + " new recipe added.";
+                        }
+
+                        // Get recipes to be returned to RecipeListFragment
+                        ArrayList<Recipe> list = recipeManager.getRecipesFromMap(map, newCount, settings.getCategory());
+                        this.sendResult(list, Activity.RESULT_OK);
+                    }
+                    else
+                    {
+                        message = "Failed saving to disk.";
+                    }
                 }
             }
             else
             {
-                message = responseCode + ". " + responseText;
+                message = response.getStatusCode() + ". " + response.getText();
             }
 
+            this.sendResult(new ArrayList<Recipe>(0), Activity.RESULT_OK);
             return message;
         }
 

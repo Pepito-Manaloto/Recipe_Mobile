@@ -15,7 +15,7 @@ import com.aaron.recipe.bean.Settings;
 import java.util.ArrayList;
 
 import static com.aaron.recipe.adapter.RecipePagerAdapter.EXTRA_PAGE;
-import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_LIST;
+import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_RECIPE_LIST;
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 
 /**
@@ -23,7 +23,6 @@ import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
  */
 public class RecipeActivity extends FragmentActivity
 {
-    //TODO http://stackoverflow.com/questions/37353160/action-bar-not-shown-in-android-studio
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -33,39 +32,40 @@ public class RecipeActivity extends FragmentActivity
         FragmentManager fm = getSupportFragmentManager();
 
         @SuppressWarnings("unchecked")
-        final ArrayList<Recipe> recipeList = (ArrayList<Recipe>) this.getIntent().getSerializableExtra(EXTRA_LIST);
+        final ArrayList<Recipe> recipeList = (ArrayList<Recipe>) this.getIntent().getSerializableExtra(EXTRA_RECIPE_LIST);
         Settings settings = (Settings) this.getIntent().getSerializableExtra(EXTRA_SETTINGS);
         int page = this.getIntent().getIntExtra(EXTRA_PAGE, 0);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         FragmentPagerAdapter pagerAdapter = new RecipePagerAdapter(fm, recipeList, settings);
-    
+
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(page);
         viewPager.clearOnPageChangeListeners();
 
         viewPager.addOnPageChangeListener(new OnPageChangeListener()
+        {
+            @Override
+            public void onPageScrollStateChanged(int state)
             {
-                @Override
-                public void onPageScrollStateChanged(int state)
-                {}
-    
-                /**
-                 * Sets the activity's title depending on the selected recipe.
-                 */
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+            }
+
+            /**
+             * Sets the activity's title depending on the selected recipe.
+             */
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+            {
+                if(positionOffsetPixels == 0) // Change title after fully swiping to another recipe
                 {
-                    if(positionOffsetPixels == 0) // Change title after fully swiping to another recipe 
-                    {
-                        setTitle(recipeList.get(position).getTitle());
-                    }
+                    setTitle(recipeList.get(position).getTitle());
                 }
-    
-                @Override
-                public void onPageSelected(int position)
-                {}
-            });
-        
+            }
+
+            @Override
+            public void onPageSelected(int position)
+            {
+            }
+        });
     }
 }

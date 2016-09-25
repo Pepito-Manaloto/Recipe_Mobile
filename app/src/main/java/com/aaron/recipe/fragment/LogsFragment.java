@@ -1,5 +1,6 @@
 package com.aaron.recipe.fragment;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
@@ -29,7 +30,7 @@ import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
  */
 public class LogsFragment extends Fragment
 {
-    public static final String TAG = "LogsFragment";
+    public static final String CLASS_NAME = LogsFragment.class.getSimpleName();
     private TextView textarea;
     private LogsManager logsManager;
     private Settings settings;
@@ -46,11 +47,16 @@ public class LogsFragment extends Fragment
 
         setHasOptionsMenu(true);
         getActivity().setTitle(R.string.menu_logs);
-        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        this.logsManager = new LogsManager(); 
+        ActionBar actionBar = getActivity().getActionBar();
+        if(actionBar != null)
+        {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
-        Log.d(LogsManager.TAG, "LogsFragment: onCreate.");
+        this.logsManager = new LogsManager();
+
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate.");
     }
 
     /**
@@ -64,31 +70,31 @@ public class LogsFragment extends Fragment
         view.setFocusableInTouchMode(true);
         view.requestFocus();
         view.setOnKeyListener(new View.OnKeyListener()
+        {
+            /**
+             * Handles back button.
+             */
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event)
             {
-                /**
-                 * Handles back button.
-                 */
-                @Override
-                public boolean onKey(View v, int keyCode, KeyEvent event) 
+                // For back button
+                if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
                 {
-                    // For back button
-                    if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
-                    {
-                        setFragmentAcivityResult();
-                        return true;
-                    } 
-                    else 
-                    {
-                        return false;
-                    }
+                    setFragmentAcivityResult();
+                    return true;
                 }
-            });
+                else
+                {
+                    return false;
+                }
+            }
+        });
 
         this.textarea = (TextView) view.findViewById(R.id.textarea_logs);
         this.textarea.setText(this.logsManager.getLogs());
         this.textarea.setMovementMethod(new ScrollingMovementMethod());
 
-        Log.d(LogsManager.TAG, "LogsFragment: onCreateView.");
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateView.");
 
         return view;
     }
@@ -110,37 +116,37 @@ public class LogsFragment extends Fragment
         searchTextfield.setHint(R.string.hint_logs);
 
         searchTextfield.addTextChangedListener(new TextWatcher()
+        {
+            /**
+             * Handles search on text update.
+             */
+            @Override
+            public void afterTextChanged(Editable arg0)
             {
-                /**
-                 * Handles search on text update.
-                 */
-                @Override
-                public void afterTextChanged(Editable arg0)
-                {
-                    String searched = searchTextfield.getText().toString();
-                    
-                    if(searched.length() <= 0)
-                    {
-                        textarea.setText(logsManager.getLogs());
-                    }
-                    else
-                    {
-                        textarea.setText(logsManager.getLogs(searched));
-                    }
+                String searched = searchTextfield.getText().toString();
 
-                    Log.d(LogsManager.TAG, "LogsFragment: onCreateOptionsMenu(afterTextChanged). searched=" + searched);
-                }
-    
-                @Override
-                public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
+                if(searched.length() <= 0)
                 {
+                    textarea.setText(logsManager.getLogs());
                 }
-    
-                @Override
-                public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
+                else
                 {
+                    textarea.setText(logsManager.getLogs(searched));
                 }
-            });
+
+                Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateOptionsMenu(afterTextChanged). searched=" + searched);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
+            {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
+            {
+            }
+        });
     }
 
     /**
@@ -174,7 +180,7 @@ public class LogsFragment extends Fragment
         getActivity().setResult(Activity.RESULT_OK, data);
         getActivity().finish();
 
-        Log.d(LogsManager.TAG, "LogsFragment: setFragmentAcivityResult. Current settings -> " + this.settings);
-        LogsManager.addToLogs("LogsFragment: setFragmentAcivityResult. Current settings -> " + this.settings);
+        Log.d(LogsManager.TAG, CLASS_NAME + ": setFragmentAcivityResult. Current settings -> " + this.settings);
+        LogsManager.addToLogs(CLASS_NAME + ": setFragmentAcivityResult. Current settings -> " + this.settings);
     }
 }

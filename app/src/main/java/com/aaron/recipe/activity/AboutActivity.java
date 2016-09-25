@@ -11,6 +11,7 @@ public class AboutActivity extends SingleFragmentActivity
 {
     /**
      * Returns a about fragment.
+     *
      * @return a fragment to be added.
      */
     @Override

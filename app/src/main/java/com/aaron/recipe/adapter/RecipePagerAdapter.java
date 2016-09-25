@@ -33,6 +33,7 @@ public class RecipePagerAdapter extends FragmentPagerAdapter
 
     /**
      * Returns a RecipeFragment.
+     *
      * @return RecipeFragment
      */
     @Override
@@ -43,6 +44,7 @@ public class RecipePagerAdapter extends FragmentPagerAdapter
 
     /**
      * Returns the number of recipe in the list.
+     *
      * @return int
      */
     @Override

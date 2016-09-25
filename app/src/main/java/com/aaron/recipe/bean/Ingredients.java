@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class Ingredients implements Serializable
 {
-    private static final long serialVersionUID = -7291846786735906304L;
+    private static final long serialVersionUID = 984150385025485765L;
 
     private String title;
     private ArrayList<Ingredient> ingredientsList;

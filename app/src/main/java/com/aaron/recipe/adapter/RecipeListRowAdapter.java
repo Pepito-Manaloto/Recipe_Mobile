@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import static com.aaron.recipe.adapter.RecipePagerAdapter.EXTRA_PAGE;
-import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_LIST;
+import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_RECIPE_LIST;
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 
 /**
@@ -38,9 +38,10 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
 
     /**
      * Default constructor. 0 is passed to the resource id, because we will be creating our own custom layout.
-     * @param context the current context
+     *
+     * @param context    the current context
      * @param recipeList the vocabulary list
-     * @param settings the current user settings
+     * @param settings   the current user settings
      */
     public RecipeListRowAdapter(final Activity context, final ArrayList<Recipe> recipeList, final Settings settings)
     {
@@ -63,7 +64,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         if(convertView == null)
         {
             convertView = this.activity.getLayoutInflater().inflate(R.layout.fragment_recipe_list_row, parent, false);
-            
+
             holder = new ViewHolder();
             holder.titleText = (TextView) convertView.findViewById(R.id.text_row_title);
             holder.categoryText = (TextView) convertView.findViewById(R.id.text_row_category);
@@ -80,34 +81,14 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         }
 
         Recipe recipe = getItem(position);
-
-        holder.scroll.setOnTouchListener(new RecipeListRowTouchListener(position));
-
-        holder.titleText.setText(recipe.getTitle());
-        holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
-        holder.titleText.setTypeface(this.settings.getTypeface(true));
-
-        holder.categoryText.setText(recipe.getCategory());
-        holder.categoryText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
-        holder.categoryText.setTypeface(this.settings.getTypeface(false));
-
-        holder.servingsText.setText(String.valueOf(recipe.getServings()));
-        holder.servingsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
-        holder.servingsText.setTypeface(this.settings.getTypeface(false));
-
-        holder.preparationTimeText.setText(recipe.getPreparationTimeString());
-        holder.preparationTimeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
-        holder.preparationTimeText.setTypeface(this.settings.getTypeface(false));
-
-        holder.description.setText(recipe.getDescription());
-        holder.description.setTextSize(TypedValue.COMPLEX_UNIT_SP, this.settings.getFontSize());
-        holder.description.setTypeface(this.settings.getTypeface(false));
+        holder.setRecipeView(recipe, this.settings, new RecipeListRowTouchListener(position));
 
         return convertView;
     }
 
     /**
      * Filters the recipe list in the adapter with the given searched text. Only shows recipe title that starts with the searched text.
+     *
      * @param searched the searched word
      */
     public void filter(final String searched)
@@ -122,7 +103,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         }
         else
         {
-            for(Recipe recipe: this.recipeListTemp)
+            for(Recipe recipe : this.recipeListTemp)
             {
                 titleWord = recipe.getTitle().toLowerCase(Locale.getDefault());
 
@@ -132,7 +113,6 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
                 }
             }
         }
-        
 
         Log.d(LogsManager.TAG, "RecipeAdapter: filter. New list -> " + this.recipeList);
         LogsManager.addToLogs("RecipeAdapter: filter. New list size -> " + this.recipeList.size());
@@ -149,6 +129,31 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         public TextView preparationTimeText;
         public TextView description;
         public HorizontalScrollView scroll;
+
+        public void setRecipeView(Recipe recipe, Settings settings, OnTouchListener listener)
+        {
+            this.scroll.setOnTouchListener(listener);
+
+            this.titleText.setText(recipe.getTitle());
+            this.titleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, settings.getFontSize());
+            this.titleText.setTypeface(settings.getTypeface(true));
+
+            this.categoryText.setText(recipe.getCategory());
+            this.categoryText.setTextSize(TypedValue.COMPLEX_UNIT_SP, settings.getFontSize());
+            this.categoryText.setTypeface(settings.getTypeface(false));
+
+            this.servingsText.setText(String.valueOf(recipe.getServings()));
+            this.servingsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, settings.getFontSize());
+            this.servingsText.setTypeface(settings.getTypeface(false));
+
+            this.preparationTimeText.setText(recipe.getPreparationTimeString());
+            this.preparationTimeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, settings.getFontSize());
+            this.preparationTimeText.setTypeface(settings.getTypeface(false));
+
+            this.description.setText(recipe.getDescription());
+            this.description.setTextSize(TypedValue.COMPLEX_UNIT_SP, settings.getFontSize());
+            this.description.setTypeface(settings.getTypeface(false));
+        }
     }
 
     /**
@@ -161,6 +166,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
 
         /**
          * Default constructor.
+         *
          * @param page the position of the selected recipe
          */
         public RecipeListRowTouchListener(final int page)
@@ -170,12 +176,12 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
 
         /**
          * If the touch moves MORE than 15 pixels horizontally then the gesture will be treated as a scrolling event,
-         * else it will be treated as selecting the row which will start RecipeActivity. 
+         * else it will be treated as selecting the row which will start RecipeActivity.
          */
         @Override
         public boolean onTouch(View v, MotionEvent event)
         {
-            switch (event.getAction()) 
+            switch(event.getAction())
             {
                 case MotionEvent.ACTION_DOWN:
                 {
@@ -190,7 +196,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
                     {
                         Intent intent = new Intent(activity, RecipeActivity.class);
                         intent.putExtra(EXTRA_PAGE, this.page);
-                        intent.putExtra(EXTRA_LIST, RecipeListRowAdapter.this.recipeList);
+                        intent.putExtra(EXTRA_RECIPE_LIST, RecipeListRowAdapter.this.recipeList);
                         intent.putExtra(EXTRA_SETTINGS, RecipeListRowAdapter.this.settings);
                         RecipeListRowAdapter.this.activity.startActivity(intent);
                     }
