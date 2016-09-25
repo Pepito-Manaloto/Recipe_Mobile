@@ -11,9 +11,10 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -33,10 +34,9 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:support-fragment:24.2.0'
-    compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
-    compile 'org.apache.directory.studio:org.apache.commons.lang:2.6'
-    compile 'org.apache.directory.studio:org.apache.commons.codec:1.8'
+    compile 'com.android.support:support-fragment:24.2.1'
+    compile 'commons-io:commons-io:2.5'
+    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'commons-codec:commons-codec:1.10'
 }
