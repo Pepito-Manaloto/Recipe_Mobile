@@ -30,7 +30,7 @@ import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
  */
 public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
 {
-    public static final String TAG = "RecipeAdapter";
+    public static final String CLASS_NAME = RecipeListRowAdapter.class.getSimpleName();
     private Activity activity;
     private ArrayList<Recipe> recipeList;
     private ArrayList<Recipe> recipeListTemp;
@@ -114,8 +114,8 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
             }
         }
 
-        Log.d(LogsManager.TAG, "RecipeAdapter: filter. New list -> " + this.recipeList);
-        LogsManager.addToLogs("RecipeAdapter: filter. New list size -> " + this.recipeList.size());
+        Log.d(LogsManager.TAG, CLASS_NAME + ": filter. New list -> " + this.recipeList);
+        LogsManager.addToLogs(CLASS_NAME + ": filter. New list size -> " + this.recipeList.size());
     }
 
     /**

@@ -46,7 +46,7 @@ public class RecipeListFragment extends ListFragment
     private Settings settings;
     private RecipeManager recipeManager;
 
-    public static final String EXTRA_RECIPE_LIST = "com.aaron.recipe.fragment.list.recipe";
+    public static final String EXTRA_RECIPE_LIST = "com.aaron.recipe.fragment.recipe_list.list";
 
     /**
      * Initializes non-fragment user interface.

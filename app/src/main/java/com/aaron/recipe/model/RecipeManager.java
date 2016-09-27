@@ -85,6 +85,7 @@ public class RecipeManager
      * (1) Retrieves the recipes from the server.
      * (2) Parse the json response and converts it to ResponseRecipe
      *
+     * @param url the url of the recipe web service
      * @return ResponseRecipe
      */
     public ResponseRecipe getRecipesFromWeb(String url)
@@ -96,8 +97,8 @@ public class RecipeManager
         {
             String query = "?last_updated=" + URLEncoder.encode(this.getLastUpdated(DATE_FORMAT_SHORT_24), "UTF-8");
 
-            Log.d(LogsManager.TAG, CLASS_NAME + ": getRecipesFromWeb. params=" + url + query);
-            LogsManager.addToLogs(CLASS_NAME + ": getRecipesFromWeb. params=" + url + query);
+            Log.d(LogsManager.TAG, CLASS_NAME + ": getRecipesFromWeb. url=" + url + query);
+            LogsManager.addToLogs(CLASS_NAME + ": getRecipesFromWeb. url=" + url + query);
 
             response = this.httpClient.get(url, query, HEADERS);
 
@@ -231,13 +232,14 @@ public class RecipeManager
             listTemp.add(recipe);
         }
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": parseJsonObject. map=" + map);
+        Log.d(LogsManager.TAG, CLASS_NAME + ": parseRecipesFromJsonObject. map=" + map);
+        LogsManager.addToLogs(CLASS_NAME + ": parseRecipesFromJsonObject. json_length=" + jsonObject.length());
 
         return map;
     }
 
     /**
-     * Saves the given recipe map to the local database.
+     * Saves the given lists of recipes to the local database.
      *
      * @param recipeLists the recipe lists to be stored
      * @return true on success, else false
@@ -363,13 +365,13 @@ public class RecipeManager
     }
 
     /**
-     * Gets the current recipe count per category, and returns them as a hashmap.
+     * Gets the current recipe count per category, and returns them as an EnumMap.
      *
-     * @return {@code HashMap<Category, Integer>}
+     * @return {@code EnumMap<Category, Integer>}
      */
-    public HashMap<Category, Integer> getRecipesCount()
+    public EnumMap<Category, Integer> getRecipesCount()
     {
-        HashMap<Category, Integer> map = new HashMap<>(CATEGORY_ARRAY.length);
+        EnumMap<Category, Integer> map = new EnumMap<>(Category.class);
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
         String whereClause = ColumnRecipe.category.name() + " = ?";
 

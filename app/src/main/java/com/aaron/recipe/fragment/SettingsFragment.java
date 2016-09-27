@@ -21,6 +21,8 @@ import com.aaron.recipe.bean.Settings.FontName;
 import com.aaron.recipe.bean.Settings.FontStyle;
 import com.aaron.recipe.model.LogsManager;
 
+import org.apache.commons.lang3.StringUtils;
+
 import static com.aaron.recipe.bean.Recipe.CATEGORY_ARRAY;
 import static com.aaron.recipe.bean.Recipe.Category;
 
@@ -107,7 +109,7 @@ public class SettingsFragment extends Fragment
 
         String serverUrl = this.settings.getServerURL();
 
-        if(serverUrl.isEmpty())
+        if(StringUtils.isBlank(serverUrl))
         {
             serverUrl = getActivity().getString(R.string.url_address_default);
         }

@@ -24,6 +24,7 @@ import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
 
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -114,7 +115,6 @@ public class AboutFragment extends Fragment
 
         String buildNumber = getActivity().getString(R.string.build_num);
         String lastUpdated = this.recipeManager.getLastUpdated(DATE_FORMAT_LONG);
-        Map<Category, Integer> recipesCount = this.recipeManager.getRecipesCount();
 
         buildNumberTextView.setText(buildNumber);
         lastUpdatedTextView.setText(lastUpdated);
@@ -122,6 +122,7 @@ public class AboutFragment extends Fragment
         GridLayout grid = (GridLayout) view.findViewById(R.id.gridlayout_count);
         grid.setColumnCount(2);
 
+        EnumMap<Category, Integer> recipesCount = this.recipeManager.getRecipesCount();
         Set<Map.Entry<Category, Integer>> entrySet = recipesCount.entrySet();
         grid.setRowCount(entrySet.size());
 
@@ -234,7 +235,7 @@ public class AboutFragment extends Fragment
         getActivity().setResult(Activity.RESULT_OK, data);
         getActivity().finish();
 
-        Log.d(LogsManager.TAG, "LogsFragment: setFragmentActivityResult. Current settings -> " + this.settings);
-        LogsManager.addToLogs("LogsFragment: setFragmentActivityResult. Current settings -> " + this.settings);
+        Log.d(LogsManager.TAG, CLASS_NAME + ": setFragmentActivityResult. Current settings -> " + this.settings);
+        LogsManager.addToLogs(CLASS_NAME + ": setFragmentActivityResult. Current settings -> " + this.settings);
     }
 }

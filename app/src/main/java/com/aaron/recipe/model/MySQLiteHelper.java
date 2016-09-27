@@ -17,7 +17,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
     public static final String TABLE_RECIPE = "recipe";
     public static final String TABLE_INGREDIENTS = "ingredients";
     public static final String TABLE_INSTRUCTIONS = "instructions";
-    public static final String[] COLUMN_COUNT = new String[]{"COUNT(*)",};
+    public static final String[] COLUMN_COUNT = new String[] {"COUNT(*)",};
 
     /**
      * The database's recipe table column names.
@@ -57,39 +57,39 @@ public class MySQLiteHelper extends SQLiteOpenHelper
     }
 
     private static final String CREATE_TABLE_RECIPE = "CREATE TABLE " + TABLE_RECIPE +
-                                                      "(" + 
-                                                       ColumnRecipe.title.name() + " TEXT PRIMARY KEY, " +
-                                                       ColumnRecipe.category.name() + " TEXT NOT NULL, " +
-                                                       ColumnRecipe.preparation_time.name() + " INTEGER NOT NULL, " +
-                                                       ColumnRecipe.description.name() + " TEXT NOT NULL, " +
-                                                       ColumnRecipe.servings.name() + " INTEGER NOT NULL, " +
-                                                       ColumnRecipe.date_in.name() + " TEXT NOT NULL" +
-                                                      ");";
+            "(" +
+            ColumnRecipe.title.name() + " TEXT PRIMARY KEY, " +
+            ColumnRecipe.category.name() + " TEXT NOT NULL, " +
+            ColumnRecipe.preparation_time.name() + " INTEGER NOT NULL, " +
+            ColumnRecipe.description.name() + " TEXT NOT NULL, " +
+            ColumnRecipe.servings.name() + " INTEGER NOT NULL, " +
+            ColumnRecipe.date_in.name() + " TEXT NOT NULL" +
+            ");";
 
     private static final String CREATE_TABLE_INGREDIENTS = "CREATE TABLE " + TABLE_INGREDIENTS +
-                                                       "(" + 
-                                                        ColumnIngredients.title.name() + " TEXT NOT NULL, " +
-                                                        ColumnIngredients.quantity.name() + " REAL NOT NULL, " +
-                                                        ColumnIngredients.measurement.name() + " TEXT NOT NULL, " +
-                                                        ColumnIngredients.ingredient.name() + " TEXT NOT NULL, " +
-                                                        ColumnIngredients.comment_.name() + " TEXT NOT NULL, " +
-                                                        ColumnIngredients.count.name() + " INTEGER NOT NULL, " +
-                                                        "UNIQUE(" + ColumnIngredients.title.name() + ", " + ColumnIngredients.ingredient.name() + ") ON CONFLICT REPLACE, " +
-                                                        "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) ON UPDATE CASCADE ON DELETE CASCADE" +
-                                                       ");";
+            "(" +
+            ColumnIngredients.title.name() + " TEXT NOT NULL, " +
+            ColumnIngredients.quantity.name() + " REAL NOT NULL, " +
+            ColumnIngredients.measurement.name() + " TEXT NOT NULL, " +
+            ColumnIngredients.ingredient.name() + " TEXT NOT NULL, " +
+            ColumnIngredients.comment_.name() + " TEXT NOT NULL, " +
+            ColumnIngredients.count.name() + " INTEGER NOT NULL, " +
+            "UNIQUE(" + ColumnIngredients.title.name() + ", " + ColumnIngredients.ingredient.name() + ") ON CONFLICT REPLACE, " +
+            "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) ON UPDATE CASCADE ON DELETE CASCADE" +
+            ");";
 
     private static final String CREATE_TABLE_INSTRUCTIONS = "CREATE TABLE " + TABLE_INSTRUCTIONS +
-                                                       "(" + 
-                                                        ColumnInstructions.title.name() + " TEXT NOT NULL, " +
-                                                        ColumnInstructions.instruction.name() + " TEXT NOT NULL, " +
-                                                        ColumnInstructions.count.name() + " INTEGER NOT NULL, " +
-                                                        "UNIQUE(" + ColumnInstructions.title.name() + ", " + ColumnInstructions.instruction.name() + ") ON CONFLICT REPLACE, " +
-                                                        "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) ON UPDATE CASCADE ON DELETE CASCADE" +
-                                                       ");";
+            "(" +
+            ColumnInstructions.title.name() + " TEXT NOT NULL, " +
+            ColumnInstructions.instruction.name() + " TEXT NOT NULL, " +
+            ColumnInstructions.count.name() + " INTEGER NOT NULL, " +
+            "UNIQUE(" + ColumnInstructions.title.name() + ", " + ColumnInstructions.instruction.name() + ") ON CONFLICT REPLACE, " +
+            "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) ON UPDATE CASCADE ON DELETE CASCADE" +
+            ");";
 
     /**
      * Default constructor.
-     */     
+     */
     public MySQLiteHelper(Context context)
     {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -121,7 +121,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
          *      (2) drop db --- IMPLEMENTED
          *      (3) create new db --- IMPLEMENTED 
          *      (4) insert temp data in new db --- NOT YET
-         */ 
+         */
         database.execSQL("DROP IF TABLE EXISTS " + TABLE_RECIPE);
         this.onCreate(database);
     }

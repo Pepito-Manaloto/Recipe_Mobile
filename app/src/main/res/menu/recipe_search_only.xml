@@ -3,6 +3,6 @@
     <item
         android:id="@+id/menu_search"
         style="@style/Item_menu_search"
-        android:title="" />
+        android:title=""/>
 
 </menu>

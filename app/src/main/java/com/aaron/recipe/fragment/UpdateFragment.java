@@ -27,8 +27,8 @@ import java.util.EnumMap;
  */
 public class UpdateFragment extends DialogFragment
 {
-    public static final String CLASS_NAME = RecipeManager.class.getSimpleName();
-    public static final String EXTRA_RECIPE_LIST = "com.aaron.recipe.fragment.recipe_list";
+    public static final String CLASS_NAME = UpdateFragment.class.getSimpleName();
+    public static final String EXTRA_RECIPE_LIST = "com.aaron.recipe.fragment.update.list";
     private RecipeManager recipeManager;
     private Settings settings;
     private String url;
@@ -64,7 +64,7 @@ public class UpdateFragment extends DialogFragment
         progressDialog.setIndeterminate(true);
 
         this.settings = (Settings) getArguments().getSerializable(SettingsFragment.EXTRA_SETTINGS);
-        if(settings.getServerURL() != null && !settings.getServerURL().isEmpty())
+        if(settings != null && settings.getServerURL() != null && !settings.getServerURL().isEmpty())
         {
             this.url = "http://" + settings.getServerURL() + activity.getString(R.string.url_resource);
         }
@@ -89,6 +89,7 @@ public class UpdateFragment extends DialogFragment
     public void onStart()
     {
         super.onStart();
+
         this.recipeRetrieverThread.execute();
         Log.d(LogsManager.TAG, CLASS_NAME + ": onStart");
     }

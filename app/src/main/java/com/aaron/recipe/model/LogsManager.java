@@ -42,14 +42,15 @@ public class LogsManager
      */
     public String getLogs(final String keyWord)
     {
-        String[] lines = logs.toString().split(System.lineSeparator());
+        String lineSeparator = System.lineSeparator();
+        String[] lines = logs.toString().split(lineSeparator);
         StringBuilder sb = new StringBuilder();
 
         for(String line : lines)
         {
             if(line.contains(keyWord))
             {
-                sb.append(line).append("\n");
+                sb.append(line).append(lineSeparator);
             }
         }
 

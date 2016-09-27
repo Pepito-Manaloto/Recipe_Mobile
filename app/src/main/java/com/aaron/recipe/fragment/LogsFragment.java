@@ -80,7 +80,7 @@ public class LogsFragment extends Fragment
                 // For back button
                 if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
                 {
-                    setFragmentAcivityResult();
+                    setFragmentActivityResult();
                     return true;
                 }
                 else
@@ -109,7 +109,7 @@ public class LogsFragment extends Fragment
         inflater.inflate(R.menu.recipe_search_only, menu);
 
         /** Get the action view of the menu item whose id is edittext_search_field */
-        View view = (View) menu.findItem(R.id.menu_search).getActionView();
+        View view = menu.findItem(R.id.menu_search).getActionView();
 
         /** Get the edit text from the action view */
         final EditText searchTextfield = (EditText) view.findViewById(R.id.edittext_search_field);
@@ -159,7 +159,7 @@ public class LogsFragment extends Fragment
         {
             case android.R.id.home:
             {
-                this.setFragmentAcivityResult();
+                this.setFragmentActivityResult();
                 return true;
             }
             default:
@@ -172,7 +172,7 @@ public class LogsFragment extends Fragment
     /**
      * Sets the current settings and sends it to the main activity fragment.
      */
-    private void setFragmentAcivityResult()
+    private void setFragmentActivityResult()
     {
         Intent data = new Intent();
 

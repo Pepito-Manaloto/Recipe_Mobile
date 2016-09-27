@@ -55,7 +55,7 @@ public class ResponseRecipe
 
     public int getRecentlyAddedCount()
     {
-        return recentlyAddedCount;
+        return this.recentlyAddedCount;
     }
 
     public void setRecentlyAddedCount(int recentlyAddedCount)
@@ -65,7 +65,7 @@ public class ResponseRecipe
 
     public EnumMap<Recipe.Category, ArrayList<Recipe>> getRecipeMap()
     {
-        return recipeMap;
+        return this.recipeMap;
     }
 
     public void setRecipeMap(EnumMap<Recipe.Category, ArrayList<Recipe>> recipeMap)
@@ -85,7 +85,8 @@ public class ResponseRecipe
             ResponseRecipe that = (ResponseRecipe) o;
 
             return statusCode != that.statusCode || recentlyAddedCount != that.recentlyAddedCount ||
-                    text != null ? !text.equals(that.text) : that.text != null || body != null ? !body.equals(that.body) : that.body != null || recipeMap != null ? recipeMap.equals(that.recipeMap) : that.recipeMap == null;
+                    text != null ? !text.equals(that.text) : that.text != null || body != null ? !body.equals(that.body) : that.body != null ||
+                    recipeMap != null ? recipeMap.equals(that.recipeMap) : that.recipeMap == null;
         }
     }
 
