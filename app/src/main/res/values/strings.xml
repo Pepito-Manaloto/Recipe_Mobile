@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Recipe</string>
     <!-- &#8211; is the unicode html_entity of "-" -->
-    <string name="build_num">master&#8211;43&#8211;2fcf1d5</string>
+    <string name="build_num">master&#8211;45&#8211;2c2a249</string>
     <string name="image_alt">Img</string>
     <string name="auth_key">aaron</string>
 
