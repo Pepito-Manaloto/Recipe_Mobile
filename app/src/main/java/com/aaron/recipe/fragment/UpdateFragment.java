@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,6 +21,7 @@ import com.aaron.recipe.model.RecipeManager;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The update dialog fragment that retrieves recipe list from the server.
@@ -32,7 +33,7 @@ public class UpdateFragment extends DialogFragment
     private RecipeManager recipeManager;
     private Settings settings;
     private String url;
-    private RecipeRetrieverThread recipeRetrieverThread;
+    private static final AtomicBoolean isUpdating = new AtomicBoolean(false);
 
     /**
      * Creates a new UpdateFragment and sets its arguments.
@@ -58,6 +59,7 @@ public class UpdateFragment extends DialogFragment
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
         Activity activity = getActivity();
+
         ProgressDialog progressDialog = new ProgressDialog(activity);
         progressDialog.setTitle(getString(R.string.dialog_update_title));
         progressDialog.setMessage(getString(R.string.dialog_update_message));
@@ -74,7 +76,6 @@ public class UpdateFragment extends DialogFragment
         }
 
         this.recipeManager = new RecipeManager(activity);
-        this.recipeRetrieverThread = new RecipeRetrieverThread();
 
         Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateDialog.");
         LogsManager.addToLogs(CLASS_NAME + ": onCreateDialog.");
@@ -90,17 +91,24 @@ public class UpdateFragment extends DialogFragment
     {
         super.onStart();
 
-        this.recipeRetrieverThread.execute();
+        if(!isUpdating())
+        {
+            RecipeRetrieverThread recipeRetrieverThread = new RecipeRetrieverThread(getActivity());
+            recipeRetrieverThread.execute();
+            isUpdating.set(true);
+        }
+
         Log.d(LogsManager.TAG, CLASS_NAME + ": onStart");
     }
 
     /**
-     * Called when dialog is cancelled before finishing its task. Stops the retriever thread.
+     * Returns true if RecipeRetrieverThread is already executing update.
+     *
+     * @return boolean
      */
-    @Override
-    public void onDismiss(DialogInterface dialog)
+    public boolean isUpdating()
     {
-        this.recipeRetrieverThread.cancel(true);
+        return isUpdating.get();
     }
 
     /**
@@ -108,6 +116,13 @@ public class UpdateFragment extends DialogFragment
      */
     private class RecipeRetrieverThread extends AsyncTask<Void, Void, String>
     {
+        private Context context;
+
+        RecipeRetrieverThread(Activity activity)
+        {
+            this.context = activity;
+        }
+
         /**
          * Encapsulates the recipe list and response to an intent and sends the intent + resultCode to VocaublaryListFragment.
          *
@@ -180,13 +195,24 @@ public class UpdateFragment extends DialogFragment
         }
 
         /**
-         * Removes the dialog from screen, and shows the result of the operation on toast.
+         * Removes the dialog from screen, shows the result of the operation on toast, and sets the isUpdating flag to false.
          */
         @Override
         public void onPostExecute(String message)
         {
             UpdateFragment.this.dismiss();
-            Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+            Toast.makeText(this.context, message, Toast.LENGTH_LONG).show();
+            isUpdating.set(false);
+        }
+
+        /**
+         * Sets the isUpdating flag to false.
+         */
+        @Override
+        protected void onCancelled(String message)
+        {
+            super.onCancelled();
+            isUpdating.set(false);
         }
     }
 }

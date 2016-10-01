@@ -22,6 +22,7 @@
     <!-- DIALOG LABELS -->
     <string name="dialog_update_title">Updating</string>
     <string name="dialog_update_message">Retrieving data from server&#8230;</string> <!-- &#8230; is the unicode html_entity of "..." -->
+    <string name="dialog_already_updating_message">Already retrieving data from server&#8230;</string> <!-- &#8230; is the unicode html_entity of "..." -->
 
     <!-- TEXT VIEW LABELS -->
     <string name="text_empty_list">There are no recipes.</string>
