@@ -33,6 +33,7 @@ proguard/
 build/
 .idea/
 captures/
+/projectFilesBackup
 
 # OS-specific files
 .DS_Store

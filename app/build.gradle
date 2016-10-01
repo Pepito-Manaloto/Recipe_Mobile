@@ -32,11 +32,11 @@ android {
         exclude 'META-INF/LGPL2.1'
     }
 
-	task updateVersion << {
-        commandLine 'misc/build_number.sh'
+    task updateVersion(type: Exec) {
+        commandLine 'cmd', 'sh ../misc/build_number.sh'
     }
 
-    build.dependsOn updateVersion
+    preBuild.dependsOn updateVersion
 }
 
 dependencies {
