@@ -99,7 +99,7 @@ public class Fraction implements Serializable
         }
         else
         {
-            return wholeNumber + fraction;
+            return (wholeNumber == 0 ? "" : wholeNumber) + fraction;
         }
     }
 
