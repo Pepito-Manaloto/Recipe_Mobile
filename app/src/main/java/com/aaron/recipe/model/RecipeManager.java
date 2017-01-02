@@ -256,7 +256,7 @@ public class RecipeManager
         {
             db.beginTransaction();
             // Delete recipes. To ensure no duplicates, if existing recipes are modified in the server.
-            db.delete(TABLE_RECIPE, null, null);
+            this.deleteQuery(db);
 
             // Iterate each recipe list
             for(ArrayList<Recipe> recipeList : recipeLists)
@@ -507,9 +507,26 @@ public class RecipeManager
     {
         try(SQLiteDatabase db = this.dbHelper.getWritableDatabase())
         {
-            int result = db.delete(TABLE_RECIPE, null, null);
+            int result = this.deleteQuery(db);
+
             Log.d(LogsManager.TAG, CLASS_NAME + ": deleteRecipeFromDisk. affected=" + result);
         }
+    }
+
+    /**
+     * Deletes the recipe, ingredients, and instructions from disk.
+     * Warning: this action cannot be reverted
+     *
+     * @param db the database connection to use
+     * @return int
+     */
+    private int deleteQuery(SQLiteDatabase db)
+    {
+        int result = db.delete(TABLE_RECIPE, null, null);
+        db.delete(TABLE_INGREDIENTS, null, null);
+        db.delete(TABLE_INSTRUCTIONS, null, null);
+
+        return result;
     }
 
     /**
