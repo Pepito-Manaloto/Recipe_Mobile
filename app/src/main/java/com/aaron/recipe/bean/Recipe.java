@@ -21,8 +21,9 @@ public class Recipe implements Serializable
         Pork,
         Lamb,
         Seafood,
-        Pasta,
         Vegetable,
+        Rice,
+        Pasta,
         Soup,
         Dessert,
     }
