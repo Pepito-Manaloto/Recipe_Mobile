@@ -6,11 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.aaron.recipe.bean.Categories;
 import com.aaron.recipe.bean.Ingredients;
 import com.aaron.recipe.bean.Ingredients.Ingredient;
 import com.aaron.recipe.bean.Instructions;
 import com.aaron.recipe.bean.Recipe;
-import com.aaron.recipe.bean.Recipe.Category;
 import com.aaron.recipe.bean.ResponseRecipe;
 
 import org.apache.commons.codec.binary.Hex;
@@ -28,13 +28,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import static com.aaron.recipe.bean.Recipe.CATEGORY_ARRAY;
 import static com.aaron.recipe.model.MySQLiteHelper.COLUMN_COUNT;
 import static com.aaron.recipe.model.MySQLiteHelper.ColumnIngredients;
 import static com.aaron.recipe.model.MySQLiteHelper.ColumnInstructions;
@@ -145,10 +144,8 @@ public class RecipeManager
         {
             if(ex == null)
             {
-                Log.d(LogsManager.TAG, CLASS_NAME + ": getRecipesFromWeb. responseText=" + response.getText() +
-                        " responseCode=" + response.getStatusCode());
-                LogsManager.addToLogs(CLASS_NAME + ": getRecipesFromWeb. responseText=" + response.getText() +
-                        " responseCode=" + response.getStatusCode());
+                Log.d(LogsManager.TAG, CLASS_NAME + ": getRecipesFromWeb. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
+                LogsManager.addToLogs(CLASS_NAME + ": getRecipesFromWeb. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
             }
             else
             {
@@ -176,10 +173,10 @@ public class RecipeManager
      * Parse the given jsonObject containing the list of recipes retrieved from the web call.
      *
      * @param jsonObject the jsonObject to be parsed
-     * @return jsonObject converted into an EnumMap, wherein the key is the category and values are list of recipes
-     * @throws JSONException
+     * @return jsonObject converted into an HashMap, wherein the key is the category and values are list of recipes
+     * @throws JSONException if the json parameter is invalid
      */
-    private EnumMap<Category, ArrayList<Recipe>> parseRecipesFromJsonObject(final JSONObject jsonObject) throws JSONException
+    private Map<String, ArrayList<Recipe>> parseRecipesFromJsonObject(final JSONObject jsonObject) throws JSONException
     {
         // Ensure the json string only contains recipes
         if(jsonObject.has(RECENTLY_ADDED_COUNT))
@@ -187,9 +184,9 @@ public class RecipeManager
             jsonObject.remove(RECENTLY_ADDED_COUNT);
         }
 
-        EnumMap<Category, ArrayList<Recipe>> map = new EnumMap<>(Category.class);
+        Map<String, ArrayList<Recipe>> map = new HashMap<>();
 
-        for(Category cat : Category.values())
+        for(String cat : Categories.getCategories())
         {
             map.put(cat, new ArrayList<Recipe>());
         }
@@ -203,7 +200,7 @@ public class RecipeManager
             JSONArray recipeJsonArray = jsonArray.getJSONArray(0);
             JSONObject recipeJsonObj = recipeJsonArray.getJSONObject(0);
 
-            Category category = Category.valueOf(recipeJsonObj.getString(ColumnRecipe.category.name()));
+            String category = recipeJsonObj.getString(ColumnRecipe.category.name());
             int preparationTime = recipeJsonObj.getInt(ColumnRecipe.preparation_time.name());
             int servings = recipeJsonObj.getInt(ColumnRecipe.servings.name());
             String description = recipeJsonObj.getString(ColumnRecipe.description.name());
@@ -229,7 +226,15 @@ public class RecipeManager
 
             Recipe recipe = new Recipe(title, category, servings, preparationTime, description, ingredients, instructions);
             ArrayList<Recipe> listTemp = map.get(category);
-            listTemp.add(recipe);
+
+            if(listTemp == null)
+            {
+                throw new JSONException("Categories not updated.");
+            }
+            else
+            {
+                listTemp.add(recipe);
+            }
         }
 
         Log.d(LogsManager.TAG, CLASS_NAME + ": parseRecipesFromJsonObject. map=" + map);
@@ -365,19 +370,19 @@ public class RecipeManager
     }
 
     /**
-     * Gets the current recipe count per category, and returns them as an EnumMap.
+     * Gets the current recipe count per category, and returns them as an HashMap.
      *
-     * @return {@code EnumMap<Category, Integer>}
+     * @return {@code HashMap<String, Integer>}
      */
-    public EnumMap<Category, Integer> getRecipesCount()
+    public Map<String, Integer> getRecipesCount()
     {
-        EnumMap<Category, Integer> map = new EnumMap<>(Category.class);
+        Map<String, Integer> map = new HashMap<>();
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
         String whereClause = ColumnRecipe.category.name() + " = ?";
 
-        for(Category category : CATEGORY_ARRAY)
+        for(String category : Categories.getCategories())
         {
-            try(Cursor cursor = db.query(TABLE_RECIPE, COLUMN_COUNT, whereClause, new String[] {category.name()}, null, null, null))
+            try(Cursor cursor = db.query(TABLE_RECIPE, COLUMN_COUNT, whereClause, new String[] {category}, null, null, null))
             {
                 if(cursor.moveToFirst())
                 {
@@ -400,7 +405,7 @@ public class RecipeManager
      * @param selectedCategory
      * @return ArrayList<Vocabulary>
      */
-    public ArrayList<Recipe> getRecipesFromDisk(final Category selectedCategory)
+    public ArrayList<Recipe> getRecipesFromDisk(final String selectedCategory)
     {
         ArrayList<Recipe> list;
         try(SQLiteDatabase db = this.dbHelper.getReadableDatabase())
@@ -410,7 +415,7 @@ public class RecipeManager
             String[] whereArgs;
             String orderBy = ColumnRecipe.title.name() + " ASC";
 
-            if(Category.All.equals(selectedCategory))
+            if(Categories.DEFAULT.equals(selectedCategory))
             {
                 whereClause = null;
                 whereArgs = null;
@@ -418,7 +423,7 @@ public class RecipeManager
             else
             {
                 whereClause = ColumnRecipe.category.name() + " = ?";
-                whereArgs = new String[] {selectedCategory.name()};
+                whereArgs = new String[] {selectedCategory};
             }
 
             Cursor cursor = db.query(TABLE_RECIPE, columns, whereClause, whereArgs, null, null, orderBy);
@@ -433,8 +438,8 @@ public class RecipeManager
             }
         }
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": getRecipesFromDisk. category=" + selectedCategory.name());
-        LogsManager.addToLogs(CLASS_NAME + ": getRecipesFromDisk. category=" + selectedCategory.name());
+        Log.d(LogsManager.TAG, CLASS_NAME + ": getRecipesFromDisk. category=" + selectedCategory);
+        LogsManager.addToLogs(CLASS_NAME + ": getRecipesFromDisk. category=" + selectedCategory);
 
         return list;
     }
@@ -448,7 +453,7 @@ public class RecipeManager
     private Recipe cursorToRecipe(final Cursor cursor)
     {
         String title = cursor.getString(0);
-        Category category = Category.valueOf(cursor.getString(1));
+        String category = cursor.getString(1);
         int preparationTime = cursor.getInt(2);
         int servings = cursor.getInt(3);
         String description = cursor.getString(4);
@@ -537,9 +542,9 @@ public class RecipeManager
      * @param selectedCategory
      * @return ArrayList<Recipe>
      */
-    public ArrayList<Recipe> getRecipesFromMap(final EnumMap<Recipe.Category, ArrayList<Recipe>> recipeMap, final int size, final Category selectedCategory)
+    public ArrayList<Recipe> getRecipesFromMap(final Map<String, ArrayList<Recipe>> recipeMap, final int size, final String selectedCategory)
     {
-        if(Recipe.Category.All.equals(selectedCategory)) // Combines all ArrayList<Recipe> into a single ArrayList
+        if(Categories.DEFAULT.equals(selectedCategory)) // Combines all ArrayList<Recipe> into a single ArrayList
         {
             ArrayList<Recipe> allRecipeList;
 

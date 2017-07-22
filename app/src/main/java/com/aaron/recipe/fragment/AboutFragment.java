@@ -6,8 +6,8 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.widget.TextViewCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -19,12 +19,10 @@ import android.widget.GridLayout;
 import android.widget.TextView;
 
 import com.aaron.recipe.R;
-import com.aaron.recipe.bean.Recipe.Category;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
 
-import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -122,41 +120,26 @@ public class AboutFragment extends Fragment
         GridLayout grid = (GridLayout) view.findViewById(R.id.gridlayout_count);
         grid.setColumnCount(2);
 
-        EnumMap<Category, Integer> recipesCount = this.recipeManager.getRecipesCount();
-        Set<Map.Entry<Category, Integer>> entrySet = recipesCount.entrySet();
+        Map<String, Integer> recipesCount = this.recipeManager.getRecipesCount();
+        Set<Map.Entry<String, Integer>> entrySet = recipesCount.entrySet();
         grid.setRowCount(entrySet.size());
 
         int ctr = 0;
-        for(Map.Entry<Category, Integer> entry : entrySet)
+        for(Map.Entry<String, Integer> entry : entrySet)
         {
             // Label
             GridLayout.LayoutParams layoutParamLabel = new GridLayout.LayoutParams(GridLayout.spec(ctr, GridLayout.LEFT), GridLayout.spec(0, GridLayout.LEFT));
 
             TextView label = new TextView(getActivity());
-            label.setText(entry.getKey().name());
-
-            if(Build.VERSION.SDK_INT < 23)
-            {
-                label.setTextAppearance(getActivity(), R.style.TextView_sub_about);
-            }
-            else
-            {
-                label.setTextAppearance(R.style.TextView_sub_about);
-            }
+            label.setText(entry.getKey());
+            TextViewCompat.setTextAppearance(label, R.style.TextView_sub_about);
 
             // Count
             GridLayout.LayoutParams layoutParamCount = new GridLayout.LayoutParams(GridLayout.spec(ctr, GridLayout.LEFT), GridLayout.spec(1, GridLayout.LEFT));
             layoutParamCount.setMargins(75, 0, 0, 0);
             TextView count = new TextView(getActivity());
             count.setText(String.valueOf(entry.getValue()));
-            if(Build.VERSION.SDK_INT < 23)
-            {
-                count.setTextAppearance(getActivity(), R.style.TextView_sub_about);
-            }
-            else
-            {
-                count.setTextAppearance(R.style.TextView_sub_about);
-            }
+            TextViewCompat.setTextAppearance(count, R.style.TextView_sub_about);
 
             grid.addView(label, layoutParamLabel);
             grid.addView(count, layoutParamCount);

@@ -1,5 +1,7 @@
 package com.aaron.recipe.bean;
 
+import android.util.Pair;
+
 import java.io.Serializable;
 
 /**
@@ -8,28 +10,9 @@ import java.io.Serializable;
 public class Recipe implements Serializable
 {
     private static final long serialVersionUID = -2999934642681556146L;
-    public static final Category[] CATEGORY_ARRAY = Category.values();
-
-    /**
-     * Enum for recipe category list.
-     */
-    public enum Category
-    {
-        All,
-        Beef,
-        Chicken,
-        Pork,
-        Lamb,
-        Seafood,
-        Vegetable,
-        Rice,
-        Pasta,
-        Soup,
-        Dessert,
-    }
 
     private String title;
-    private Category category;
+    private String category;
     private int servings;
     private int preparationTime;
     private String description;
@@ -39,7 +22,7 @@ public class Recipe implements Serializable
     /**
      * Default constructor.
      */
-    public Recipe(final String title, final Category category, final int servings, final int preparationTime, final String description, final Ingredients ingredients, final Instructions instructions)
+    public Recipe(final String title, final String category, final int servings, final int preparationTime, final String description, final Ingredients ingredients, final Instructions instructions)
     {
         this.title = title;
         this.category = category;
@@ -118,7 +101,7 @@ public class Recipe implements Serializable
      */
     public String getCategory()
     {
-        return this.category.name();
+        return this.category;
     }
 
     /**
@@ -190,7 +173,7 @@ public class Recipe implements Serializable
 
             return this.title.equals(that.getTitle()) &&
                     this.servings == that.getServings() &&
-                    this.category.name().equals(that.getCategory()) &&
+                    this.category.equals(that.getCategory()) &&
                     this.getPreparationTimeString().equals(that.getPreparationTimeString()) &&
                     this.description.equals(that.getDescription()) &&
                     this.ingredients.equals(that.getIngredients()) &&

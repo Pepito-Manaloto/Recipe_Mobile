@@ -13,7 +13,8 @@
 
     <!-- URL -->
     <string name="url_address_default">192.168.0.101</string>
-    <string name="url_resource">/Recipe/web_service/get</string>
+    <string name="url_resource_recipes">/Recipe/web_service/recipes</string>
+    <string name="url_resource_categories">/Recipe/web_service/categories</string>
 
     <!-- HINTS -->
     <string name="hint_recipe">Search Recipe</string>
@@ -36,6 +37,9 @@
     <string name="text_servings">Servings:</string>
     <string name="text_preparation_time">Preparation Time:</string>
     <string name="text_description">Description:</string>
+
+    <!-- Error messages -->
+    <string name="error_retrieving_categories">Failed retrieving categories from server. Update url in settings and try to update again.</string>
 
     <!-- COMBO BOX ITEMS -->
     <string-array name="font_name_arrays">

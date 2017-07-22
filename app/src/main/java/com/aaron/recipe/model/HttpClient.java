@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -108,7 +109,7 @@ public class HttpClient
      */
     protected String getResponseRecipeBodyFromStream(final InputStream inputStream) throws IOException
     {
-        String response = IOUtils.toString(inputStream, Charsets.UTF_8);
+        String response = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         IOUtils.closeQuietly(inputStream);
 
         return response;

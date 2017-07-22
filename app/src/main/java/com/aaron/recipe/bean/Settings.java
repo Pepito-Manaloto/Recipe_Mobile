@@ -2,8 +2,6 @@ package com.aaron.recipe.bean;
 
 import android.graphics.Typeface;
 
-import com.aaron.recipe.bean.Recipe.Category;
-
 import java.io.Serializable;
 
 /**
@@ -18,10 +16,7 @@ public class Settings implements Serializable
      */
     public enum FontName
     {
-        Default,
-        Serif,
-        Sans_Serif,
-        Monospace,
+        Default, Serif, Sans_Serif, Monospace,
     }
 
     /**
@@ -29,13 +24,10 @@ public class Settings implements Serializable
      */
     public enum FontStyle
     {
-        Normal,
-        Bold,
-        Italic,
-        Bold_Italic,
+        Normal, Bold, Italic, Bold_Italic,
     }
 
-    private Category category;
+    private String category;
     private FontName fontName;
     private FontStyle fontStyle;
     private int fontSize;
@@ -46,7 +38,7 @@ public class Settings implements Serializable
      */
     public Settings()
     {
-        this.category = Category.All;
+        this.category = Categories.DEFAULT;
         this.fontName = FontName.Default;
         this.fontStyle = FontStyle.Normal;
         this.fontSize = 14;
@@ -58,7 +50,7 @@ public class Settings implements Serializable
      *
      * @return Category
      */
-    public Category getCategory()
+    public String getCategory()
     {
         return this.category;
     }
@@ -70,7 +62,7 @@ public class Settings implements Serializable
      */
     public int getCategoryIndex()
     {
-        return this.category.ordinal();
+        return Categories.getIndex(this.category);
     }
 
     /**
@@ -183,7 +175,7 @@ public class Settings implements Serializable
      * @param category
      * @return the settings object being updated
      */
-    public Settings setCategory(final Category category)
+    public Settings setCategory(final String category)
     {
         this.category = category;
         return this;
@@ -245,11 +237,7 @@ public class Settings implements Serializable
     @Override
     public String toString()
     {
-        return "Category: " + this.category +
-                " Font name: " + this.fontName +
-                " Font style: " + this.fontStyle +
-                " Font size: " + this.fontSize +
-                " Server URL: " + this.serverURL;
+        return "Category: " + this.category + " Font name: " + this.fontName + " Font style: " + this.fontStyle + " Font size: " + this.fontSize + " Server URL: " + this.serverURL;
     }
 
     /**
@@ -269,9 +257,7 @@ public class Settings implements Serializable
         {
             Settings settings = (Settings) o;
 
-            return fontSize != settings.fontSize || category != settings.category ||
-                    fontName != settings.fontName || fontStyle != settings.fontStyle ||
-                    (serverURL != null ? serverURL.equals(settings.serverURL) : settings.serverURL == null);
+            return fontSize == settings.fontSize && category.equals(settings.category) && fontName == settings.fontName && fontStyle == settings.fontStyle && (serverURL != null ? serverURL.equals(settings.serverURL) : settings.serverURL == null);
         }
     }
 

@@ -14,6 +14,13 @@
         style="@style/Spinner_settings"
         android:layout_below="@id/textview_category" />
 
+    <ImageView
+        android:id="@+id/imageview_refresh_category"
+        android:layout_below="@id/textview_category"
+        android:layout_toEndOf="@id/spinner_category"
+        android:layout_marginTop="15dp"
+        style="@style/ImageView_settings"/>
+
     <TextView
         android:id="@+id/textview_font"
         style="@style/TextView_settings"

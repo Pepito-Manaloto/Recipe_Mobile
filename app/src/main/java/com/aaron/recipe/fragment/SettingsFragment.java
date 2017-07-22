@@ -3,28 +3,37 @@ package com.aaron.recipe.fragment;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.aaron.recipe.R;
+import com.aaron.recipe.async.CategoriesRetrieverThread;
+import com.aaron.recipe.bean.Categories;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.bean.Settings.FontName;
 import com.aaron.recipe.bean.Settings.FontStyle;
 import com.aaron.recipe.model.LogsManager;
 
 import org.apache.commons.lang3.StringUtils;
-
-import static com.aaron.recipe.bean.Recipe.CATEGORY_ARRAY;
-import static com.aaron.recipe.bean.Recipe.Category;
 
 /**
  * The application settings fragment.
@@ -35,13 +44,14 @@ public class SettingsFragment extends Fragment
     public static final String EXTRA_SETTINGS = "com.aaron.recipe.fragment.settings";
     private Settings settings;
 
-    private ArrayAdapter<Category> categoryAdapter;
+    private ArrayAdapter<String> categoryAdapter;
 
     private Spinner categorySpinner;
     private Spinner fontNameSpinner;
     private Spinner fontStyleSpinner;
     private Spinner fontSizeSpinner;
 
+    private ImageView categoryImageView;
     private EditText serverURLEditText;
 
     /**
@@ -79,7 +89,7 @@ public class SettingsFragment extends Fragment
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        this.categoryAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, CATEGORY_ARRAY);
+        this.categoryAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, Categories.getCategoriesArray());
         this.categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate. settings=" + this.settings);
@@ -94,6 +104,23 @@ public class SettingsFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_settings, parent, false);
 
+        this.categoryImageView = (ImageView) view.findViewById(R.id.imageview_refresh_category);
+        this.categoryImageView.setClickable(true);
+
+        final Animation rotation = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_refresh);
+        rotation.setRepeatCount(Animation.INFINITE);
+        this.categoryImageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View imageView)
+            {
+                imageView.startAnimation(rotation);
+
+                CategoriesRetrieverThread categoriesRetrieverThread = new CategoriesRetrieverThread(SettingsFragment.this, settings);
+                categoriesRetrieverThread.execute();
+            }
+        });
+
         this.categorySpinner = (Spinner) view.findViewById(R.id.spinner_category);
         this.categorySpinner.setAdapter(this.categoryAdapter);
 
@@ -101,6 +128,24 @@ public class SettingsFragment extends Fragment
         this.fontStyleSpinner = (Spinner) view.findViewById(R.id.spinner_font_style);
         this.fontSizeSpinner = (Spinner) view.findViewById(R.id.spinner_font_size);
         this.serverURLEditText = (EditText) view.findViewById(R.id.edittext_server_url);
+        this.serverURLEditText.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                settings.setServerURL(s.toString());
+            }
+        });
 
         this.categorySpinner.setSelection(this.settings.getCategoryIndex());
         this.fontNameSpinner.setSelection(this.settings.getFontNameIndex());
@@ -126,6 +171,13 @@ public class SettingsFragment extends Fragment
         return view;
     }
 
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        categoryImageView.clearAnimation();
+    }
+
     /**
      * This method is called when a user selects an item in the menu bar. Home button.
      * the fragment of selected item.
@@ -147,6 +199,20 @@ public class SettingsFragment extends Fragment
         }
     }
 
+    public void updateCategoriesSpinner()
+    {
+        Activity settingsActivity = getActivity();
+
+        // The activity is null if the AsyncTask is not yet finished but this is no longer the current activity.
+        if(settingsActivity != null)
+        {
+            this.categoryAdapter = new ArrayAdapter<>(settingsActivity, android.R.layout.simple_spinner_item, Categories.getCategoriesArray());
+            this.categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            this.categorySpinner.setAdapter(this.categoryAdapter);
+            this.categoryImageView.clearAnimation();
+        }
+    }
+
     /**
      * Sets the new settings and sends it to the main activity fragment.
      */
@@ -154,7 +220,7 @@ public class SettingsFragment extends Fragment
     {
         Intent data = new Intent();
 
-        Category category = Category.valueOf(this.categorySpinner.getSelectedItem().toString());
+        String category = this.categorySpinner.getSelectedItem().toString();
         FontName fontName = FontName.valueOf(this.fontNameSpinner.getSelectedItem().toString());
         FontStyle fontStyle = FontStyle.valueOf(this.fontStyleSpinner.getSelectedItem().toString());
         int fontSize = Integer.parseInt(this.fontSizeSpinner.getSelectedItem().toString());

@@ -2,6 +2,7 @@ package com.aaron.recipe.bean;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * Created by Aaron on 9/24/2016.
@@ -12,7 +13,7 @@ public class ResponseRecipe
     private String text;
     private String body;
     private int recentlyAddedCount;
-    private EnumMap<Recipe.Category, ArrayList<Recipe>> recipeMap;
+    private Map<String, ArrayList<Recipe>> recipeMap;
 
     public ResponseRecipe()
     {
@@ -63,12 +64,12 @@ public class ResponseRecipe
         this.recentlyAddedCount = recentlyAddedCount;
     }
 
-    public EnumMap<Recipe.Category, ArrayList<Recipe>> getRecipeMap()
+    public Map<String, ArrayList<Recipe>> getRecipeMap()
     {
         return this.recipeMap;
     }
 
-    public void setRecipeMap(EnumMap<Recipe.Category, ArrayList<Recipe>> recipeMap)
+    public void setRecipeMap(Map<String, ArrayList<Recipe>> recipeMap)
     {
         this.recipeMap = recipeMap;
     }
@@ -84,9 +85,7 @@ public class ResponseRecipe
         {
             ResponseRecipe that = (ResponseRecipe) o;
 
-            return statusCode != that.statusCode || recentlyAddedCount != that.recentlyAddedCount ||
-                    text != null ? !text.equals(that.text) : that.text != null || body != null ? !body.equals(that.body) : that.body != null ||
-                    recipeMap != null ? recipeMap.equals(that.recipeMap) : that.recipeMap == null;
+            return statusCode != that.statusCode || recentlyAddedCount != that.recentlyAddedCount || text != null ? !text.equals(that.text) : that.text != null || body != null ? !body.equals(that.body) : that.body != null || recipeMap != null ? recipeMap.equals(that.recipeMap) : that.recipeMap == null;
         }
     }
 
@@ -104,9 +103,6 @@ public class ResponseRecipe
     @Override
     public String toString()
     {
-        return "statusCode: " + statusCode +
-                ", text: " + text + ", body: " + body +
-                ", recentlyAddedCount: " + recentlyAddedCount +
-                ", recipeMap: " + recipeMap;
+        return "statusCode: " + statusCode + ", text: " + text + ", body: " + body + ", recentlyAddedCount: " + recentlyAddedCount + ", recipeMap: " + recipeMap;
     }
 }
