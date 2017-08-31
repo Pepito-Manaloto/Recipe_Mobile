@@ -38,13 +38,13 @@ import static com.aaron.recipe.model.MySQLiteHelper.COLUMN_COUNT;
 import static com.aaron.recipe.model.MySQLiteHelper.ColumnIngredients;
 import static com.aaron.recipe.model.MySQLiteHelper.ColumnInstructions;
 import static com.aaron.recipe.model.MySQLiteHelper.ColumnRecipe;
+import static com.aaron.recipe.model.MySQLiteHelper.TABLE_CATEGORIES;
 import static com.aaron.recipe.model.MySQLiteHelper.TABLE_INGREDIENTS;
 import static com.aaron.recipe.model.MySQLiteHelper.TABLE_INSTRUCTIONS;
 import static com.aaron.recipe.model.MySQLiteHelper.TABLE_RECIPE;
 
 /**
- * Handles the web call to retrieve recipes in JSON object representation.
- * Handles the data storage of recipes.
+ * Handles the web call to retrieve recipes in JSON object representation. Handles the data storage of recipes.
  */
 public class RecipeManager
 {
@@ -59,7 +59,7 @@ public class RecipeManager
 
     private MySQLiteHelper dbHelper;
     private Date curDate;
-    private HttpClient httpClient;
+    private HttpClient<ResponseRecipe> httpClient;
 
     static
     {
@@ -70,13 +70,14 @@ public class RecipeManager
     /**
      * Constructor initializes the url.
      *
-     * @param activity the caller activity
+     * @param activity
+     *            the caller activity
      */
     public RecipeManager(final Activity activity)
     {
         this.dbHelper = new MySQLiteHelper(activity);
         this.curDate = new Date();
-        this.httpClient = new HttpClient();
+        this.httpClient = new HttpClient<>(ResponseRecipe.class);
     }
 
     /**
@@ -84,7 +85,8 @@ public class RecipeManager
      * (1) Retrieves the recipes from the server.
      * (2) Parse the json response and converts it to ResponseRecipe
      *
-     * @param url the url of the recipe web service
+     * @param url
+     *            the url of the recipe web service
      * @return ResponseRecipe
      */
     public ResponseRecipe getRecipesFromWeb(String url)
@@ -118,7 +120,7 @@ public class RecipeManager
                 }
 
                 response.setRecipeMap(this.parseRecipesFromJsonObject(jsonObject));
-                response.setText("Success");
+                response.setTextSuccess();
                 return response;
             }
         }
@@ -160,9 +162,10 @@ public class RecipeManager
     /**
      * Parse the given jsonObject and returns the recently added count.
      *
-     * @param jsonObject the jsonObject to be parsed
+     * @param jsonObject
+     *            the jsonObject to be parsed
      * @return int
-     * @throws NumberFormatException
+     * @throws NumberFormatException recently added count is not an integer
      */
     private int parseRecentlyAddedCountFromJsonObject(final JSONObject jsonObject) throws NumberFormatException
     {
@@ -172,9 +175,11 @@ public class RecipeManager
     /**
      * Parse the given jsonObject containing the list of recipes retrieved from the web call.
      *
-     * @param jsonObject the jsonObject to be parsed
+     * @param jsonObject
+     *            the jsonObject to be parsed
      * @return jsonObject converted into an HashMap, wherein the key is the category and values are list of recipes
-     * @throws JSONException if the json parameter is invalid
+     * @throws JSONException
+     *             if the json parameter is invalid
      */
     private Map<String, ArrayList<Recipe>> parseRecipesFromJsonObject(final JSONObject jsonObject) throws JSONException
     {
@@ -212,7 +217,9 @@ public class RecipeManager
             for(int i = 0; i < ingredientsJsonArraySize; i++)
             {
                 JSONObject ingredientsJsonObj = ingredientsJsonArray.getJSONObject(i);
-                ingredients.addIngredient(new Ingredients.Ingredient(ingredientsJsonObj.getDouble(ColumnIngredients.quantity.name()), ingredientsJsonObj.getString(ColumnIngredients.measurement.name()), ingredientsJsonObj.getString(ColumnIngredients.ingredient.name()), ingredientsJsonObj.getString(ColumnIngredients.comment_.name())));
+                ingredients
+                        .addIngredient(new Ingredients.Ingredient(ingredientsJsonObj.getDouble(ColumnIngredients.quantity.name()), ingredientsJsonObj.getString(ColumnIngredients.measurement.name()),
+                                ingredientsJsonObj.getString(ColumnIngredients.ingredient.name()), ingredientsJsonObj.getString(ColumnIngredients.comment_.name())));
             }
 
             JSONArray instructionsJsonArray = jsonArray.getJSONArray(2);
@@ -246,7 +253,8 @@ public class RecipeManager
     /**
      * Saves the given lists of recipes to the local database.
      *
-     * @param recipeLists the recipe lists to be stored
+     * @param recipeLists
+     *            the recipe lists to be stored
      * @return true on success, else false
      */
     public boolean saveRecipesToDisk(final Collection<ArrayList<Recipe>> recipeLists)
@@ -272,7 +280,7 @@ public class RecipeManager
                     String title = recipe.getTitle();
 
                     recipeValues.put(ColumnRecipe.title.name(), title);
-                    recipeValues.put(ColumnRecipe.category.name(), recipe.getCategory());
+                    recipeValues.put(ColumnRecipe.category.name(), Categories.getId(recipe.getCategory()));
                     recipeValues.put(ColumnRecipe.preparation_time.name(), recipe.getPreparationTime());
                     recipeValues.put(ColumnRecipe.servings.name(), recipe.getServings());
                     recipeValues.put(ColumnRecipe.description.name(), recipe.getDescription());
@@ -326,14 +334,15 @@ public class RecipeManager
     /**
      * Gets the latest date_in of the recipes.
      *
-     * @param format the date format used in formatting the last_updated date
+     * @param format
+     *            the date format used in formatting the last_updated date
      * @return String
      */
     public String getLastUpdated(final String format)
     {
         String lastUpdatedDate = "1950-01-01 00:00:00";
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
-        String[] columns = new String[] {ColumnRecipe.date_in.name(),};
+        String[] columns = new String[] { ColumnRecipe.date_in.name(), };
         String orderBy = ColumnRecipe.date_in.name() + " DESC";
         String limit = "1";
 
@@ -380,13 +389,13 @@ public class RecipeManager
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
         String whereClause = ColumnRecipe.category.name() + " = ?";
 
-        for(String category : Categories.getCategories())
+        for(Map.Entry<Integer, String> entry : Categories.getCategoriesMap().entrySet())
         {
-            try(Cursor cursor = db.query(TABLE_RECIPE, COLUMN_COUNT, whereClause, new String[] {category}, null, null, null))
+            try(Cursor cursor = db.query(TABLE_RECIPE, COLUMN_COUNT, whereClause, new String[] { entry.getKey().toString() }, null, null, null))
             {
                 if(cursor.moveToFirst())
                 {
-                    map.put(category, cursor.getInt(0));
+                    map.put(entry.getValue(), cursor.getInt(0));
                 }
             }
         }
@@ -398,11 +407,9 @@ public class RecipeManager
     }
 
     /**
-     * Does the following logic.
-     * (1) Retrieves the recipes from the local disk.
-     * (2) Returns the recipe list of the selected Category.
+     * Does the following logic. (1) Retrieves the recipes from the local disk. (2) Returns the recipe list of the selected Category.
      *
-     * @param selectedCategory
+     * @param selectedCategory the current selected category in the settings
      * @return ArrayList<Vocabulary>
      */
     public ArrayList<Recipe> getRecipesFromDisk(final String selectedCategory)
@@ -410,7 +417,8 @@ public class RecipeManager
         ArrayList<Recipe> list;
         try(SQLiteDatabase db = this.dbHelper.getReadableDatabase())
         {
-            String[] columns = new String[] {ColumnRecipe.title.name(), ColumnRecipe.category.name(), ColumnRecipe.preparation_time.name(), ColumnRecipe.servings.name(), ColumnRecipe.description.name()};
+            String[] columns = new String[] { ColumnRecipe.title.name(), ColumnRecipe.category.name(), ColumnRecipe.preparation_time.name(), ColumnRecipe.servings.name(),
+                    ColumnRecipe.description.name() };
             String whereClause;
             String[] whereArgs;
             String orderBy = ColumnRecipe.title.name() + " ASC";
@@ -423,7 +431,7 @@ public class RecipeManager
             else
             {
                 whereClause = ColumnRecipe.category.name() + " = ?";
-                whereArgs = new String[] {selectedCategory};
+                whereArgs = new String[] { String.valueOf(Categories.getId(selectedCategory)) };
             }
 
             Cursor cursor = db.query(TABLE_RECIPE, columns, whereClause, whereArgs, null, null, orderBy);
@@ -447,13 +455,14 @@ public class RecipeManager
     /**
      * Retrieves the recipe from the cursor.
      *
-     * @param cursor the cursor resulting from a query
+     * @param cursor
+     *            the cursor resulting from a query
      * @return Recipe
      */
     private Recipe cursorToRecipe(final Cursor cursor)
     {
         String title = cursor.getString(0);
-        String category = cursor.getString(1);
+        String category = Categories.getCategoriesMap().get(cursor.getInt(1));
         int preparationTime = cursor.getInt(2);
         int servings = cursor.getInt(3);
         String description = cursor.getString(4);
@@ -461,10 +470,10 @@ public class RecipeManager
 
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
 
-        String[] ingredientsColumns = new String[] {ColumnIngredients.quantity.name(), ColumnIngredients.measurement.name(), ColumnIngredients.ingredient.name(), ColumnIngredients.comment_.name()};
-        String[] instructionsColumns = new String[] {ColumnInstructions.instruction.name()};
+        String[] ingredientsColumns = new String[] { ColumnIngredients.quantity.name(), ColumnIngredients.measurement.name(), ColumnIngredients.ingredient.name(), ColumnIngredients.comment_.name() };
+        String[] instructionsColumns = new String[] { ColumnInstructions.instruction.name() };
         String whereClause = ColumnRecipe.title.name() + " = ?";
-        String[] whereArgs = new String[] {title};
+        String[] whereArgs = new String[] { title };
 
         Ingredients ingredients;
         try(Cursor ingredientCursor = db.query(TABLE_INGREDIENTS, ingredientsColumns, whereClause, whereArgs, null, null, orderBy))
@@ -505,8 +514,7 @@ public class RecipeManager
     }
 
     /**
-     * Deletes the recipe from disk.
-     * Warning: this action cannot be reverted
+     * Deletes the recipe from disk. Warning: this action cannot be reverted
      */
     public void deleteRecipeFromDisk()
     {
@@ -519,10 +527,10 @@ public class RecipeManager
     }
 
     /**
-     * Deletes the recipe, ingredients, and instructions from disk.
-     * Warning: this action cannot be reverted
+     * Deletes the recipe, ingredients, and instructions from disk. Warning: this action cannot be reverted
      *
-     * @param db the database connection to use
+     * @param db
+     *            the database connection to use
      * @return int
      */
     private int deleteQuery(SQLiteDatabase db)
@@ -530,6 +538,7 @@ public class RecipeManager
         int result = db.delete(TABLE_RECIPE, null, null);
         db.delete(TABLE_INGREDIENTS, null, null);
         db.delete(TABLE_INSTRUCTIONS, null, null);
+        db.delete(TABLE_CATEGORIES, null, null);
 
         return result;
     }
@@ -537,9 +546,9 @@ public class RecipeManager
     /**
      * Returns the recipes based on the current selected category.
      *
-     * @param recipeMap
-     * @param size
-     * @param selectedCategory
+     * @param recipeMap the recipe map
+     * @param size the number of recipes in the map
+     * @param selectedCategory the current selected category
      * @return ArrayList<Recipe>
      */
     public ArrayList<Recipe> getRecipesFromMap(final Map<String, ArrayList<Recipe>> recipeMap, final int size, final String selectedCategory)

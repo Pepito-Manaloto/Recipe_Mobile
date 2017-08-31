@@ -90,7 +90,7 @@ public class LogsFragment extends Fragment
             }
         });
 
-        this.textarea = (TextView) view.findViewById(R.id.textarea_logs);
+        this.textarea = view.findViewById(R.id.textarea_logs);
         this.textarea.setText(this.logsManager.getLogs());
         this.textarea.setMovementMethod(new ScrollingMovementMethod());
 
@@ -108,11 +108,11 @@ public class LogsFragment extends Fragment
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.recipe_search_only, menu);
 
-        /** Get the action view of the menu item whose id is edittext_search_field */
+        // Get the action view of the menu item whose id is edittext_search_field
         View view = menu.findItem(R.id.menu_search).getActionView();
 
-        /** Get the edit text from the action view */
-        final EditText searchTextfield = (EditText) view.findViewById(R.id.edittext_search_field);
+        // Get the edit text from the action view
+        final EditText searchTextfield = view.findViewById(R.id.edittext_search_field);
         searchTextfield.setHint(R.string.hint_logs);
 
         searchTextfield.addTextChangedListener(new TextWatcher()

@@ -128,8 +128,7 @@ public class RecipeListFragment extends ListFragment
     }
 
     /**
-     * Receives the result data from the previous fragment. Updates the
-     * application's state depending on the data received.
+     * Receives the result data from the previous fragment. Updates the application's state depending on the data received.
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -146,7 +145,8 @@ public class RecipeListFragment extends ListFragment
         if(requestCode == REQUEST_UPDATE && data != null && data.hasExtra(UpdateFragment.EXTRA_RECIPE_LIST))
         {
             // But we are sure of its type
-            @SuppressWarnings("unchecked") ArrayList<Recipe> list = (ArrayList<Recipe>) data.getSerializableExtra(UpdateFragment.EXTRA_RECIPE_LIST);
+            @SuppressWarnings("unchecked")
+            ArrayList<Recipe> list = (ArrayList<Recipe>) data.getSerializableExtra(UpdateFragment.EXTRA_RECIPE_LIST);
 
             // Handles occasional NullPointerException.
             if(list != null && list.size() > 0)
@@ -178,15 +178,11 @@ public class RecipeListFragment extends ListFragment
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.recipe, menu);
 
-        /**
-         * Get the action view of the menu item whose id is
-         * edittext_search_field
-         */
-
+        // Get the action view of the menu item whose id is edittext_search_field
         View view = menu.findItem(R.id.menu_search).getActionView();
 
-        /** Get the edit text from the action view */
-        final EditText searchTextfield = (EditText) view.findViewById(R.id.edittext_search_field);
+        // Get the edit text from the action view
+        final EditText searchTextfield = view.findViewById(R.id.edittext_search_field);
         searchTextfield.setHint(R.string.hint_recipe);
 
         searchTextfield.addTextChangedListener(new TextWatcher()
@@ -218,8 +214,7 @@ public class RecipeListFragment extends ListFragment
     }
 
     /**
-     * This method is called when a user selects an item in the menu bar. Opens
-     * the fragment of selected item.
+     * This method is called when a user selects an item in the menu bar. Opens the fragment of selected item.
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
@@ -282,7 +277,8 @@ public class RecipeListFragment extends ListFragment
     /**
      * Updates the list view on UI thread.
      *
-     * @param list the new list
+     * @param list
+     *            the new list
      */
     private void updateListOnUiThread(final ArrayList<Recipe> list)
     {

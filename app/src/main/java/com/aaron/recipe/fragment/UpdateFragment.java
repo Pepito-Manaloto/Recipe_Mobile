@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.aaron.recipe.R;
-import com.aaron.recipe.async.CategoriesRetrieverThread;
 import com.aaron.recipe.async.RecipeRetrieverThread;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
@@ -50,6 +49,7 @@ public class UpdateFragment extends DialogFragment
     {
         Activity activity = getActivity();
 
+        // TODO: Replace with ProgressBar
         ProgressDialog progressDialog = new ProgressDialog(activity);
         progressDialog.setTitle(getString(R.string.dialog_update_title));
         progressDialog.setMessage(getString(R.string.dialog_update_message));

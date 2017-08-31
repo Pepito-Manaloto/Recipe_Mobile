@@ -108,8 +108,8 @@ public class AboutFragment extends Fragment
             }
         });
 
-        final TextView buildNumberTextView = (TextView) view.findViewById(R.id.text_build_number);
-        TextView lastUpdatedTextView = (TextView) view.findViewById(R.id.text_last_updated);
+        final TextView buildNumberTextView = view.findViewById(R.id.text_build_number);
+        TextView lastUpdatedTextView = view.findViewById(R.id.text_last_updated);
 
         String buildNumber = getActivity().getString(R.string.build_num);
         String lastUpdated = this.recipeManager.getLastUpdated(DATE_FORMAT_LONG);
@@ -117,7 +117,7 @@ public class AboutFragment extends Fragment
         buildNumberTextView.setText(buildNumber);
         lastUpdatedTextView.setText(lastUpdated);
 
-        GridLayout grid = (GridLayout) view.findViewById(R.id.gridlayout_count);
+        GridLayout grid = view.findViewById(R.id.gridlayout_count);
         grid.setColumnCount(2);
 
         Map<String, Integer> recipesCount = this.recipeManager.getRecipesCount();

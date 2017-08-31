@@ -1,57 +1,24 @@
 package com.aaron.recipe.bean;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.Map;
 
 /**
- * Created by Aaron on 9/24/2016.
+ * Bean representing the http response from a recipe request.
  */
-public class ResponseRecipe
+public class ResponseRecipe extends Response
 {
-    private int statusCode;
-    private String text;
-    private String body;
     private int recentlyAddedCount;
     private Map<String, ArrayList<Recipe>> recipeMap;
 
     public ResponseRecipe()
     {
+        super();
     }
 
     public ResponseRecipe(int statusCode)
     {
-        this.statusCode = statusCode;
-    }
-
-    public int getStatusCode()
-    {
-        return this.statusCode;
-    }
-
-    public void setStatusCode(int statusCode)
-    {
-        this.statusCode = statusCode;
-    }
-
-    public String getText()
-    {
-        return this.text;
-    }
-
-    public void setText(String text)
-    {
-        this.text = text;
-    }
-
-    public String getBody()
-    {
-        return this.body;
-    }
-
-    public void setBody(String body)
-    {
-        this.body = body;
+        super(statusCode);
     }
 
     public int getRecentlyAddedCount()
@@ -103,6 +70,6 @@ public class ResponseRecipe
     @Override
     public String toString()
     {
-        return "statusCode: " + statusCode + ", text: " + text + ", body: " + body + ", recentlyAddedCount: " + recentlyAddedCount + ", recipeMap: " + recipeMap;
+        return super.toString() + ", recentlyAddedCount: " + recentlyAddedCount + ", recipeMap: " + recipeMap;
     }
 }

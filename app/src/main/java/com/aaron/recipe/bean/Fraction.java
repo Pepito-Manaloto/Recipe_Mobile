@@ -14,7 +14,7 @@ public class Fraction implements Serializable
     /**
      * Constants for fractional characters.
      */
-    enum CommonFraction
+    public enum CommonFraction
     {
         THREE_FOURTH("¾", 0.75),
         ONE_HALF_PLUS_ONE_EIGHT("½ + ⅛", 0.625),

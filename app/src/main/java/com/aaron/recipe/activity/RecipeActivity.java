@@ -36,7 +36,9 @@ public class RecipeActivity extends FragmentActivity
         Settings settings = (Settings) this.getIntent().getSerializableExtra(EXTRA_SETTINGS);
         int page = this.getIntent().getIntExtra(EXTRA_PAGE, 0);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
+        setTitle(recipeList.get(page).getTitle());
+
+        ViewPager viewPager = findViewById(R.id.view_pager);
         FragmentPagerAdapter pagerAdapter = new RecipePagerAdapter(fm, recipeList, settings);
 
         viewPager.setAdapter(pagerAdapter);
@@ -52,13 +54,21 @@ public class RecipeActivity extends FragmentActivity
 
             /**
              * Sets the activity's title depending on the selected recipe.
+             * Title is updated here to become more responsive (reduce delay)
              */
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+            public void onPageScrolled(final int position, float positionOffset, int positionOffsetPixels)
             {
                 if(positionOffsetPixels == 0) // Change title after fully swiping to another recipe
                 {
-                    setTitle(recipeList.get(position).getTitle());
+                    runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            setTitle(recipeList.get(position).getTitle());
+                        }
+                    });
                 }
             }
 
@@ -67,5 +77,6 @@ public class RecipeActivity extends FragmentActivity
             {
             }
         });
+
     }
 }

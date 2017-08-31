@@ -19,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.aaron.recipe.R;
 import com.aaron.recipe.async.CategoriesRetrieverThread;
@@ -99,30 +100,39 @@ public class SettingsFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_settings, parent, false);
 
-        this.categoryImageView = (ImageView) view.findViewById(R.id.imageview_refresh_category);
+        this.categoryImageView = view.findViewById(R.id.imageview_refresh_category);
         this.categoryImageView.setClickable(true);
 
         final Animation rotation = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_refresh);
         rotation.setRepeatCount(Animation.INFINITE);
+
         this.categoryImageView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View imageView)
             {
-                imageView.startAnimation(rotation);
+                if(!CategoriesRetrieverThread.isUpdating())
+                {
+                    CategoriesRetrieverThread categoriesRetrieverThread = new CategoriesRetrieverThread(SettingsFragment.this, settings);
+                    categoriesRetrieverThread.execute();
 
-                CategoriesRetrieverThread categoriesRetrieverThread = new CategoriesRetrieverThread(SettingsFragment.this, settings);
-                categoriesRetrieverThread.execute();
+                    CategoriesRetrieverThread.setIsUpdating();
+                    imageView.startAnimation(rotation);
+                }
+                else
+                {
+                    Toast.makeText(getActivity(), getActivity().getString(R.string.categories_currently_updating), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-        this.categorySpinner = (Spinner) view.findViewById(R.id.spinner_category);
+        this.categorySpinner = view.findViewById(R.id.spinner_category);
         this.categorySpinner.setAdapter(this.categoryAdapter);
 
-        this.fontNameSpinner = (Spinner) view.findViewById(R.id.spinner_font_name);
-        this.fontStyleSpinner = (Spinner) view.findViewById(R.id.spinner_font_style);
-        this.fontSizeSpinner = (Spinner) view.findViewById(R.id.spinner_font_size);
-        this.serverURLEditText = (EditText) view.findViewById(R.id.edittext_server_url);
+        this.fontNameSpinner = view.findViewById(R.id.spinner_font_name);
+        this.fontStyleSpinner = view.findViewById(R.id.spinner_font_style);
+        this.fontSizeSpinner = view.findViewById(R.id.spinner_font_size);
+        this.serverURLEditText = view.findViewById(R.id.edittext_server_url);
         this.serverURLEditText.addTextChangedListener(new TextWatcher()
         {
             @Override
@@ -174,8 +184,7 @@ public class SettingsFragment extends Fragment
     }
 
     /**
-     * This method is called when a user selects an item in the menu bar. Home button.
-     * the fragment of selected item.
+     * This method is called when a user selects an item in the menu bar. Home button. the fragment of selected item.
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item)

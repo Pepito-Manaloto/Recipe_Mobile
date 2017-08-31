@@ -172,7 +172,7 @@ public class Settings implements Serializable
     /**
      * Sets the category new value.
      *
-     * @param category
+     * @param category the category to set
      * @return the settings object being updated
      */
     public Settings setCategory(final String category)
@@ -184,7 +184,7 @@ public class Settings implements Serializable
     /**
      * Sets the fontName new value.
      *
-     * @param fontName
+     * @param fontName the font name to set
      * @return the settings object being updated
      */
     public Settings setFontName(final FontName fontName)
@@ -196,7 +196,7 @@ public class Settings implements Serializable
     /**
      * Sets the fontStyle new value.
      *
-     * @param fontStyle
+     * @param fontStyle the font style to set
      * @return the settings object being updated
      */
     public Settings setFontStyle(final FontStyle fontStyle)
@@ -208,7 +208,7 @@ public class Settings implements Serializable
     /**
      * Sets the fontSize new value.
      *
-     * @param fontSize
+     * @param fontSize the font size to set
      * @return the settings object being updated
      */
     public Settings setFontSize(final int fontSize)
@@ -220,7 +220,7 @@ public class Settings implements Serializable
     /**
      * Sets the serverURL new value.
      *
-     * @param serverURL
+     * @param serverURL the server url to set
      * @return the settings object being updated
      */
     public Settings setServerURL(final String serverURL)

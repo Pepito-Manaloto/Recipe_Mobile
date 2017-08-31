@@ -36,15 +36,17 @@ public class RecipeFragment extends Fragment
     private Recipe recipe;
 
     /**
-     * Creates a new RecipeFragment instance and stores the passed Recipe data as arguments.
-     * Note: Android will call no-argument constructor of a fragment when it decides to recreate the fragment;
-     * hence, overloading a fragment constructor for data passing will not be able to save the passed data.
-     * That is why this static initializer is used.
-     * There is also no way to pass data to RecipePageAdapter through savedInstanceState intent, that is why we pass data through instance creation.
+     * Creates a new RecipeFragment instance and stores the passed Recipe data as arguments. Note: Android will call no-argument constructor of a fragment
+     * when it decides to recreate the fragment; hence, overloading a fragment constructor for data passing will not be able to save the passed data. That
+     * is why this static initializer is used. There is also no way to pass data to RecipePageAdapter through savedInstanceState intent, that is why we
+     * pass data through instance creation.
      *
-     * @param page       the page
-     * @param recipeList the recipe list
-     * @param settings   the settings
+     * @param page
+     *            the page
+     * @param recipeList
+     *            the recipe list
+     * @param settings
+     *            the settings
      */
     public static RecipeFragment newInstance(final int page, final ArrayList<Recipe> recipeList, final Settings settings)
     {
@@ -132,6 +134,7 @@ public class RecipeFragment extends Fragment
      * Creates a TextView with the given text and current selected settings.
      *
      * @param text
+     *            the text of the TextView to create
      * @return TextView
      */
     private TextView createTextView(final String text)

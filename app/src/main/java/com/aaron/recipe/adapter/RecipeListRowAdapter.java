@@ -2,6 +2,7 @@ package com.aaron.recipe.adapter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -56,8 +57,9 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
     /**
      * Populates the ListView.
      */
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
+    public View getView(int position, View convertView, @NonNull ViewGroup parent)
     {
         ViewHolder holder;
 
@@ -66,12 +68,12 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
             convertView = this.activity.getLayoutInflater().inflate(R.layout.fragment_recipe_list_row, parent, false);
 
             holder = new ViewHolder();
-            holder.titleText = (TextView) convertView.findViewById(R.id.text_row_title);
-            holder.categoryText = (TextView) convertView.findViewById(R.id.text_row_category);
-            holder.servingsText = (TextView) convertView.findViewById(R.id.text_row_servings);
-            holder.preparationTimeText = (TextView) convertView.findViewById(R.id.text_row_preparation_time);
-            holder.description = (TextView) convertView.findViewById(R.id.text_row_description);
-            holder.scroll = (HorizontalScrollView) convertView.findViewById(R.id.horizontalscroll_list_row);
+            holder.titleText = convertView.findViewById(R.id.text_row_title);
+            holder.categoryText = convertView.findViewById(R.id.text_row_category);
+            holder.servingsText = convertView.findViewById(R.id.text_row_servings);
+            holder.preparationTimeText = convertView.findViewById(R.id.text_row_preparation_time);
+            holder.description = convertView.findViewById(R.id.text_row_description);
+            holder.scroll = convertView.findViewById(R.id.horizontalscroll_list_row);
 
             convertView.setTag(holder);
         }
@@ -123,14 +125,14 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
      */
     private static class ViewHolder
     {
-        public TextView titleText;
-        public TextView categoryText;
-        public TextView servingsText;
-        public TextView preparationTimeText;
-        public TextView description;
-        public HorizontalScrollView scroll;
+        TextView titleText;
+        TextView categoryText;
+        TextView servingsText;
+        TextView preparationTimeText;
+        TextView description;
+        HorizontalScrollView scroll;
 
-        public void setRecipeView(Recipe recipe, Settings settings, OnTouchListener listener)
+        void setRecipeView(Recipe recipe, Settings settings, OnTouchListener listener)
         {
             this.scroll.setOnTouchListener(listener);
 
@@ -169,7 +171,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
          *
          * @param page the position of the selected recipe
          */
-        public RecipeListRowTouchListener(final int page)
+        RecipeListRowTouchListener(final int page)
         {
             this.page = page;
         }

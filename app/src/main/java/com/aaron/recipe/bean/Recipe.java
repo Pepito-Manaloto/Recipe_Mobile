@@ -1,7 +1,5 @@
 package com.aaron.recipe.bean;
 
-import android.util.Pair;
-
 import java.io.Serializable;
 
 /**

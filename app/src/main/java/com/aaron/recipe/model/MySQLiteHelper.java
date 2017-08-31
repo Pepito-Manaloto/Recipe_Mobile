@@ -17,20 +17,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper
     public static final String TABLE_RECIPE = "recipe";
     public static final String TABLE_INGREDIENTS = "ingredients";
     public static final String TABLE_INSTRUCTIONS = "instructions";
-    public static final String[] COLUMN_COUNT = new String[] {"COUNT(*)",};
+    public static final String TABLE_CATEGORIES = "categories";
+    public static final String[] COLUMN_COUNT = new String[] { "COUNT(*)", };
 
     /**
      * The database's recipe table column names.
      */
     public enum ColumnRecipe
     {
-        id,
-        title,
-        category,
-        preparation_time,
-        description,
-        servings,
-        date_in,
+        id, title, category, preparation_time, description, servings, date_in,
     }
 
     /**
@@ -38,12 +33,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
      */
     public enum ColumnIngredients
     {
-        title,
-        quantity,
-        measurement,
-        ingredient,
-        comment_,
-        count,
+        title, quantity, measurement, ingredient, comment_, count,
     }
 
     /**
@@ -51,15 +41,21 @@ public class MySQLiteHelper extends SQLiteOpenHelper
      */
     public enum ColumnInstructions
     {
-        title,
-        instruction,
-        count,
+        title, instruction, count,
+    }
+
+    /**
+     * The database's categories table column names.
+     */
+    public enum ColumnCategories
+    {
+        id, name,
     }
 
     private static final String CREATE_TABLE_RECIPE = "CREATE TABLE " + TABLE_RECIPE +
             "(" +
             ColumnRecipe.title.name() + " TEXT PRIMARY KEY, " +
-            ColumnRecipe.category.name() + " TEXT NOT NULL, " +
+            ColumnRecipe.category.name() + " INTEGER NOT NULL, " +
             ColumnRecipe.preparation_time.name() + " INTEGER NOT NULL, " +
             ColumnRecipe.description.name() + " TEXT NOT NULL, " +
             ColumnRecipe.servings.name() + " INTEGER NOT NULL, " +
@@ -87,6 +83,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper
             "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) ON UPDATE CASCADE ON DELETE CASCADE" +
             ");";
 
+    private static final String CREATE_TABLE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES +
+            "(" +
+            ColumnCategories.id.name() + " INTEGER NOT NULL," +
+            ColumnCategories.name.name() + " TEXT NOT NULL" +
+            ");";
+
     /**
      * Default constructor.
      */
@@ -104,10 +106,23 @@ public class MySQLiteHelper extends SQLiteOpenHelper
         Log.d(LogsManager.TAG, "MySQLiteHelper: onCreate. query=" + CREATE_TABLE_RECIPE);
         Log.d(LogsManager.TAG, "MySQLiteHelper: onCreate. query=" + CREATE_TABLE_INGREDIENTS);
         Log.d(LogsManager.TAG, "MySQLiteHelper: onCreate. query=" + CREATE_TABLE_INSTRUCTIONS);
+        Log.d(LogsManager.TAG, "MySQLiteHelper: onCreate. query=" + CREATE_TABLE_CATEGORIES);
 
-        database.execSQL(CREATE_TABLE_RECIPE);
-        database.execSQL(CREATE_TABLE_INGREDIENTS);
-        database.execSQL(CREATE_TABLE_INSTRUCTIONS);
+        try
+        {
+            database.beginTransaction();
+
+            database.execSQL(CREATE_TABLE_RECIPE);
+            database.execSQL(CREATE_TABLE_INGREDIENTS);
+            database.execSQL(CREATE_TABLE_INSTRUCTIONS);
+            database.execSQL(CREATE_TABLE_CATEGORIES);
+
+            database.setTransactionSuccessful();
+        }
+        finally
+        {
+            database.endTransaction();
+        }
     }
 
     /**
@@ -117,12 +132,26 @@ public class MySQLiteHelper extends SQLiteOpenHelper
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion)
     {
         /**
-         * TODO (1) store db contents in temp --- NOT YET
-         *      (2) drop db --- IMPLEMENTED
-         *      (3) create new db --- IMPLEMENTED 
-         *      (4) insert temp data in new db --- NOT YET
+         * TODO
+         * (1) store db contents in temp --- NOT YET
+         * (2) drop db --- IMPLEMENTED
+         * (3) create new db --- IMPLEMENTED
+         * (4) insert temp data in new db --- NOT YET
          */
-        database.execSQL("DROP IF TABLE EXISTS " + TABLE_RECIPE);
+        try
+        {
+            database.beginTransaction();
+            database.execSQL("DROP IF TABLE EXISTS " + TABLE_RECIPE);
+            database.execSQL("DROP IF TABLE EXISTS " + TABLE_INGREDIENTS);
+            database.execSQL("DROP IF TABLE EXISTS " + TABLE_INSTRUCTIONS);
+            database.execSQL("DROP IF TABLE EXISTS " + TABLE_CATEGORIES);
+            database.setTransactionSuccessful();
+        }
+        finally
+        {
+            database.endTransaction();
+        }
+
         this.onCreate(database);
     }
 

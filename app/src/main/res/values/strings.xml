@@ -40,6 +40,7 @@
 
     <!-- Error messages -->
     <string name="error_retrieving_categories">Failed retrieving categories from server. Update url in settings and try to update again.</string>
+    <string name="categories_currently_updating">Categories is currently updating.</string>
 
     <!-- COMBO BOX ITEMS -->
     <string-array name="font_name_arrays">

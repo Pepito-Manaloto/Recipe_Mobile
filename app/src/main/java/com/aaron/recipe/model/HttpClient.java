@@ -1,8 +1,7 @@
 package com.aaron.recipe.model;
 
-import com.aaron.recipe.bean.ResponseRecipe;
+import com.aaron.recipe.bean.Response;
 
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,18 +15,24 @@ import java.util.List;
 /**
  * Created by Aaron on 9/24/2016.
  */
-public class HttpClient
+public class HttpClient<T extends Response>
 {
     public static final int CONNECTION_TIMEOUT = 10_000;
     public static final int READ_TIMEOUT = 10_000;
+    private Class<T> clazz;
+
+    public HttpClient(final Class<T> clazz)
+    {
+        this.clazz = clazz;
+    }
 
     /**
      * Performs a GET request.
      *
-     * @param url
-     * @return ResponseRecipe
+     * @param url the url to make http request
+     * @return Response
      */
-    public ResponseRecipe get(String url) throws IOException
+    public T get(String url) throws IOException
     {
         return this.get(url, null, null);
     }
@@ -35,11 +40,11 @@ public class HttpClient
     /**
      * Performs a GET request with query.
      *
-     * @param url
-     * @param query
-     * @return ResponseRecipe
+     * @param url the url to make http request
+     * @param query the query parameter
+     * @return Response
      */
-    public ResponseRecipe get(String url, String query) throws IOException
+    public T get(String url, String query) throws IOException
     {
         return this.get(url, query, null);
     }
@@ -47,11 +52,11 @@ public class HttpClient
     /**
      * Performs a GET request with specific headers.
      *
-     * @param url
-     * @param headers
-     * @return ResponseRecipe
+     * @param url the url to make http request
+     * @param headers the request headers
+     * @return Response
      */
-    public ResponseRecipe get(String url, List<Header> headers) throws IOException
+    public T get(String url, List<Header> headers) throws IOException
     {
         return this.get(url, null, headers);
     }
@@ -59,12 +64,12 @@ public class HttpClient
     /**
      * Performs a GET request with query and specific headers.
      *
-     * @param url
-     * @param query
-     * @param headers
-     * @return ResponseRecipe
+     * @param url the url to make http request
+     * @param query the query parameter
+     * @param headers the request headers
+     * @return Response
      */
-    public ResponseRecipe get(String url, String query, List<Header> headers) throws IOException
+    public T get(String url, String query, List<Header> headers) throws IOException
     {
         if(StringUtils.isNotBlank(query))
         {
@@ -73,7 +78,8 @@ public class HttpClient
         HttpURLConnection con = null;
 
         URL getURL = new URL(url);
-        ResponseRecipe response = new ResponseRecipe(HttpURLConnection.HTTP_INTERNAL_ERROR);
+        T response = Response.newInstance(this.clazz);
+        response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
 
         try
         {
@@ -87,7 +93,7 @@ public class HttpClient
             }
 
             response.setStatusCode(con.getResponseCode());
-            response.setBody(getResponseRecipeBodyFromStream(con.getInputStream()));
+            response.setBody(getResponseBodyFromStream(con.getInputStream()));
             response.setText(getStatusText(response.getStatusCode()));
         }
         finally
@@ -104,10 +110,11 @@ public class HttpClient
     /**
      * Converts the inputStream to String.
      *
-     * @param inputStream HttpURLConnection response
+     * @param inputStream
+     *            HttpURLConnection response
      * @return String
      */
-    protected String getResponseRecipeBodyFromStream(final InputStream inputStream) throws IOException
+    private String getResponseBodyFromStream(final InputStream inputStream) throws IOException
     {
         String response = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         IOUtils.closeQuietly(inputStream);
@@ -116,8 +123,8 @@ public class HttpClient
     }
 
     /**
-     * Returns the string representation of the status code returned by the last web call.
-     * Internal Server Error is returned if the class does not have a previous web call.
+     * Returns the string representation of the status code returned by the last web call. Internal Server Error is returned if the class does not have a
+     * previous web call.
      *
      * @return String
      */
