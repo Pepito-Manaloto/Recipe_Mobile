@@ -1,5 +1,7 @@
 package com.aaron.recipe.bean;
 
+import android.os.Parcelable;
+
 import com.aaron.recipe.model.MathUtils;
 
 import java.io.Serializable;
@@ -7,10 +9,8 @@ import java.io.Serializable;
 /**
  * Represents a decimal number as fraction.
  */
-public class Fraction implements Serializable
+public class Fraction implements Parcelable
 {
-    private static final long serialVersionUID = 3145067774846177809L;
-
     /**
      * Constants for fractional characters.
      */

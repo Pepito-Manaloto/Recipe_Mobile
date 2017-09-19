@@ -1,14 +1,14 @@
 package com.aaron.recipe.bean;
 
+import android.os.Parcelable;
+
 import java.io.Serializable;
 
 /**
  * Recipe class.
  */
-public class Recipe implements Serializable
+public class Recipe implements Parcelable
 {
-    private static final long serialVersionUID = -2999934642681556146L;
-
     private String title;
     private String category;
     private int servings;

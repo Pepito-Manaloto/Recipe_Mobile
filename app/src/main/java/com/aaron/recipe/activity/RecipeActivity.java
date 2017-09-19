@@ -12,6 +12,7 @@ import com.aaron.recipe.adapter.RecipePagerAdapter;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import static com.aaron.recipe.adapter.RecipePagerAdapter.EXTRA_PAGE;
@@ -23,6 +24,8 @@ import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
  */
 public class RecipeActivity extends FragmentActivity
 {
+    private ArrayList<Recipe> recipeList;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -31,8 +34,7 @@ public class RecipeActivity extends FragmentActivity
 
         FragmentManager fm = getSupportFragmentManager();
 
-        @SuppressWarnings("unchecked")
-        final ArrayList<Recipe> recipeList = (ArrayList<Recipe>) this.getIntent().getSerializableExtra(EXTRA_RECIPE_LIST);
+        this.recipeList = this.getIntent().getParcelableArrayListExtra(EXTRA_RECIPE_LIST);
         Settings settings = (Settings) this.getIntent().getSerializableExtra(EXTRA_SETTINGS);
         int page = this.getIntent().getIntExtra(EXTRA_PAGE, 0);
 
@@ -45,38 +47,56 @@ public class RecipeActivity extends FragmentActivity
         viewPager.setCurrentItem(page);
         viewPager.clearOnPageChangeListeners();
 
-        viewPager.addOnPageChangeListener(new OnPageChangeListener()
-        {
-            @Override
-            public void onPageScrollStateChanged(int state)
-            {
-            }
+        viewPager.addOnPageChangeListener(new PageChangeListener(this));
 
-            /**
-             * Sets the activity's title depending on the selected recipe.
-             * Title is updated here to become more responsive (reduce delay)
-             */
-            @Override
-            public void onPageScrolled(final int position, float positionOffset, int positionOffsetPixels)
+    }
+
+    protected ArrayList<Recipe> getRecipeList()
+    {
+        return this.recipeList;
+    }
+
+    private static class PageChangeListener implements OnPageChangeListener
+    {
+        private WeakReference<RecipeActivity> activityRef;
+
+        PageChangeListener(RecipeActivity activity)
+        {
+            this.activityRef = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state)
+        {
+        }
+
+        /**
+         * Sets the activity's title depending on the selected recipe. Title is updated here to become more responsive (reduce delay)
+         */
+        @Override
+        public void onPageScrolled(final int position, float positionOffset, int positionOffsetPixels)
+        {
+            if(positionOffsetPixels == 0) // Change title after fully swiping to another recipe
             {
-                if(positionOffsetPixels == 0) // Change title after fully swiping to another recipe
+                final RecipeActivity activity = this.activityRef.get();
+
+                if(activity != null)
                 {
-                    runOnUiThread(new Runnable()
+                    activity.runOnUiThread(new Runnable()
                     {
                         @Override
                         public void run()
                         {
-                            setTitle(recipeList.get(position).getTitle());
+                            activity.setTitle(activity.getRecipeList().get(position).getTitle());
                         }
                     });
                 }
             }
+        }
 
-            @Override
-            public void onPageSelected(int position)
-            {
-            }
-        });
-
+        @Override
+        public void onPageSelected(int position)
+        {
+        }
     }
 }

@@ -9,6 +9,8 @@ import com.aaron.recipe.fragment.RecipeListFragment;
  */
 public class RecipeListActivity extends SingleFragmentActivity
 {
+    private RecipeListFragment fragment;
+
     /**
      * Returns a recipe list fragment.
      *
@@ -17,6 +19,11 @@ public class RecipeListActivity extends SingleFragmentActivity
     @Override
     protected Fragment createFragment()
     {
-        return new RecipeListFragment();
+        if(this.fragment == null)
+        {
+            this.fragment = new RecipeListFragment();
+        }
+
+        return this.fragment;
     }
 }

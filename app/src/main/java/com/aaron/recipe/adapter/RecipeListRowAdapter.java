@@ -19,6 +19,7 @@ import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -40,15 +41,18 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
     /**
      * Default constructor. 0 is passed to the resource id, because we will be creating our own custom layout.
      *
-     * @param context    the current context
-     * @param recipeList the vocabulary list
-     * @param settings   the current user settings
+     * @param activity
+     *            the current activity
+     * @param recipeList
+     *            the vocabulary list
+     * @param settings
+     *            the current user settings
      */
-    public RecipeListRowAdapter(final Activity context, final ArrayList<Recipe> recipeList, final Settings settings)
+    public RecipeListRowAdapter(final Activity activity, final ArrayList<Recipe> recipeList, final Settings settings)
     {
-        super(context, 0, recipeList);
+        super(activity, 0, recipeList);
 
-        this.activity = context;
+        this.activity = activity;
         this.recipeList = recipeList;
         this.recipeListTemp = new ArrayList<>(recipeList);
         this.settings = settings;
@@ -83,7 +87,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         }
 
         Recipe recipe = getItem(position);
-        holder.setRecipeView(recipe, this.settings, new RecipeListRowTouchListener(position));
+        holder.setRecipeView(recipe, this.settings, new RecipeListRowTouchListener(this.activity, this.recipeList, this.settings, position));
 
         return convertView;
     }
@@ -91,7 +95,8 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
     /**
      * Filters the recipe list in the adapter with the given searched text. Only shows recipe title that starts with the searched text.
      *
-     * @param searched the searched word
+     * @param searched
+     *            the searched word
      */
     public void filter(final String searched)
     {
@@ -161,24 +166,31 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
     /**
      * Helper class for handling Recipe selection and Recipe list row scrolling.
      */
-    private class RecipeListRowTouchListener implements OnTouchListener
+    private static class RecipeListRowTouchListener implements OnTouchListener
     {
+        private WeakReference<Activity> activityRef;
+        private ArrayList<Recipe> recipeList;
+        private Settings settings;
         private float historicX;
         private int page;
 
         /**
          * Default constructor.
          *
-         * @param page the position of the selected recipe
+         * @param page
+         *            the position of the selected recipe
          */
-        RecipeListRowTouchListener(final int page)
+        RecipeListRowTouchListener(Activity activity, ArrayList<Recipe> recipeList, Settings settings, final int page)
         {
+            this.activityRef = new WeakReference<>(activity);
+            this.recipeList = recipeList;
+            this.settings = settings;
             this.page = page;
         }
 
         /**
-         * If the touch moves MORE than 15 pixels horizontally then the gesture will be treated as a scrolling event,
-         * else it will be treated as selecting the row which will start RecipeActivity.
+         * If the touch moves MORE than 15 pixels horizontally then the gesture will be treated as a scrolling event, else it will be treated as selecting the
+         * row which will start RecipeActivity.
          */
         @Override
         public boolean onTouch(View v, MotionEvent event)
@@ -192,15 +204,19 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
                 }
                 case MotionEvent.ACTION_UP:
                 {
-                    boolean touchMovedLessThan10Pixels = Math.abs(this.historicX - event.getX()) < 15;
+                    Activity activity = this.activityRef.get();
 
-                    if(touchMovedLessThan10Pixels)
+                    if(activity != null)
                     {
-                        Intent intent = new Intent(activity, RecipeActivity.class);
-                        intent.putExtra(EXTRA_PAGE, this.page);
-                        intent.putExtra(EXTRA_RECIPE_LIST, RecipeListRowAdapter.this.recipeList);
-                        intent.putExtra(EXTRA_SETTINGS, RecipeListRowAdapter.this.settings);
-                        RecipeListRowAdapter.this.activity.startActivity(intent);
+                        boolean touchMovedLessThan10Pixels = Math.abs(this.historicX - event.getX()) < 15;
+                        if(touchMovedLessThan10Pixels)
+                        {
+                            Intent intent = new Intent(activity, RecipeActivity.class);
+                            intent.putExtra(EXTRA_PAGE, this.page);
+                            intent.putExtra(EXTRA_RECIPE_LIST, this.recipeList);
+                            intent.putExtra(EXTRA_SETTINGS, this.settings);
+                            activity.startActivity(intent);
+                        }
                     }
 
                     // Removes compiler warning

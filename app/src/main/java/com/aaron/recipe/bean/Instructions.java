@@ -1,14 +1,15 @@
 package com.aaron.recipe.bean;
 
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Instructions class.
  */
-public class Instructions implements Serializable
+public class Instructions implements Parcelable
 {
-    private static final long serialVersionUID = 5879474962110261190L;
     private String title;
     private ArrayList<String> instructionsList;
 

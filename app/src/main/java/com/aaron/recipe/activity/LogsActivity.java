@@ -2,6 +2,7 @@ package com.aaron.recipe.activity;
 
 import android.app.Fragment;
 
+import com.aaron.recipe.fragment.AboutFragment;
 import com.aaron.recipe.fragment.LogsFragment;
 
 /**
@@ -9,6 +10,8 @@ import com.aaron.recipe.fragment.LogsFragment;
  */
 public class LogsActivity extends SingleFragmentActivity
 {
+    private LogsFragment fragment;
+
     /**
      * Returns a logs fragment.
      *
@@ -17,7 +20,12 @@ public class LogsActivity extends SingleFragmentActivity
     @Override
     protected Fragment createFragment()
     {
-        return new LogsFragment();
+        if(this.fragment == null)
+        {
+            this.fragment = new LogsFragment();
+        }
+
+        return this.fragment;
     }
 
 }

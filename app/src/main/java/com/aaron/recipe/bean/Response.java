@@ -13,11 +13,11 @@ public abstract class Response
     protected String text;
     protected String body;
 
-    public Response()
+    Response()
     {
     }
 
-    public Response(int statusCode)
+    Response(int statusCode)
     {
         this.statusCode = statusCode;
     }

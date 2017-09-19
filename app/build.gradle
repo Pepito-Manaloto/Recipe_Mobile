@@ -41,6 +41,9 @@ android {
 
 dependencies {
     testCompile 'junit:junit:4.12'
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.2'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.2'
+
     compile 'com.android.support:support-fragment:26.0.1'
     compile 'commons-io:commons-io:2.5'
     compile 'org.apache.commons:commons-lang3:3.4'

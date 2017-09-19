@@ -1,13 +1,14 @@
 package com.aaron.recipe.bean;
 
 import android.graphics.Typeface;
+import android.os.Parcelable;
 
 import java.io.Serializable;
 
 /**
  * Java bean for the application settings.
  */
-public class Settings implements Serializable
+public class Settings implements Parcelable
 {
     private static final long serialVersionUID = -8674493096543909252L;
 

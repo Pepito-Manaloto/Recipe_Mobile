@@ -10,6 +10,8 @@ import com.aaron.recipe.fragment.SettingsFragment;
  */
 public class SettingsActivity extends SingleFragmentActivity
 {
+    private SettingsFragment fragment;
+
     /**
      * Returns a settings fragment.
      *
@@ -19,8 +21,9 @@ public class SettingsActivity extends SingleFragmentActivity
     protected Fragment createFragment()
     {
         Settings settings = (Settings) this.getIntent().getSerializableExtra(SettingsFragment.EXTRA_SETTINGS);
+        this.fragment = SettingsFragment.newInstance(this.fragment, settings);
 
-        return SettingsFragment.newInstance(settings);
+        return this.fragment;
     }
 
 }

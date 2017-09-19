@@ -53,17 +53,26 @@ public class SettingsFragment extends Fragment
     /**
      * Returns a new SettingsFragment with the given settings as arguments.
      */
-    public static SettingsFragment newInstance(final Settings settings)
+    public static SettingsFragment newInstance(SettingsFragment fragment, final Settings settings)
     {
         Bundle args = new Bundle();
         args.putSerializable(EXTRA_SETTINGS, settings);
 
-        SettingsFragment fragment = new SettingsFragment();
-        fragment.setArguments(args);
+        SettingsFragment settingsFragment;
+        if(fragment != null)
+        {
+            settingsFragment = fragment;
+        }
+        else
+        {
+            settingsFragment = new SettingsFragment();
+        }
+
+        settingsFragment.setArguments(args);
 
         Log.d(LogsManager.TAG, CLASS_NAME + ": newInstance. settings=" + settings);
 
-        return fragment;
+        return settingsFragment;
     }
 
     /**

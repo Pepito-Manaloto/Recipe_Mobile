@@ -10,6 +10,7 @@ import com.aaron.recipe.async.CategoriesRetrieverThread;
 import com.aaron.recipe.bean.Categories;
 import com.aaron.recipe.model.CategoryManager;
 import com.aaron.recipe.model.LogsManager;
+import com.squareup.leakcanary.LeakCanary;
 
 /**
  * Initializes the categories.
@@ -22,6 +23,14 @@ public class RecipeApplication extends Application
     public void onCreate()
     {
         super.onCreate();
+
+        if(LeakCanary.isInAnalyzerProcess(this))
+        {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
 
         if(Categories.getCategories().size() <= 1)
         {
@@ -39,7 +48,7 @@ public class RecipeApplication extends Application
             {
                 if(!CategoriesRetrieverThread.isUpdating())
                 {
-                    CategoriesRetrieverThread categoriesRetrieverThread = new CategoriesRetrieverThread(this, null);
+                    CategoriesRetrieverThread categoriesRetrieverThread = new CategoriesRetrieverThread(this.getApplicationContext(), null);
                     categoriesRetrieverThread.execute();
                     CategoriesRetrieverThread.setIsUpdating();
                 }
