@@ -20,7 +20,7 @@ public class SettingsActivity extends SingleFragmentActivity
     @Override
     protected Fragment createFragment()
     {
-        Settings settings = (Settings) this.getIntent().getSerializableExtra(SettingsFragment.EXTRA_SETTINGS);
+        Settings settings = this.getIntent().getParcelableExtra(SettingsFragment.EXTRA_SETTINGS);
         this.fragment = SettingsFragment.newInstance(this.fragment, settings);
 
         return this.fragment;

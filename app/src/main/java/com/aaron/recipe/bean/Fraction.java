@@ -1,10 +1,9 @@
 package com.aaron.recipe.bean;
 
+import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.aaron.recipe.model.MathUtils;
-
-import java.io.Serializable;
 
 /**
  * Represents a decimal number as fraction.
@@ -113,4 +112,48 @@ public class Fraction implements Parcelable
     {
         return this.fraction;
     }
+
+    /**
+     * Constructor that will be called in creating the parcel. Note: Reading the parcel should be the same order as writing the parcel!
+     */
+    private Fraction(Parcel in)
+    {
+        this.fraction = in.readString();
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(this.fraction);
+    }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable instance's marshaled representation.
+     */
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    /**
+     * Generates instances of your Parcelable class from a Parcel.
+     */
+    public static final Creator<Fraction> CREATOR = new Creator<Fraction>()
+    {
+        @Override
+        public Fraction createFromParcel(Parcel in)
+        {
+            return new Fraction(in);
+        }
+
+        @Override
+        public Fraction[] newArray(int size)
+        {
+            return new Fraction[size];
+        }
+    };
 }

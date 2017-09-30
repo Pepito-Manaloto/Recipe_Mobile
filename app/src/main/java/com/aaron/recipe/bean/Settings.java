@@ -1,17 +1,14 @@
 package com.aaron.recipe.bean;
 
 import android.graphics.Typeface;
+import android.os.Parcel;
 import android.os.Parcelable;
-
-import java.io.Serializable;
 
 /**
  * Java bean for the application settings.
  */
 public class Settings implements Parcelable
 {
-    private static final long serialVersionUID = -8674493096543909252L;
-
     /**
      * Enum for the list of default font name.
      */
@@ -277,4 +274,56 @@ public class Settings implements Parcelable
         result = 31 * result + (serverURL != null ? serverURL.hashCode() : 0);
         return result;
     }
+
+    /**
+     * Constructor that will be called in creating the parcel. Note: Reading the parcel should be the same order as writing the parcel!
+     */
+    private Settings(Parcel in)
+    {
+        this.category = in.readString();
+        this.fontName = FontName.values()[in.readInt()];
+        this.fontStyle = FontStyle.values()[in.readInt()];
+        this.fontSize = in.readInt();
+        this.serverURL = in.readString();
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(this.category);
+        dest.writeInt(this.fontName != null ? this.fontName.ordinal() : 0);
+        dest.writeInt(this.fontStyle != null ? this.fontStyle.ordinal() : 0);
+        dest.writeInt(this.fontSize);
+        dest.writeString(this.serverURL);
+    }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable instance's marshaled representation.
+     */
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    /**
+     * Generates instances of your Parcelable class from a Parcel.
+     */
+    public static final Creator<Settings> CREATOR = new Creator<Settings>()
+    {
+        @Override
+        public Settings createFromParcel(Parcel in)
+        {
+            return new Settings(in);
+        }
+
+        @Override
+        public Settings[] newArray(int size)
+        {
+            return new Settings[size];
+        }
+    };
 }

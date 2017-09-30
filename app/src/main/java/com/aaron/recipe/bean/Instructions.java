@@ -1,8 +1,8 @@
 package com.aaron.recipe.bean;
 
+import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -25,7 +25,8 @@ public class Instructions implements Parcelable
     /**
      * Adds an instruction to the instructionsList.
      *
-     * @param instruction an instruction
+     * @param instruction
+     *            an instruction
      */
     public void addInstruction(final String instruction)
     {
@@ -55,7 +56,8 @@ public class Instructions implements Parcelable
     /**
      * Checks for equality, only checks the title of the instructions.
      *
-     * @param obj Instruction object to compare to
+     * @param obj
+     *            Instruction object to compare to
      * @return boolean true if equal, else false
      */
     @Override
@@ -97,4 +99,52 @@ public class Instructions implements Parcelable
         return "title: " + this.title +
                 " instructions: " + this.instructionsList;
     }
+
+    /**
+     * Constructor that will be called in creating the parcel. Note: Reading the parcel should be the same order as writing the parcel!
+     */
+    private Instructions(Parcel in)
+    {
+        this.instructionsList = new ArrayList<>();
+
+        this.title = in.readString();
+        in.readStringList(this.instructionsList);
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(this.title);
+        dest.writeStringList(this.instructionsList);
+    }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable instance's marshaled representation.
+     */
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    /**
+     * Generates instances of your Parcelable class from a Parcel.
+     */
+    public static final Creator<Instructions> CREATOR = new Creator<Instructions>()
+    {
+        @Override
+        public Instructions createFromParcel(Parcel in)
+        {
+            return new Instructions(in);
+        }
+
+        @Override
+        public Instructions[] newArray(int size)
+        {
+            return new Instructions[size];
+        }
+    };
 }

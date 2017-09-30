@@ -1,8 +1,7 @@
 package com.aaron.recipe.bean;
 
+import android.os.Parcel;
 import android.os.Parcelable;
-
-import java.io.Serializable;
 
 /**
  * Recipe class.
@@ -215,4 +214,60 @@ public class Recipe implements Parcelable
                 " Ingredients: " + this.ingredients.toString() +
                 " Instructions: " + this.instructions.toString();
     }
+
+    /**
+     * Constructor that will be called in creating the parcel. Note: Reading the parcel should be the same order as writing the parcel!
+     */
+    private Recipe(Parcel in)
+    {
+        this.title = in.readString();
+        this.category = in.readString();
+        this.servings = in.readInt();
+        this.preparationTime = in.readInt();
+        this.description = in.readString();
+        this.ingredients = in.readParcelable(Ingredients.class.getClassLoader());
+        this.instructions = in.readParcelable(Instructions.class.getClassLoader());
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(this.title);
+        dest.writeString(this.category);
+        dest.writeInt(this.servings);
+        dest.writeInt(this.preparationTime);
+        dest.writeString(this.description);
+        dest.writeParcelable(this.ingredients, flags);
+        dest.writeParcelable(this.instructions, flags);
+    }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable instance's marshaled representation.
+     */
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    /**
+     * Generates instances of your Parcelable class from a Parcel.
+     */
+    public static final Creator<Recipe> CREATOR = new Creator<Recipe>()
+    {
+        @Override
+        public Recipe createFromParcel(Parcel in)
+        {
+            return new Recipe(in);
+        }
+
+        @Override
+        public Recipe[] newArray(int size)
+        {
+            return new Recipe[size];
+        }
+    };
 }

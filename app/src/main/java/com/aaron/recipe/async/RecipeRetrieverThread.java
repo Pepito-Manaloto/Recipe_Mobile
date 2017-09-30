@@ -22,6 +22,7 @@ import com.aaron.recipe.model.RecipeManager;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Map;
@@ -33,8 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RecipeRetrieverThread extends AsyncTask<Void, Void, String>
 {
     public static final String CLASS_NAME = RecipeRetrieverThread.class.getSimpleName();
-    private Activity activity;
-    private DialogFragment fragment;
+    private WeakReference<DialogFragment> fragmentRef;
     private AtomicBoolean isUpdating;
     private RecipeManager recipeManager;
     private CategoryManager categoryManager;
@@ -42,14 +42,15 @@ public class RecipeRetrieverThread extends AsyncTask<Void, Void, String>
     private String recipeUrl;
     private String categoryUrl;
 
-    public RecipeRetrieverThread(Activity activity, DialogFragment fragment, AtomicBoolean isUpdating, Settings settings)
+    public RecipeRetrieverThread(DialogFragment fragment, AtomicBoolean isUpdating, Settings settings)
     {
-        this.activity = activity;
-        this.fragment = fragment;
+        this.fragmentRef = new WeakReference<>(fragment);
         this.isUpdating = isUpdating;
+        this.settings = settings;
+
+        Activity activity = fragment.getActivity();
         this.recipeManager = new RecipeManager(activity);
         this.categoryManager = new CategoryManager(activity);
-        this.settings = settings;
 
         if(settings != null && settings.getServerURL() != null && !settings.getServerURL().isEmpty())
         {
@@ -73,18 +74,22 @@ public class RecipeRetrieverThread extends AsyncTask<Void, Void, String>
      */
     private void sendResult(final ArrayList<Recipe> vocabList, final int resultCode)
     {
-        Fragment targetFragment = this.fragment.getTargetFragment();
-        if(targetFragment == null)
+        DialogFragment fragment = this.fragmentRef.get();
+        if(fragment != null)
         {
-            return;
+            Fragment targetFragment = fragment.getTargetFragment();
+            if(targetFragment == null)
+            {
+                return;
+            }
+
+            Intent data = new Intent();
+            data.putExtra(UpdateFragment.EXTRA_RECIPE_LIST, vocabList);
+            targetFragment.onActivityResult(fragment.getTargetRequestCode(), resultCode, data);
+
+            Log.d(LogsManager.TAG, CLASS_NAME + ": sendResult. list=" + vocabList);
+            LogsManager.addToLogs(CLASS_NAME + ": sendResult. list_size=" + vocabList.size());
         }
-
-        Intent data = new Intent();
-        data.putExtra(UpdateFragment.EXTRA_RECIPE_LIST, vocabList);
-        targetFragment.onActivityResult(this.fragment.getTargetRequestCode(), resultCode, data);
-
-        Log.d(LogsManager.TAG, CLASS_NAME + ": sendResult. list=" + vocabList);
-        LogsManager.addToLogs(CLASS_NAME + ": sendResult. list_size=" + vocabList.size());
     }
 
     /**
@@ -92,7 +97,7 @@ public class RecipeRetrieverThread extends AsyncTask<Void, Void, String>
      * 
      * @return String null on success, error message on failure
      */
-    protected String retrieveAndPersistCategoriesFromWeb()
+    private String retrieveAndPersistCategoriesFromWeb()
     {
         String message = null;
         if(!Categories.isCategoriesUpdated())
@@ -184,8 +189,13 @@ public class RecipeRetrieverThread extends AsyncTask<Void, Void, String>
     @Override
     public void onPostExecute(String message)
     {
-        this.fragment.dismiss();
-        Toast.makeText(this.activity, message, Toast.LENGTH_LONG).show();
+        DialogFragment fragment = this.fragmentRef.get();
+        if(fragment != null)
+        {
+            fragment.dismiss();
+            Toast.makeText(fragment.getActivity(), message, Toast.LENGTH_LONG).show();
+        }
+
         this.isUpdating.set(false);
     }
 

@@ -31,6 +31,8 @@ import com.aaron.recipe.model.LogsManager;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.ref.WeakReference;
+
 /**
  * The application settings fragment.
  */
@@ -56,7 +58,7 @@ public class SettingsFragment extends Fragment
     public static SettingsFragment newInstance(SettingsFragment fragment, final Settings settings)
     {
         Bundle args = new Bundle();
-        args.putSerializable(EXTRA_SETTINGS, settings);
+        args.putParcelable(EXTRA_SETTINGS, settings);
 
         SettingsFragment settingsFragment;
         if(fragment != null)
@@ -83,7 +85,7 @@ public class SettingsFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        this.settings = (Settings) getArguments().getSerializable(SettingsFragment.EXTRA_SETTINGS);
+        this.settings = getArguments().getParcelable(SettingsFragment.EXTRA_SETTINGS);
 
         setHasOptionsMenu(true);
         getActivity().setTitle(R.string.menu_settings);
@@ -112,28 +114,7 @@ public class SettingsFragment extends Fragment
         this.categoryImageView = view.findViewById(R.id.imageview_refresh_category);
         this.categoryImageView.setClickable(true);
 
-        final Animation rotation = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_refresh);
-        rotation.setRepeatCount(Animation.INFINITE);
-
-        this.categoryImageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View imageView)
-            {
-                if(!CategoriesRetrieverThread.isUpdating())
-                {
-                    CategoriesRetrieverThread categoriesRetrieverThread = new CategoriesRetrieverThread(SettingsFragment.this, settings);
-                    categoriesRetrieverThread.execute();
-
-                    CategoriesRetrieverThread.setIsUpdating();
-                    imageView.startAnimation(rotation);
-                }
-                else
-                {
-                    Toast.makeText(getActivity(), getActivity().getString(R.string.categories_currently_updating), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        this.categoryImageView.setOnClickListener(new UpdateCategoriesListener(this));
 
         this.categorySpinner = view.findViewById(R.id.spinner_category);
         this.categorySpinner.setAdapter(this.categoryAdapter);
@@ -142,24 +123,7 @@ public class SettingsFragment extends Fragment
         this.fontStyleSpinner = view.findViewById(R.id.spinner_font_style);
         this.fontSizeSpinner = view.findViewById(R.id.spinner_font_size);
         this.serverURLEditText = view.findViewById(R.id.edittext_server_url);
-        this.serverURLEditText.addTextChangedListener(new TextWatcher()
-        {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after)
-            {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s)
-            {
-                settings.setServerURL(s.toString());
-            }
-        });
+        this.serverURLEditText.addTextChangedListener(new ServerUrlTextListener(this.settings));
 
         this.categorySpinner.setSelection(this.settings.getCategoryIndex());
         this.fontNameSpinner.setSelection(this.settings.getFontNameIndex());
@@ -177,8 +141,10 @@ public class SettingsFragment extends Fragment
 
         view.setFocusableInTouchMode(true);
         view.requestFocus();
-        view.setOnKeyListener(new BackButtonListener());
-        this.serverURLEditText.setOnKeyListener(new BackButtonListener());
+
+        BackButtonListener backButtonListener = new BackButtonListener(this);
+        view.setOnKeyListener(backButtonListener);
+        this.serverURLEditText.setOnKeyListener(backButtonListener);
 
         Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateView");
 
@@ -249,8 +215,20 @@ public class SettingsFragment extends Fragment
         LogsManager.addToLogs(CLASS_NAME + ": setFragmentActivityResult. New settings -> " + this.settings);
     }
 
+    private Settings getSettings()
+    {
+        return this.settings;
+    }
+
     private class BackButtonListener implements View.OnKeyListener
     {
+        private WeakReference<SettingsFragment> fragmentRef;
+
+        BackButtonListener(SettingsFragment fragment)
+        {
+            this.fragmentRef = new WeakReference<>(fragment);
+        }
+
         /**
          * Handles back button.
          */
@@ -260,13 +238,81 @@ public class SettingsFragment extends Fragment
             // For back button
             if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
             {
-                setFragmentActivityResult();
+                SettingsFragment fragment = this.fragmentRef.get();
+                if(fragment != null)
+                {
+                    fragment.setFragmentActivityResult();
+                }
+
                 return true;
             }
             else
             {
                 return false;
             }
+        }
+    }
+
+    private static class UpdateCategoriesListener implements View.OnClickListener
+    {
+        private WeakReference<SettingsFragment> fragmentRef;
+
+        UpdateCategoriesListener(SettingsFragment fragment)
+        {
+            this.fragmentRef = new WeakReference<>(fragment);
+        }
+
+        @Override
+        public void onClick(View imageView)
+        {
+            SettingsFragment fragment = this.fragmentRef.get();
+
+            if(fragment != null)
+            {
+                Activity activity = fragment.getActivity();
+
+                if(!CategoriesRetrieverThread.isUpdating())
+                {
+                    final Animation rotation = AnimationUtils.loadAnimation(activity, R.anim.rotate_refresh);
+                    rotation.setRepeatCount(Animation.INFINITE);
+
+                    CategoriesRetrieverThread categoriesRetrieverThread = new CategoriesRetrieverThread(fragment, fragment.getSettings());
+                    categoriesRetrieverThread.execute();
+
+                    CategoriesRetrieverThread.setIsUpdating();
+                    imageView.startAnimation(rotation);
+                }
+                else
+                {
+                    Toast.makeText(activity, activity.getString(R.string.categories_currently_updating), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    private static class ServerUrlTextListener implements TextWatcher
+    {
+        private Settings settings;
+
+        ServerUrlTextListener(Settings settings)
+        {
+            this.settings = settings;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after)
+        {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count)
+        {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable)
+        {
+            this.settings.setServerURL(editable.toString());
         }
     }
 }

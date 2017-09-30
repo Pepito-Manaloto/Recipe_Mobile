@@ -1,14 +1,14 @@
 package com.aaron.recipe.model;
 
-import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.aaron.recipe.bean.Categories;
+import com.aaron.recipe.bean.Ingredient;
 import com.aaron.recipe.bean.Ingredients;
-import com.aaron.recipe.bean.Ingredients.Ingredient;
 import com.aaron.recipe.bean.Instructions;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.ResponseRecipe;
@@ -70,20 +70,18 @@ public class RecipeManager
     /**
      * Constructor initializes the url.
      *
-     * @param activity
-     *            the caller activity
+     * @param context
+     *            the caller context
      */
-    public RecipeManager(final Activity activity)
+    public RecipeManager(final Context context)
     {
-        this.dbHelper = new MySQLiteHelper(activity);
+        this.dbHelper = new MySQLiteHelper(context);
         this.curDate = new Date();
         this.httpClient = new HttpClient<>(ResponseRecipe.class);
     }
 
     /**
-     * Does the following logic.
-     * (1) Retrieves the recipes from the server.
-     * (2) Parse the json response and converts it to ResponseRecipe
+     * Does the following logic. (1) Retrieves the recipes from the server. (2) Parse the json response and converts it to ResponseRecipe
      *
      * @param url
      *            the url of the recipe web service
@@ -165,7 +163,8 @@ public class RecipeManager
      * @param jsonObject
      *            the jsonObject to be parsed
      * @return int
-     * @throws NumberFormatException recently added count is not an integer
+     * @throws NumberFormatException
+     *             recently added count is not an integer
      */
     private int parseRecentlyAddedCountFromJsonObject(final JSONObject jsonObject) throws NumberFormatException
     {
@@ -218,7 +217,7 @@ public class RecipeManager
             {
                 JSONObject ingredientsJsonObj = ingredientsJsonArray.getJSONObject(i);
                 ingredients
-                        .addIngredient(new Ingredients.Ingredient(ingredientsJsonObj.getDouble(ColumnIngredients.quantity.name()), ingredientsJsonObj.getString(ColumnIngredients.measurement.name()),
+                        .addIngredient(new Ingredient(ingredientsJsonObj.getDouble(ColumnIngredients.quantity.name()), ingredientsJsonObj.getString(ColumnIngredients.measurement.name()),
                                 ingredientsJsonObj.getString(ColumnIngredients.ingredient.name()), ingredientsJsonObj.getString(ColumnIngredients.comment_.name())));
             }
 
@@ -409,7 +408,8 @@ public class RecipeManager
     /**
      * Does the following logic. (1) Retrieves the recipes from the local disk. (2) Returns the recipe list of the selected Category.
      *
-     * @param selectedCategory the current selected category in the settings
+     * @param selectedCategory
+     *            the current selected category in the settings
      * @return ArrayList<Vocabulary>
      */
     public ArrayList<Recipe> getRecipesFromDisk(final String selectedCategory)
@@ -546,9 +546,12 @@ public class RecipeManager
     /**
      * Returns the recipes based on the current selected category.
      *
-     * @param recipeMap the recipe map
-     * @param size the number of recipes in the map
-     * @param selectedCategory the current selected category
+     * @param recipeMap
+     *            the recipe map
+     * @param size
+     *            the number of recipes in the map
+     * @param selectedCategory
+     *            the current selected category
      * @return ArrayList<Recipe>
      */
     public ArrayList<Recipe> getRecipesFromMap(final Map<String, ArrayList<Recipe>> recipeMap, final int size, final String selectedCategory)

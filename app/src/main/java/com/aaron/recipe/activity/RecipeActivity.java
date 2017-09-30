@@ -35,7 +35,7 @@ public class RecipeActivity extends FragmentActivity
         FragmentManager fm = getSupportFragmentManager();
 
         this.recipeList = this.getIntent().getParcelableArrayListExtra(EXTRA_RECIPE_LIST);
-        Settings settings = (Settings) this.getIntent().getSerializableExtra(EXTRA_SETTINGS);
+        Settings settings = this.getIntent().getParcelableExtra(EXTRA_SETTINGS);
         int page = this.getIntent().getIntExtra(EXTRA_PAGE, 0);
 
         setTitle(recipeList.get(page).getTitle());

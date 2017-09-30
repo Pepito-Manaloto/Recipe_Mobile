@@ -16,6 +16,7 @@ import com.aaron.recipe.model.LogsManager;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -23,7 +24,7 @@ public class CategoriesRetrieverThread extends AsyncTask<Void, Void, String>
 {
     public static final String CLASS_NAME = CategoriesRetrieverThread.class.getSimpleName();
     private static final AtomicBoolean isUpdating = new AtomicBoolean(false);
-    private Context context;
+    private WeakReference<Context> contextRef;
     private SettingsFragment settingsFragment;
     private CategoryManager categoryManager;
     private String url;
@@ -35,18 +36,18 @@ public class CategoriesRetrieverThread extends AsyncTask<Void, Void, String>
         this.categoryManager = new CategoryManager(settingsFragment.getActivity());
     }
 
-    public CategoriesRetrieverThread(Context context, Settings settings)
+    public CategoriesRetrieverThread(Context contextRef, Settings settings)
     {
-        this.context = context;
-        this.categoryManager = new CategoryManager(this.context);
+        this.contextRef = new WeakReference<>(contextRef);
+        this.categoryManager = new CategoryManager(contextRef);
 
         if(settings != null && settings.getServerURL() != null && !settings.getServerURL().isEmpty())
         {
-            this.url = "http://" + settings.getServerURL() + this.context.getString(R.string.url_resource_categories);
+            this.url = "http://" + settings.getServerURL() + contextRef.getString(R.string.url_resource_categories);
         }
         else
         {
-            this.url = "http://" + this.context.getString(R.string.url_address_default) + this.context.getString(R.string.url_resource_categories);
+            this.url = "http://" + contextRef.getString(R.string.url_address_default) + contextRef.getString(R.string.url_resource_categories);
         }
     }
 
@@ -90,7 +91,11 @@ public class CategoriesRetrieverThread extends AsyncTask<Void, Void, String>
 
         if(StringUtils.isBlank(message))
         {
-            Toast.makeText(this.context, this.context.getString(R.string.error_retrieving_categories), Toast.LENGTH_LONG).show();
+            Context context = this.contextRef.get();
+            if(context != null)
+            {
+                Toast.makeText(context, context.getString(R.string.error_retrieving_categories), Toast.LENGTH_LONG).show();
+            }
         }
 
         isUpdating.set(false);

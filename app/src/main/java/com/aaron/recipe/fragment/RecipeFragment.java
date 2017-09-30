@@ -13,7 +13,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.aaron.recipe.R;
-import com.aaron.recipe.bean.Ingredients.Ingredient;
+import com.aaron.recipe.bean.Ingredient;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
@@ -52,8 +52,8 @@ public class RecipeFragment extends Fragment
     {
         Bundle bundle = new Bundle();
         bundle.putInt(EXTRA_PAGE, page);
-        bundle.putSerializable(EXTRA_RECIPE_LIST, recipeList);
-        bundle.putSerializable(EXTRA_SETTINGS, settings);
+        bundle.putParcelableArrayList(EXTRA_RECIPE_LIST, recipeList);
+        bundle.putParcelable(EXTRA_SETTINGS, settings);
 
         RecipeFragment recipeFragment = new RecipeFragment();
         recipeFragment.setArguments(bundle);
@@ -70,8 +70,8 @@ public class RecipeFragment extends Fragment
         super.onCreate(savedInstanceState);
 
         int page = getArguments().getInt(EXTRA_PAGE);
-        ArrayList<Recipe> recipeList = (ArrayList<Recipe>) getArguments().getSerializable(EXTRA_RECIPE_LIST);
-        this.settings = (Settings) getArguments().getSerializable(EXTRA_SETTINGS);
+        ArrayList<Recipe> recipeList = getArguments().getParcelableArrayList(EXTRA_RECIPE_LIST);
+        this.settings = getArguments().getParcelable(EXTRA_SETTINGS);
 
         this.recipe = recipeList == null ? null : recipeList.get(page);
 

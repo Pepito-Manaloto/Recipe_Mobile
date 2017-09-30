@@ -109,15 +109,15 @@ public class CategoryManager
         catch(JSONException e)
         {
             response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
-            response.setText("Error parsing categories.");
-            Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate. Error parsing categories response. Error: " + e.getMessage());
+            response.setText("Error parsing categories." + e.getMessage());
+            Log.e(LogsManager.TAG, CLASS_NAME + ": onCreate. Error parsing categories response. Error: " + e.getMessage());
             LogsManager.addToLogs(CLASS_NAME + ": onCreate. Error parsing categories response. Error: " + e.getMessage());
         }
         catch(IOException e)
         {
             response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
-            response.setText("Error retrieving categories.");
-            Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate. Error retrieving categories. Error: " + e.getMessage());
+            response.setText("Error retrieving categories. " + e.getMessage());
+            Log.e(LogsManager.TAG, CLASS_NAME + ": onCreate. Error retrieving categories. Error: " + e.getMessage());
             LogsManager.addToLogs(CLASS_NAME + ": onCreate. Error retrieving categories. Error: " + e.getMessage());
         }
 

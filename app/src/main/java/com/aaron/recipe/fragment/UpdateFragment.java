@@ -32,7 +32,7 @@ public class UpdateFragment extends DialogFragment
     public static UpdateFragment newInstance(final Settings settings)
     {
         Bundle args = new Bundle();
-        args.putSerializable(SettingsFragment.EXTRA_SETTINGS, settings);
+        args.putParcelable(SettingsFragment.EXTRA_SETTINGS, settings);
         UpdateFragment fragment = new UpdateFragment();
         fragment.setArguments(args);
 
@@ -55,7 +55,7 @@ public class UpdateFragment extends DialogFragment
         progressDialog.setMessage(getString(R.string.dialog_update_message));
         progressDialog.setIndeterminate(true);
 
-        this.settings = (Settings) getArguments().getSerializable(SettingsFragment.EXTRA_SETTINGS);
+        this.settings = getArguments().getParcelable(SettingsFragment.EXTRA_SETTINGS);
 
         Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateDialog.");
         LogsManager.addToLogs(CLASS_NAME + ": onCreateDialog.");
@@ -73,7 +73,7 @@ public class UpdateFragment extends DialogFragment
 
         if(!isUpdating())
         {
-            RecipeRetrieverThread recipeRetrieverThread = new RecipeRetrieverThread(getActivity(), this, isUpdating, this.settings);
+            RecipeRetrieverThread recipeRetrieverThread = new RecipeRetrieverThread(this, isUpdating, this.settings);
             recipeRetrieverThread.execute();
             isUpdating.set(true);
         }

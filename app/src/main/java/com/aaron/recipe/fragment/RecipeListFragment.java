@@ -30,6 +30,7 @@ import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
@@ -60,10 +61,10 @@ public class RecipeListFragment extends ListFragment
 
         if(savedInstanceState != null)
         {
-            this.settings = (Settings) savedInstanceState.getSerializable(EXTRA_SETTINGS);
+            this.settings = savedInstanceState.getParcelable(EXTRA_SETTINGS);
 
             // But we are sure of its type
-            this.list = (ArrayList<Recipe>) savedInstanceState.getSerializable(EXTRA_RECIPE_LIST);
+            this.list = savedInstanceState.getParcelableArrayList(EXTRA_RECIPE_LIST);
         }
 
         if(this.settings == null)
@@ -121,8 +122,8 @@ public class RecipeListFragment extends ListFragment
     {
         super.onSaveInstanceState(outState);
 
-        outState.putSerializable(EXTRA_SETTINGS, this.settings);
-        outState.putSerializable(EXTRA_RECIPE_LIST, this.list);
+        outState.putParcelable(EXTRA_SETTINGS, this.settings);
+        outState.putParcelableArrayList(EXTRA_RECIPE_LIST, this.list);
 
         Log.d(LogsManager.TAG, CLASS_NAME + ": onSaveInstanceState");
     }
@@ -146,7 +147,7 @@ public class RecipeListFragment extends ListFragment
         {
             // But we are sure of its type
             @SuppressWarnings("unchecked")
-            ArrayList<Recipe> list = (ArrayList<Recipe>) data.getSerializableExtra(UpdateFragment.EXTRA_RECIPE_LIST);
+            ArrayList<Recipe> list = data.getParcelableArrayListExtra(UpdateFragment.EXTRA_RECIPE_LIST);
 
             // Handles occasional NullPointerException.
             if(list != null && list.size() > 0)
@@ -162,7 +163,7 @@ public class RecipeListFragment extends ListFragment
         }
         else if((requestCode == REQUEST_SETTINGS || requestCode == REQUEST_ABOUT || requestCode == REQUEST_LOGS) && (data != null && data.hasExtra(EXTRA_SETTINGS)))
         {
-            this.settings = (Settings) data.getSerializableExtra(EXTRA_SETTINGS);
+            this.settings = data.getParcelableExtra(EXTRA_SETTINGS);
 
             this.list = this.recipeManager.getRecipesFromDisk(this.settings.getCategory());
             this.updateListOnUiThread(this.list);
@@ -185,32 +186,7 @@ public class RecipeListFragment extends ListFragment
         final EditText searchTextfield = view.findViewById(R.id.edittext_search_field);
         searchTextfield.setHint(R.string.hint_recipe);
 
-        searchTextfield.addTextChangedListener(new TextWatcher()
-        {
-            /**
-             * Handles search on text update.
-             */
-            @Override
-            public void afterTextChanged(Editable arg0)
-            {
-                String searched = searchTextfield.getText().toString();
-                RecipeListRowAdapter recipeAdapter = (RecipeListRowAdapter) getListAdapter();
-                recipeAdapter.filter(searched);
-                recipeAdapter.notifyDataSetChanged();
-
-                Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateOptionsMenu(afterTextChanged). searched=" + searched);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
-            {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
-            {
-            }
-        });
+        searchTextfield.addTextChangedListener(new SearchListener((RecipeListRowAdapter) getListAdapter()));
     }
 
     /**
@@ -287,39 +263,30 @@ public class RecipeListFragment extends ListFragment
             return;
         }
 
-        this.getActivity().runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                RecipeListRowAdapter recipeAdapter = new RecipeListRowAdapter(getActivity(), list, settings);
-                setListAdapter(recipeAdapter);
+        this.getActivity().runOnUiThread(new UpdateAdapterRunnable(this, this.list));
+    }
 
-                Log.d(LogsManager.TAG, CLASS_NAME + ": updateListOnUiThread(run). settings=" + settings + " list=" + list);
-                LogsManager.addToLogs(CLASS_NAME + ": updateListOnUiThread(run). settings=" + settings + " list_size=" + list.size());
-            }
-        });
+    private Settings getSettings()
+    {
+        return this.settings;
     }
 
     /**
      * Helper class for ListView's scroll listener.
      */
-    private static class ShowHideFastScrollListener implements OnScrollListener
+    private static class ShowHideFastScrollListener implements OnScrollListener, Runnable
     {
         private static final int DELAY = 1000;
         private AbsListView view;
 
         private Handler handler = new Handler();
-        // Runnable for handler object.
-        private Runnable runnable = new Runnable()
+
+        @Override
+        public void run()
         {
-            @Override
-            public void run()
-            {
-                view.setFastScrollAlwaysVisible(false);
-                view = null;
-            }
-        };
+            this.view.setFastScrollAlwaysVisible(false);
+            this.view = null;
+        }
 
         /**
          * Show fast-scroll thumb if scrolling, and hides fast-scroll thumb if not scrolling.
@@ -333,7 +300,7 @@ public class RecipeListFragment extends ListFragment
 
                 // Removes the runnable from the message queue.
                 // Stops the handler from hiding the fast-scroll.
-                this.handler.removeCallbacks(this.runnable);
+                this.handler.removeCallbacks(this);
             }
             else
             {
@@ -341,13 +308,74 @@ public class RecipeListFragment extends ListFragment
 
                 // Adds the runnable to the message queue, will run after the DELAY.
                 // Hides the fast-scroll after one seconds of no scrolling.
-                this.handler.postDelayed(this.runnable, DELAY);
+                this.handler.postDelayed(this, DELAY);
             }
         }
 
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
         {
+        }
+    }
+
+    private static class SearchListener implements TextWatcher
+    {
+        private RecipeListRowAdapter adapter;
+
+        SearchListener(RecipeListRowAdapter adapter)
+        {
+            this.adapter = adapter;
+        }
+
+        /**
+         * Handles search on text update.
+         */
+        @Override
+        public void afterTextChanged(Editable editable)
+        {
+            String searched = editable.toString();
+            this.adapter.filter(searched);
+            this.adapter.notifyDataSetChanged();
+
+            Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateOptionsMenu(afterTextChanged). searched=" + searched);
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
+        {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
+        {
+        }
+    }
+
+    private static class UpdateAdapterRunnable implements Runnable
+    {
+        private WeakReference<RecipeListFragment> fragmentRef;
+        private final ArrayList<Recipe> list;
+
+        UpdateAdapterRunnable(RecipeListFragment fragment, ArrayList<Recipe> list)
+        {
+            this.fragmentRef = new WeakReference<>(fragment);
+            this.list = list;
+        }
+
+        @Override
+        public void run()
+        {
+            RecipeListFragment fragment = fragmentRef.get();
+
+            if(fragment != null)
+            {
+                Settings settings = fragment.getSettings();
+                RecipeListRowAdapter recipeAdapter = new RecipeListRowAdapter(fragment.getActivity(), this.list, settings);
+                fragment.setListAdapter(recipeAdapter);
+
+                Log.d(LogsManager.TAG, CLASS_NAME + ": updateListOnUiThread(run). settings=" + settings + " list=" + this.list);
+                LogsManager.addToLogs(CLASS_NAME + ": updateListOnUiThread(run). settings=" + settings + " list_size=" + this.list.size());
+            }
         }
     }
 }
