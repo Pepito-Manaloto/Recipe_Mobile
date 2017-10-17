@@ -61,13 +61,9 @@ public class CategoriesRetrieverThread extends AsyncTask<Void, Void, String>
 
         if(response.getStatusCode() == HttpURLConnection.HTTP_OK)
         {
-            SparseArray<String> categoriesArray = response.getCategories();
-
-            if(categoriesArray != null && categoriesArray.size() > 1)
+            boolean saved = this.categoryManager.saveCategories(response.getCategories());
+            if(saved)
             {
-                this.categoryManager.saveCategoriesInCache(categoriesArray);
-                this.categoryManager.saveCategoriesInDatabase(categoriesArray);
-
                 Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate Categories = " + Categories.getCategories());
                 LogsManager.addToLogs(CLASS_NAME + ": onCreate Categories = " + Categories.getCategories());
 

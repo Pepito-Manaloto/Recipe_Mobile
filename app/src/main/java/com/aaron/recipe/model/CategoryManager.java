@@ -125,6 +125,26 @@ public class CategoryManager
     }
 
     /**
+     * Store categories in cache and persist to the database.
+     *
+     * @param categoriesArray
+     *            the category map where the id is the key and category is the value
+     *
+     */
+    public boolean saveCategories(SparseArray<String> categoriesArray)
+    {
+        if(categoriesArray != null && categoriesArray.size() > 1)
+        {
+            this.saveCategoriesInCache(categoriesArray);
+            this.saveCategoriesInDatabase(categoriesArray);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Store categories in cache.
      *
      * @param categoryArray
@@ -165,6 +185,9 @@ public class CategoryManager
                 try
                 {
                     db.beginTransaction();
+
+                    // Delete categories to insert latest data
+                    db.delete(TABLE_CATEGORIES, null, null);
 
                     for(int i = 0; i < length; i++)
                     {

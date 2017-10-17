@@ -106,14 +106,8 @@ public class RecipeRetrieverThread extends AsyncTask<Void, Void, String>
 
             if(response.getStatusCode() == HttpURLConnection.HTTP_OK)
             {
-                SparseArray<String> categoriesArray = response.getCategories();
-
-                if(categoriesArray != null && categoriesArray.size() > 1)
-                {
-                    this.categoryManager.saveCategoriesInCache(categoriesArray);
-                    this.categoryManager.saveCategoriesInDatabase(categoriesArray);
-                }
-                else
+                boolean saved = this.categoryManager.saveCategories(response.getCategories());
+                if(!saved)
                 {
                     message = "No categories parsed from response.";
                 }

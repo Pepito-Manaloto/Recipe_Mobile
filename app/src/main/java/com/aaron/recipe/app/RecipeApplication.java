@@ -10,6 +10,7 @@ import com.aaron.recipe.async.CategoriesRetrieverThread;
 import com.aaron.recipe.bean.Categories;
 import com.aaron.recipe.model.CategoryManager;
 import com.aaron.recipe.model.LogsManager;
+import com.facebook.stetho.Stetho;
 import com.squareup.leakcanary.LeakCanary;
 
 /**
@@ -31,6 +32,9 @@ public class RecipeApplication extends Application
             return;
         }
         LeakCanary.install(this);
+
+        // Access in Google Chrome url via -> chrome://inspect
+        Stetho.initializeWithDefaults(this);
 
         if(Categories.getCategories().size() <= 1)
         {

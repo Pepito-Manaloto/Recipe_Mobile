@@ -539,7 +539,6 @@ public class RecipeManager
         int result = db.delete(TABLE_RECIPE, null, null);
         db.delete(TABLE_INGREDIENTS, null, null);
         db.delete(TABLE_INSTRUCTIONS, null, null);
-        db.delete(TABLE_CATEGORIES, null, null);
 
         return result;
     }
