@@ -8,6 +8,7 @@ import android.os.Parcelable;
  */
 public class Recipe implements Parcelable
 {
+    private int id;
     private String title;
     private String category;
     private int servings;
@@ -19,8 +20,9 @@ public class Recipe implements Parcelable
     /**
      * Default constructor.
      */
-    public Recipe(final String title, final String category, final int servings, final int preparationTime, final String description, final Ingredients ingredients, final Instructions instructions)
+    public Recipe(final int id, final String title, final String category, final int servings, final int preparationTime, final String description, final Ingredients ingredients, final Instructions instructions)
     {
+        this.id = id;
         this.title = title;
         this.category = category;
         this.servings = servings;
@@ -30,10 +32,16 @@ public class Recipe implements Parcelable
         this.instructions = instructions;
     }
 
+    public Recipe(final String title, final String category, final int servings, final int preparationTime, final String description, final Ingredients ingredients, final Instructions instructions)
+    {
+        this(-1, title, category, servings, preparationTime, description, ingredients, instructions);
+    }
+
     /**
      * Formats the given preparation time from minutes into hours + minutes. The given time is always assume to be in minutes.
      *
-     * @param minutes the minutes to convert
+     * @param minutes
+     *            the minutes to convert
      * @return the minutes converted to hours+minutes
      */
     private String formatPreparationTime(final int minutes)
@@ -69,6 +77,16 @@ public class Recipe implements Parcelable
         }
 
         return formattedPreparationTime;
+    }
+
+    /**
+     * Gets the id.
+     *
+     * @return int
+     */
+    public int getId()
+    {
+        return this.id;
     }
 
     /**
@@ -154,7 +172,8 @@ public class Recipe implements Parcelable
     /**
      * Checks all attribute for equality.
      *
-     * @param o Recipe to compare
+     * @param o
+     *            Recipe to compare
      * @return true if equals, else false
      */
     @Override
@@ -168,7 +187,8 @@ public class Recipe implements Parcelable
         {
             Recipe that = (Recipe) o;
 
-            return this.title.equals(that.getTitle()) &&
+            return this.id == that.getId() &&
+                    this.title.equals(that.getTitle()) &&
                     this.servings == that.getServings() &&
                     this.category.equals(that.getCategory()) &&
                     this.getPreparationTimeString().equals(that.getPreparationTimeString()) &&
@@ -187,6 +207,7 @@ public class Recipe implements Parcelable
     public int hashCode()
     {
         int hash = 3;
+        hash = 47 * hash + this.id;
         hash = 47 * hash + this.title.hashCode();
         hash = 47 * hash + this.category.hashCode();
         hash = 47 * hash + this.servings;
@@ -206,7 +227,8 @@ public class Recipe implements Parcelable
     @Override
     public String toString()
     {
-        return "Title: " + this.title +
+        return "Id: " + this.id +
+                " Title: " + this.title +
                 " Category: " + this.category +
                 " Servings: " + this.servings +
                 " Preparation Time: " + this.getPreparationTimeString() +
@@ -220,6 +242,7 @@ public class Recipe implements Parcelable
      */
     private Recipe(Parcel in)
     {
+        this.id = in.readInt();
         this.title = in.readString();
         this.category = in.readString();
         this.servings = in.readInt();
@@ -235,6 +258,7 @@ public class Recipe implements Parcelable
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {
+        dest.writeInt(this.id);
         dest.writeString(this.title);
         dest.writeString(this.category);
         dest.writeInt(this.servings);

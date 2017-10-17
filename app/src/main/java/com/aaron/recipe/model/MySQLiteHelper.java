@@ -33,7 +33,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
      */
     public enum ColumnIngredients
     {
-        title, quantity, measurement, ingredient, comment_, count,
+        recipe_id, quantity, measurement, ingredient, comment_, count,
     }
 
     /**
@@ -41,7 +41,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
      */
     public enum ColumnInstructions
     {
-        title, instruction, count,
+        recipe_id, instruction, count,
     }
 
     /**
@@ -54,39 +54,41 @@ public class MySQLiteHelper extends SQLiteOpenHelper
 
     private static final String CREATE_TABLE_RECIPE = "CREATE TABLE " + TABLE_RECIPE +
             "(" +
-            ColumnRecipe.title.name() + " TEXT PRIMARY KEY, " +
+            ColumnRecipe.id.name() + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            ColumnRecipe.title.name() + " TEXT UNIQUE NOT NULL, " +
             ColumnRecipe.category.name() + " INTEGER NOT NULL, " +
             ColumnRecipe.preparation_time.name() + " INTEGER NOT NULL, " +
             ColumnRecipe.description.name() + " TEXT NOT NULL, " +
             ColumnRecipe.servings.name() + " INTEGER NOT NULL, " +
-            ColumnRecipe.date_in.name() + " TEXT NOT NULL" +
+            ColumnRecipe.date_in.name() + " TEXT NOT NULL, " +
+            "FOREIGN KEY (category) REFERENCES " + TABLE_CATEGORIES + "(id)" +
             ");";
 
     private static final String CREATE_TABLE_INGREDIENTS = "CREATE TABLE " + TABLE_INGREDIENTS +
             "(" +
-            ColumnIngredients.title.name() + " TEXT NOT NULL, " +
+            ColumnIngredients.recipe_id.name() + " INTEGER NOT NULL, " +
             ColumnIngredients.quantity.name() + " REAL NOT NULL, " +
             ColumnIngredients.measurement.name() + " TEXT NOT NULL, " +
             ColumnIngredients.ingredient.name() + " TEXT NOT NULL, " +
             ColumnIngredients.comment_.name() + " TEXT NOT NULL, " +
             ColumnIngredients.count.name() + " INTEGER NOT NULL, " +
-            "UNIQUE(" + ColumnIngredients.title.name() + ", " + ColumnIngredients.ingredient.name() + ") ON CONFLICT REPLACE, " +
-            "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) ON UPDATE CASCADE ON DELETE CASCADE" +
+            "UNIQUE(" + ColumnIngredients.recipe_id.name() + ", " + ColumnIngredients.ingredient.name() + ") ON CONFLICT REPLACE, " +
+            "FOREIGN KEY (recipe_id) REFERENCES " + TABLE_RECIPE + "(id) ON UPDATE CASCADE ON DELETE CASCADE" +
             ");";
 
     private static final String CREATE_TABLE_INSTRUCTIONS = "CREATE TABLE " + TABLE_INSTRUCTIONS +
             "(" +
-            ColumnInstructions.title.name() + " TEXT NOT NULL, " +
+            ColumnInstructions.recipe_id.name() + " INTEGER NOT NULL, " +
             ColumnInstructions.instruction.name() + " TEXT NOT NULL, " +
             ColumnInstructions.count.name() + " INTEGER NOT NULL, " +
-            "UNIQUE(" + ColumnInstructions.title.name() + ", " + ColumnInstructions.instruction.name() + ") ON CONFLICT REPLACE, " +
-            "FOREIGN KEY (title) REFERENCES " + TABLE_RECIPE + "(title) ON UPDATE CASCADE ON DELETE CASCADE" +
+            "UNIQUE(" + ColumnInstructions.recipe_id.name() + ", " + ColumnInstructions.instruction.name() + ") ON CONFLICT REPLACE, " +
+            "FOREIGN KEY (recipe_id) REFERENCES " + TABLE_RECIPE + "(id) ON UPDATE CASCADE ON DELETE CASCADE" +
             ");";
 
     private static final String CREATE_TABLE_CATEGORIES = "CREATE TABLE " + TABLE_CATEGORIES +
             "(" +
-            ColumnCategories.id.name() + " INTEGER NOT NULL," +
-            ColumnCategories.name.name() + " TEXT NOT NULL" +
+            ColumnCategories.id.name() + " INTEGER PRIMARY KEY," +
+            ColumnCategories.name.name() + " TEXT UNIQUE NOT NULL" +
             ");";
 
     /**

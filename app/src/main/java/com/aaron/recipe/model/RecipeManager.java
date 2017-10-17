@@ -276,22 +276,20 @@ public class RecipeManager
                 // Iterate each recipe of a particular category
                 for(Recipe recipe : recipeList)
                 {
-                    String title = recipe.getTitle();
-
-                    recipeValues.put(ColumnRecipe.title.name(), title);
+                    recipeValues.put(ColumnRecipe.title.name(), recipe.getTitle());
                     recipeValues.put(ColumnRecipe.category.name(), Categories.getId(recipe.getCategory()));
                     recipeValues.put(ColumnRecipe.preparation_time.name(), recipe.getPreparationTime());
                     recipeValues.put(ColumnRecipe.servings.name(), recipe.getServings());
                     recipeValues.put(ColumnRecipe.description.name(), recipe.getDescription());
                     recipeValues.put(ColumnRecipe.date_in.name(), dateFormatter.format(this.curDate));
 
-                    db.insert(TABLE_RECIPE, null, recipeValues);
+                    long recipeId = db.insert(TABLE_RECIPE, null, recipeValues);
 
                     int count = 1;
                     // Iterate over all ingredients of a recipe
                     for(Ingredient ingredient : recipe.getIngredients().getIngredientsList())
                     {
-                        ingredientsValues.put(ColumnIngredients.title.name(), title);
+                        ingredientsValues.put(ColumnIngredients.recipe_id.name(), recipeId);
                         ingredientsValues.put(ColumnIngredients.quantity.name(), ingredient.getQuantity());
                         ingredientsValues.put(ColumnIngredients.measurement.name(), ingredient.getMeasurement());
                         ingredientsValues.put(ColumnIngredients.ingredient.name(), ingredient.getIngredient());
@@ -306,7 +304,7 @@ public class RecipeManager
                     // Iterate over all instructions of a recipe
                     for(String instruction : recipe.getInstructions().getInstructionsList())
                     {
-                        instructionsValues.put(ColumnInstructions.title.name(), title);
+                        instructionsValues.put(ColumnInstructions.recipe_id.name(), recipeId);
                         instructionsValues.put(ColumnInstructions.instruction.name(), instruction);
                         instructionsValues.put(ColumnInstructions.count.name(), count++);
 
@@ -417,8 +415,9 @@ public class RecipeManager
         ArrayList<Recipe> list;
         try(SQLiteDatabase db = this.dbHelper.getReadableDatabase())
         {
-            String[] columns = new String[] { ColumnRecipe.title.name(), ColumnRecipe.category.name(), ColumnRecipe.preparation_time.name(), ColumnRecipe.servings.name(),
-                    ColumnRecipe.description.name() };
+            String[] columns = new String[] { ColumnRecipe.id.name(), ColumnRecipe.title.name(),
+                                              ColumnRecipe.category.name(), ColumnRecipe.preparation_time.name(),
+                                              ColumnRecipe.servings.name(), ColumnRecipe.description.name() };
             String whereClause;
             String[] whereArgs;
             String orderBy = ColumnRecipe.title.name() + " ASC";
@@ -461,19 +460,20 @@ public class RecipeManager
      */
     private Recipe cursorToRecipe(final Cursor cursor)
     {
-        String title = cursor.getString(0);
-        String category = Categories.getCategoriesMap().get(cursor.getInt(1));
-        int preparationTime = cursor.getInt(2);
-        int servings = cursor.getInt(3);
-        String description = cursor.getString(4);
+        int id = cursor.getInt(0);
+        String title = cursor.getString(1);
+        String category = Categories.getCategoriesMap().get(cursor.getInt(2));
+        int preparationTime = cursor.getInt(3);
+        int servings = cursor.getInt(4);
+        String description = cursor.getString(5);
         String orderBy = ColumnIngredients.count.name() + " ASC";
 
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
 
         String[] ingredientsColumns = new String[] { ColumnIngredients.quantity.name(), ColumnIngredients.measurement.name(), ColumnIngredients.ingredient.name(), ColumnIngredients.comment_.name() };
         String[] instructionsColumns = new String[] { ColumnInstructions.instruction.name() };
-        String whereClause = ColumnRecipe.title.name() + " = ?";
-        String[] whereArgs = new String[] { title };
+        String whereClause = ColumnIngredients.recipe_id.name() + " = ?";
+        String[] whereArgs = new String[] { String.valueOf(id) };
 
         Ingredients ingredients;
         try(Cursor ingredientCursor = db.query(TABLE_INGREDIENTS, ingredientsColumns, whereClause, whereArgs, null, null, orderBy))
@@ -494,6 +494,7 @@ public class RecipeManager
             }
         }
 
+        whereClause = ColumnInstructions.recipe_id.name() + " = ?";
         Instructions instructions;
         try(Cursor instructionCursor = db.query(TABLE_INSTRUCTIONS, instructionsColumns, whereClause, whereArgs, null, null, orderBy))
         {
@@ -510,7 +511,7 @@ public class RecipeManager
             }
         }
 
-        return new Recipe(title, category, servings, preparationTime, description, ingredients, instructions);
+        return new Recipe(id, title, category, servings, preparationTime, description, ingredients, instructions);
     }
 
     /**
