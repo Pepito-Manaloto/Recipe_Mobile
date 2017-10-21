@@ -1,8 +1,10 @@
 apply plugin: 'com.android.application'
 
+def ANDROID_VERSION = "26.0.2"
+
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion "$ANDROID_VERSION"
 
     defaultConfig {
         applicationId "com.aaron.recipe"
@@ -39,12 +41,15 @@ android {
     preBuild.dependsOn updateVersion
 }
 
+def LEAKCANARY_VERSION = "1.5.2"
+
 dependencies {
     testCompile 'junit:junit:4.12'
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.2'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.2'
+    debugCompile "com.squareup.leakcanary:leakcanary-android:$LEAKCANARY_VERSION"
+    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$LEAKCANARY_VERSION"
 
-    compile 'com.android.support:support-fragment:26.0.1'
+    compile "com.android.support:support-fragment:$ANDROID_VERSION"
+    compile "com.android.support:recyclerview-v7:$ANDROID_VERSION"
     compile 'commons-io:commons-io:2.5'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'commons-codec:commons-codec:1.10'

@@ -47,6 +47,7 @@ public class RecipeListFragment extends ListFragment
     private ArrayList<Recipe> list;
     private Settings settings;
     private RecipeManager recipeManager;
+    private RecipeListRowAdapter recipeAdapter;
 
     public static final String EXTRA_RECIPE_LIST = "com.aaron.recipe.fragment.recipe_list.list";
 
@@ -79,7 +80,8 @@ public class RecipeListFragment extends ListFragment
             this.list = this.recipeManager.getRecipesFromDisk(this.settings.getCategory());
         }
 
-        this.updateListOnUiThread(this.list);
+        this.recipeAdapter = new RecipeListRowAdapter(getActivity(), this.list, this.settings);
+        this.setListAdapter(this.recipeAdapter);
 
         setHasOptionsMenu(true);
 
@@ -186,7 +188,7 @@ public class RecipeListFragment extends ListFragment
         final EditText searchTextfield = view.findViewById(R.id.edittext_search_field);
         searchTextfield.setHint(R.string.hint_recipe);
 
-        searchTextfield.addTextChangedListener(new SearchListener((RecipeListRowAdapter) getListAdapter()));
+        searchTextfield.addTextChangedListener(new SearchListener(this.recipeAdapter));
     }
 
     /**
@@ -263,12 +265,7 @@ public class RecipeListFragment extends ListFragment
             return;
         }
 
-        this.getActivity().runOnUiThread(new UpdateAdapterRunnable(this, this.list));
-    }
-
-    private Settings getSettings()
-    {
-        return this.settings;
+        this.getActivity().runOnUiThread(new UpdateAdapterRunnable(this.recipeAdapter, this.list));
     }
 
     /**
@@ -335,7 +332,6 @@ public class RecipeListFragment extends ListFragment
         {
             String searched = editable.toString();
             this.adapter.filter(searched);
-            this.adapter.notifyDataSetChanged();
 
             Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateOptionsMenu(afterTextChanged). searched=" + searched);
         }
@@ -353,28 +349,26 @@ public class RecipeListFragment extends ListFragment
 
     private static class UpdateAdapterRunnable implements Runnable
     {
-        private WeakReference<RecipeListFragment> fragmentRef;
+        private WeakReference<RecipeListRowAdapter> adapterRef;
         private final ArrayList<Recipe> list;
 
-        UpdateAdapterRunnable(RecipeListFragment fragment, ArrayList<Recipe> list)
+        UpdateAdapterRunnable(RecipeListRowAdapter adapter, ArrayList<Recipe> list)
         {
-            this.fragmentRef = new WeakReference<>(fragment);
+            this.adapterRef = new WeakReference<>(adapter);
             this.list = list;
         }
 
         @Override
         public void run()
         {
-            RecipeListFragment fragment = fragmentRef.get();
+            RecipeListRowAdapter adapter = adapterRef.get();
 
-            if(fragment != null)
+            if(adapter != null)
             {
-                Settings settings = fragment.getSettings();
-                RecipeListRowAdapter recipeAdapter = new RecipeListRowAdapter(fragment.getActivity(), this.list, settings);
-                fragment.setListAdapter(recipeAdapter);
+                adapter.update(this.list);
 
-                Log.d(LogsManager.TAG, CLASS_NAME + ": updateListOnUiThread(run). settings=" + settings + " list=" + this.list);
-                LogsManager.addToLogs(CLASS_NAME + ": updateListOnUiThread(run). settings=" + settings + " list_size=" + this.list.size());
+                Log.d(LogsManager.TAG, CLASS_NAME + ": updateListOnUiThread(run)." + " list=" + this.list);
+                LogsManager.addToLogs(CLASS_NAME + ": updateListOnUiThread(run)." + " list_size=" + this.list.size());
             }
         }
     }

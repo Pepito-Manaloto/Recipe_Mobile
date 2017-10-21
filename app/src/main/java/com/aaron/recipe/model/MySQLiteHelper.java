@@ -72,7 +72,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper
             ColumnIngredients.ingredient.name() + " TEXT NOT NULL, " +
             ColumnIngredients.comment_.name() + " TEXT NOT NULL, " +
             ColumnIngredients.count.name() + " INTEGER NOT NULL, " +
-            "UNIQUE(" + ColumnIngredients.recipe_id.name() + ", " + ColumnIngredients.ingredient.name() + ") ON CONFLICT REPLACE, " +
             "FOREIGN KEY (recipe_id) REFERENCES " + TABLE_RECIPE + "(id) ON UPDATE CASCADE ON DELETE CASCADE" +
             ");";
 
@@ -81,7 +80,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper
             ColumnInstructions.recipe_id.name() + " INTEGER NOT NULL, " +
             ColumnInstructions.instruction.name() + " TEXT NOT NULL, " +
             ColumnInstructions.count.name() + " INTEGER NOT NULL, " +
-            "UNIQUE(" + ColumnInstructions.recipe_id.name() + ", " + ColumnInstructions.instruction.name() + ") ON CONFLICT REPLACE, " +
             "FOREIGN KEY (recipe_id) REFERENCES " + TABLE_RECIPE + "(id) ON UPDATE CASCADE ON DELETE CASCADE" +
             ");";
 

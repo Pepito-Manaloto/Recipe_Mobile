@@ -121,8 +121,32 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
             }
         }
 
+        this.notifyDataSetChanged();
+
         Log.d(LogsManager.TAG, CLASS_NAME + ": filter. New list -> " + this.recipeList);
         LogsManager.addToLogs(CLASS_NAME + ": filter. New list size -> " + this.recipeList.size());
+    }
+
+    /**
+     * Updates the recipe list.
+     *
+     * @param list
+     *            the list to replace the current
+     */
+    public void update(ArrayList<Recipe> list)
+    {
+        if(list != null)
+        {
+            this.recipeList.clear();
+
+            // If user deletes recipe list in AboutFragment
+            if(!list.isEmpty())
+            {
+                this.recipeList.addAll(list);
+            }
+
+            this.notifyDataSetChanged();
+        }
     }
 
     /**
