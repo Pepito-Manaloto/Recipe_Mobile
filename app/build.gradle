@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
-def ANDROID_VERSION = "26.0.2"
+def ANDROID_VERSION = "27.0.2"
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion "$ANDROID_VERSION"
 
     defaultConfig {
         applicationId "com.aaron.recipe"
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
@@ -41,7 +41,7 @@ android {
     preBuild.dependsOn updateVersion
 }
 
-def LEAKCANARY_VERSION = "1.5.2"
+def LEAKCANARY_VERSION = "1.5.4"
 
 dependencies {
     testCompile 'junit:junit:4.12'
@@ -51,7 +51,7 @@ dependencies {
     compile "com.android.support:support-fragment:$ANDROID_VERSION"
     compile "com.android.support:recyclerview-v7:$ANDROID_VERSION"
     compile 'commons-io:commons-io:2.5'
-    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'org.apache.commons:commons-lang3:3.7'
     compile 'commons-codec:commons-codec:1.10'
     compile 'com.facebook.stetho:stetho:1.5.0'
 }
