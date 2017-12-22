@@ -308,6 +308,7 @@ public class SettingsFragment extends Fragment
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count)
         {
+            // No Action
         }
 
         @Override

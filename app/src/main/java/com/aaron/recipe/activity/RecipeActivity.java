@@ -98,6 +98,7 @@ public class RecipeActivity extends FragmentActivity
         @Override
         public void onPageSelected(int position)
         {
+            // No Action
         }
     }
 }
