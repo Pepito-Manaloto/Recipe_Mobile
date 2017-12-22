@@ -152,7 +152,6 @@ public class Settings implements Parcelable
             case Monospace:
                 family = Typeface.MONOSPACE;
                 break;
-
             default:
                 family = Typeface.DEFAULT;
         }

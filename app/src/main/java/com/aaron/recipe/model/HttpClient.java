@@ -1,5 +1,7 @@
 package com.aaron.recipe.model;
 
+import android.support.annotation.NonNull;
+
 import com.aaron.recipe.bean.Response;
 
 import org.apache.commons.io.IOUtils;
@@ -71,13 +73,14 @@ public class HttpClient<T extends Response>
      */
     public T get(String url, String query, List<Header> headers) throws IOException
     {
+        String urlStr = url;
         if(StringUtils.isNotBlank(query))
         {
-            url += query;
+            urlStr += query;
         }
         HttpURLConnection con = null;
 
-        URL getURL = new URL(url);
+        URL getURL = new URL(urlStr);
         T response = Response.newInstance(this.clazz);
         response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
 
@@ -87,9 +90,12 @@ public class HttpClient<T extends Response>
             con.setConnectTimeout(CONNECTION_TIMEOUT);
             con.setReadTimeout(READ_TIMEOUT);
 
-            for(Header header : headers)
+            if(headers != null)
             {
-                con.addRequestProperty(header.getField(), header.getValue());
+                for(Header header : headers)
+                {
+                    con.addRequestProperty(header.getField(), header.getValue());
+                }
             }
 
             response.setStatusCode(con.getResponseCode());
@@ -110,8 +116,7 @@ public class HttpClient<T extends Response>
     /**
      * Converts the inputStream to String.
      *
-     * @param inputStream
-     *            HttpURLConnection response
+     * @param inputStream HttpURLConnection response
      * @return String
      */
     private String getResponseBodyFromStream(final InputStream inputStream) throws IOException

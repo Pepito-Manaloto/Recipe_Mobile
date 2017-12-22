@@ -9,13 +9,6 @@ public class LogsManager
     private static final StringBuilder logs = new StringBuilder();
 
     /**
-     * Default constructor
-     */
-    public LogsManager()
-    {
-    }
-
-    /**
      * Adds the given message to the string builder logs.
      *
      * @param text the message to add

@@ -312,6 +312,7 @@ public class RecipeListFragment extends ListFragment
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
         {
+            // No Action
         }
     }
 

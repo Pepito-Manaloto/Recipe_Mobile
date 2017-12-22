@@ -6,7 +6,6 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.aaron.recipe.R;

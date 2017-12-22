@@ -2,7 +2,6 @@ package com.aaron.recipe.activity;
 
 import android.app.Fragment;
 
-import com.aaron.recipe.fragment.AboutFragment;
 import com.aaron.recipe.fragment.LogsFragment;
 
 /**

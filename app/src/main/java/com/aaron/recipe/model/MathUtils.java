@@ -22,7 +22,7 @@ public class MathUtils
             throw new IllegalArgumentException();
         }
 
-        BigDecimal bd = new BigDecimal(value);
+        BigDecimal bd = new BigDecimal(String.valueOf(value));
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }

@@ -38,7 +38,6 @@ import static com.aaron.recipe.model.MySQLiteHelper.COLUMN_COUNT;
 import static com.aaron.recipe.model.MySQLiteHelper.ColumnIngredients;
 import static com.aaron.recipe.model.MySQLiteHelper.ColumnInstructions;
 import static com.aaron.recipe.model.MySQLiteHelper.ColumnRecipe;
-import static com.aaron.recipe.model.MySQLiteHelper.TABLE_CATEGORIES;
 import static com.aaron.recipe.model.MySQLiteHelper.TABLE_INGREDIENTS;
 import static com.aaron.recipe.model.MySQLiteHelper.TABLE_INSTRUCTIONS;
 import static com.aaron.recipe.model.MySQLiteHelper.TABLE_RECIPE;

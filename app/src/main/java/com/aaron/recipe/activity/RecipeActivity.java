@@ -68,6 +68,7 @@ public class RecipeActivity extends FragmentActivity
         @Override
         public void onPageScrollStateChanged(int state)
         {
+            // No action
         }
 
         /**
