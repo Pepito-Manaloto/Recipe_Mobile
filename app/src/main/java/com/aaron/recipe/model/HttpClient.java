@@ -1,7 +1,5 @@
 package com.aaron.recipe.model;
 
-import android.support.annotation.NonNull;
-
 import com.aaron.recipe.bean.Response;
 
 import org.apache.commons.io.IOUtils;
