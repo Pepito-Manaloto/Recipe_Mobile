@@ -1,11 +1,9 @@
 package com.aaron.recipe.adapter;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
@@ -14,18 +12,14 @@ import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
 import com.aaron.recipe.R;
-import com.aaron.recipe.activity.RecipeActivity;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
+import com.aaron.recipe.listener.RecipeListRowTouchListener;
 import com.aaron.recipe.model.LogsManager;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Locale;
-
-import static com.aaron.recipe.adapter.RecipePagerAdapter.EXTRA_PAGE;
-import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_RECIPE_LIST;
-import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
+import java.util.function.Predicate;
 
 /**
  * ListView adapter for recipe list.
@@ -34,26 +28,21 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
 {
     public static final String CLASS_NAME = RecipeListRowAdapter.class.getSimpleName();
     private Activity activity;
-    private ArrayList<Recipe> recipeList;
     private ArrayList<Recipe> recipeListTemp;
     private Settings settings;
 
     /**
      * Default constructor. 0 is passed to the resource id, because we will be creating our own custom layout.
      *
-     * @param activity
-     *            the current activity
-     * @param recipeList
-     *            the vocabulary list
-     * @param settings
-     *            the current user settings
+     * @param activity   the current activity
+     * @param recipeList the vocabulary list
+     * @param settings   the current user settings
      */
     public RecipeListRowAdapter(final Activity activity, final ArrayList<Recipe> recipeList, final Settings settings)
     {
         super(activity, 0, recipeList);
 
         this.activity = activity;
-        this.recipeList = recipeList;
         this.recipeListTemp = new ArrayList<>(recipeList);
         this.settings = settings;
     }
@@ -89,7 +78,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         }
 
         Recipe recipe = getItem(position);
-        holder.setRecipeView(recipe, this.settings, new RecipeListRowTouchListener(this.activity, this.recipeList, this.settings, position));
+        holder.setRecipeView(recipe, settings, new RecipeListRowTouchListener(activity, recipeListTemp, settings, position));
 
         return listRowView;
     }
@@ -97,57 +86,55 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
     /**
      * Filters the recipe list in the adapter with the given searched text. Only shows recipe title that starts with the searched text.
      *
-     * @param searched
-     *            the searched word
+     * @param searched the searched word
      */
     public void filter(final String searched)
     {
-        this.recipeList.clear();
+        clear();
         String searchedText = searched.trim();
-        String titleWord;
 
         if(searchedText.length() == 0)
         {
-            this.recipeList.addAll(this.recipeListTemp);
+            addAll(this.recipeListTemp);
         }
         else
         {
-            for(Recipe recipe : this.recipeListTemp)
-            {
-                titleWord = recipe.getTitle().toLowerCase(Locale.getDefault());
-
-                if(titleWord.startsWith(searchedText.toLowerCase(Locale.getDefault())))
-                {
-                    this.recipeList.add(recipe);
-                }
-            }
+            filterRecipeByTitle(searchedText);
         }
 
-        this.notifyDataSetChanged();
+        Log.d(LogsManager.TAG, CLASS_NAME + ": filter. New list size -> " + getCount());
+        LogsManager.addToLogs(CLASS_NAME + ": filter. New list size -> " + getCount());
+    }
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": filter. New list -> " + this.recipeList);
-        LogsManager.addToLogs(CLASS_NAME + ": filter. New list size -> " + this.recipeList.size());
+    private void filterRecipeByTitle(String searchedText)
+    {
+        Predicate<Recipe> recipeTitleStartsWithSearchedText = recipe -> recipe.getTitle().toLowerCase(Locale.getDefault())
+                .startsWith(searchedText.toLowerCase(Locale.getDefault()));
+
+        recipeListTemp.stream().filter(recipeTitleStartsWithSearchedText).forEach(this::add);
     }
 
     /**
      * Updates the recipe list.
      *
-     * @param list
-     *            the list to replace the current
+     * @param list the list to replace the current
      */
     public void update(ArrayList<Recipe> list)
     {
         if(list != null)
         {
-            this.recipeList.clear();
+            // Store this new list into temp, because the list parameter shares the same reference as the Adapter's list.
+            // Thus, calling clear() will clear out both the adapter's list and the new list.
+            ArrayList<Recipe> tmpList = new ArrayList<>(list);
+            clear();
 
             // If user deletes recipe list in AboutFragment
-            if(!list.isEmpty())
+            if(!tmpList.isEmpty())
             {
-                this.recipeList.addAll(list);
+                addAll(tmpList);
+                recipeListTemp.clear();
+                recipeListTemp.addAll(tmpList);
             }
-
-            this.notifyDataSetChanged();
         }
     }
 
@@ -188,76 +175,4 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
             this.description.setTypeface(settings.getTypeface(false));
         }
     }
-
-    /**
-     * Helper class for handling Recipe selection and Recipe list row scrolling.
-     */
-    private static class RecipeListRowTouchListener implements OnTouchListener
-    {
-        private WeakReference<Activity> activityRef;
-        private ArrayList<Recipe> recipeList;
-        private Settings settings;
-        private float historicX;
-        private int page;
-
-        /**
-         * Default constructor.
-         *
-         * @param page
-         *            the position of the selected recipe
-         */
-        RecipeListRowTouchListener(Activity activity, ArrayList<Recipe> recipeList, Settings settings, final int page)
-        {
-            this.activityRef = new WeakReference<>(activity);
-            this.recipeList = recipeList;
-            this.settings = settings;
-            this.page = page;
-        }
-
-        /**
-         * If the touch moves MORE than 15 pixels horizontally then the gesture will be treated as a scrolling event, else it will be treated as selecting the
-         * row which will start RecipeActivity.
-         */
-        @Override
-        public boolean onTouch(View v, MotionEvent event)
-        {
-            switch(event.getAction())
-            {
-                case MotionEvent.ACTION_DOWN:
-                {
-                    this.historicX = event.getX();
-                    break;
-                }
-                case MotionEvent.ACTION_UP:
-                {
-                    Activity activity = this.activityRef.get();
-
-                    if(activity != null)
-                    {
-                        boolean touchMovedLessThan10Pixels = Math.abs(this.historicX - event.getX()) < 15;
-                        if(touchMovedLessThan10Pixels)
-                        {
-                            Intent intent = new Intent(activity, RecipeActivity.class);
-                            intent.putExtra(EXTRA_PAGE, this.page);
-                            intent.putExtra(EXTRA_RECIPE_LIST, this.recipeList);
-                            intent.putExtra(EXTRA_SETTINGS, this.settings);
-                            activity.startActivity(intent);
-                        }
-                    }
-
-                    // Removes compiler warning
-                    v.performClick();
-
-                    break;
-                }
-                default:
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
-
 }

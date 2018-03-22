@@ -38,29 +38,40 @@ public class RecipeApplication extends Application
 
         if(Categories.getCategories().size() <= 1)
         {
-            Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate. Init categories.");
-            LogsManager.addToLogs(CLASS_NAME + ": onCreate. Init categories.");
+            loadCategories();
+        }
+    }
 
-            CategoryManager categoryManager = new CategoryManager(this);
-            SparseArray<String> categoriesArray = categoryManager.getCategoriesFromDisk();
+    private void loadCategories()
+    {
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate. Init categories.");
+        LogsManager.addToLogs(CLASS_NAME + ": onCreate. Init categories.");
 
-            if(categoriesArray != null && categoriesArray.size() > 1)
+        CategoryManager categoryManager = new CategoryManager(this);
+        SparseArray<String> categoriesArray = categoryManager.getCategoriesFromDisk();
+
+        boolean haveCategories = categoriesArray != null && categoriesArray.size() > 1;
+        if(haveCategories)
+        {
+            categoryManager.saveCategoriesInCache(categoriesArray);
+        }
+        else
+        {
+            if(!CategoriesRetrieverThread.isUpdating())
             {
-                categoryManager.saveCategoriesInCache(categoriesArray);
+                startCategoriesRetrieverThread();
             }
             else
             {
-                if(!CategoriesRetrieverThread.isUpdating())
-                {
-                    CategoriesRetrieverThread categoriesRetrieverThread = new CategoriesRetrieverThread(this.getApplicationContext(), null);
-                    categoriesRetrieverThread.execute();
-                    CategoriesRetrieverThread.setIsUpdating();
-                }
-                else
-                {
-                    Toast.makeText(this, this.getString(R.string.categories_currently_updating), Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(this, this.getString(R.string.categories_currently_updating), Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void startCategoriesRetrieverThread()
+    {
+        CategoriesRetrieverThread categoriesRetrieverThread = new CategoriesRetrieverThread(getApplicationContext(), null);
+        categoriesRetrieverThread.execute();
+        CategoriesRetrieverThread.setIsUpdating();
     }
 }
