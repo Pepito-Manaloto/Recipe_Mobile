@@ -5,11 +5,8 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,16 +18,16 @@ import android.widget.TextView;
 
 import com.aaron.recipe.R;
 import com.aaron.recipe.bean.Settings;
+import com.aaron.recipe.listener.BackButtonListener;
+import com.aaron.recipe.listener.LogsSearchListener;
 import com.aaron.recipe.model.LogsManager;
-
-import java.lang.ref.WeakReference;
 
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 
 /**
  * The application logs fragment.
  */
-public class LogsFragment extends Fragment
+public class LogsFragment extends Fragment implements Backable
 {
     public static final String CLASS_NAME = LogsFragment.class.getSimpleName();
     private TextView textarea;
@@ -45,20 +42,23 @@ public class LogsFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        this.settings = getActivity().getIntent().getParcelableExtra(EXTRA_SETTINGS);
-
         setHasOptionsMenu(true);
         getActivity().setTitle(R.string.menu_logs);
+        initializeActionBar();
 
+        this.settings = getActivity().getIntent().getParcelableExtra(EXTRA_SETTINGS);
+        this.logsManager = new LogsManager();
+
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate.");
+    }
+
+    private void initializeActionBar()
+    {
         ActionBar actionBar = getActivity().getActionBar();
         if(actionBar != null)
         {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-        this.logsManager = new LogsManager();
-
-        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate.");
     }
 
     /**
@@ -68,7 +68,6 @@ public class LogsFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_logs, parent, false);
-
         view.setFocusableInTouchMode(true);
         view.requestFocus();
         view.setOnKeyListener(new BackButtonListener(this));
@@ -95,10 +94,10 @@ public class LogsFragment extends Fragment
         View view = menu.findItem(R.id.menu_search).getActionView();
 
         // Get the edit text from the action view
-        final EditText searchTextfield = view.findViewById(R.id.edittext_search_field);
+        EditText searchTextfield = view.findViewById(R.id.edittext_search_field);
         searchTextfield.setHint(R.string.hint_logs);
 
-        searchTextfield.addTextChangedListener(new SearchListener(this));
+        searchTextfield.addTextChangedListener(new LogsSearchListener(this, logsManager));
     }
 
     /**
@@ -121,6 +120,12 @@ public class LogsFragment extends Fragment
         }
     }
 
+    @Override
+    public void setActivityResultOnBackEvent()
+    {
+        setFragmentActivityResult();
+    }
+
     /**
      * Sets the current settings and sends it to the main activity fragment.
      */
@@ -136,95 +141,8 @@ public class LogsFragment extends Fragment
         LogsManager.addToLogs(CLASS_NAME + ": setFragmentAcivityResult. Current settings -> " + this.settings);
     }
 
-    private void setTextareaText(final String text)
+    public void setTextareaText(final String text)
     {
         this.textarea.setText(text);
-    }
-
-    private LogsManager getLogsManager()
-    {
-        return this.logsManager;
-    }
-
-    private static class BackButtonListener implements View.OnKeyListener
-    {
-        private WeakReference<LogsFragment> fragmentRef;
-
-        BackButtonListener(LogsFragment fragment)
-        {
-            this.fragmentRef = new WeakReference<>(fragment);
-        }
-
-        /**
-         * Handles back button.
-         */
-        @Override
-        public boolean onKey(View v, int keyCode, KeyEvent event)
-        {
-            // For back button
-            if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
-            {
-                LogsFragment fragment = this.fragmentRef.get();
-
-                if(fragment != null)
-                {
-                    fragment.setFragmentActivityResult();
-                }
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-    }
-
-    private static class SearchListener implements TextWatcher
-    {
-        private WeakReference<LogsFragment> fragmentRef;
-
-        SearchListener(LogsFragment fragment)
-        {
-            this.fragmentRef = new WeakReference<>(fragment);
-        }
-
-        /**
-         * Handles search on text update.
-         */
-        @Override
-        public void afterTextChanged(Editable editable)
-        {
-            String searched = editable.toString();
-
-            LogsFragment fragment = this.fragmentRef.get();
-            if(fragment != null)
-            {
-                LogsManager logsManager = fragment.getLogsManager();
-
-                if(searched.length() <= 0)
-                {
-                    fragment.setTextareaText(logsManager.getLogs());
-                }
-                else
-                {
-                    fragment.setTextareaText(logsManager.getLogs(searched));
-                }
-
-                Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateOptionsMenu(afterTextChanged). searched=" + searched);
-            }
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
-        {
-            // No Action
-        }
-
-        @Override
-        public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3)
-        {
-           // No Action
-        }
     }
 }

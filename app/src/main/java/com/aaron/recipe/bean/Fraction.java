@@ -5,6 +5,10 @@ import android.os.Parcelable;
 
 import com.aaron.recipe.model.MathUtils;
 
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 /**
  * Represents a decimal number as fraction.
  */
@@ -75,16 +79,8 @@ public class Fraction implements Parcelable
     {
         int wholeNumber = (int) decimalNumber;
         double decimal = MathUtils.round(decimalNumber - wholeNumber, 3);
-        String fraction = "";
 
-        for(CommonFraction cf : CommonFraction.values())
-        {
-            if(cf.getValue() == decimal)
-            {
-                fraction = cf.getCode();
-            }
-        }
-
+        String fraction = getCommonFraction(decimal);
         if(fraction.isEmpty())
         {
             if(decimal == 0)
@@ -100,6 +96,19 @@ public class Fraction implements Parcelable
         {
             return (wholeNumber == 0 ? "" : wholeNumber) + fraction;
         }
+    }
+
+    private String getCommonFraction(double decimal)
+    {
+        Predicate<CommonFraction> isFractionDecimalEqualToDecimal = cf -> cf.getValue() == decimal;
+        Optional<CommonFraction> cf = Arrays.stream(CommonFraction.values()).filter(isFractionDecimalEqualToDecimal).findFirst();
+        String fraction = "";
+        if(cf.isPresent())
+        {
+            fraction = cf.get().getCode();
+        }
+
+        return fraction;
     }
 
     /**

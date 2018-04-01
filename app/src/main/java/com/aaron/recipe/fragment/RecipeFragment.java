@@ -19,6 +19,9 @@ import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.stream.IntStream;
 
 import static android.widget.LinearLayout.LayoutParams;
 import static com.aaron.recipe.adapter.RecipePagerAdapter.EXTRA_PAGE;
@@ -69,27 +72,40 @@ public class RecipeFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        int page = getArguments().getInt(EXTRA_PAGE);
-        ArrayList<Recipe> recipeList = getArguments().getParcelableArrayList(EXTRA_RECIPE_LIST);
-        this.settings = getArguments().getParcelable(EXTRA_SETTINGS);
-
-        this.recipe = recipeList == null ? null : recipeList.get(page);
+        Bundle args = getArguments();
+        if(args != null)
+        {
+            parseBundleARguments(args);
+        }
 
         setHasOptionsMenu(true);
+        initializeActionBar();
 
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate.");
+    }
+
+    private void parseBundleARguments(Bundle args)
+    {
+        this.settings = args.getParcelable(EXTRA_SETTINGS);
+
+        int page = args.getInt(EXTRA_PAGE);
+        ArrayList<Recipe> recipeList = args.getParcelableArrayList(EXTRA_RECIPE_LIST);
+        this.recipe = recipeList == null ? null : recipeList.get(page);
+    }
+
+    private void initializeActionBar()
+    {
         ActionBar actionBar = getActivity().getActionBar();
         if(actionBar != null)
         {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate.");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState)
     {
-        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.fragment_recipe, parent, false);
+        LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.fragment_recipe, parent, false);
 
         LayoutParams layoutParamsLabel = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParamsLabel.setMargins(0, 10, 5, 0);
@@ -97,37 +113,43 @@ public class RecipeFragment extends Fragment
         LayoutParams layoutParamsListLabel = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParamsListLabel.setMargins(0, 30, 0, 5);
 
-        view.addView(createTextView("Title: " + this.recipe.getTitle()), layoutParamsLabel);
-        view.addView(createTextView("Category: " + this.recipe.getCategory()), layoutParamsLabel);
-        view.addView(createTextView("Preparation Time: " + this.recipe.getPreparationTimeString()), layoutParamsLabel);
-        view.addView(createTextView("Servings: " + this.recipe.getServings()), layoutParamsLabel);
-        view.addView(createTextView("Description: " + this.recipe.getDescription()), layoutParamsLabel);
-
-        view.addView(createTextView("Ingredients:"), layoutParamsListLabel);
-
-        for(Ingredient ingredient : this.recipe.getIngredients().getIngredientsList())
-        {
-            view.addView(createTextView(ingredient.toString()), layoutParamsLabel);
-        }
-
-        view.addView(createTextView("Instructions:"), layoutParamsListLabel);
-
-        int count = 1;
-        for(String instruction : this.recipe.getInstructions().getInstructionsList())
-        {
-            view.addView(createTextView(count + ". " + instruction), layoutParamsLabel);
-            count++;
-        }
+        initializeRecipeViewDetails(linearLayout, layoutParamsLabel);
+        initializeIngredientsAndInstructionsView(linearLayout, layoutParamsLabel, layoutParamsListLabel);
 
         // Add newline at the end of the page
-        view.addView(createTextView(""), layoutParamsLabel);
+        linearLayout.addView(createTextView(""), layoutParamsLabel);
 
         ScrollView scroll = new ScrollView(getActivity());
-        scroll.addView(view);
+        scroll.addView(linearLayout);
 
         Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateView.");
 
         return scroll;
+    }
+
+    private void initializeRecipeViewDetails(LinearLayout linearLayout, LayoutParams layoutParamsLabel)
+    {
+        linearLayout.addView(createTextView("Title: " + this.recipe.getTitle()), layoutParamsLabel);
+        linearLayout.addView(createTextView("Category: " + this.recipe.getCategory()), layoutParamsLabel);
+        linearLayout.addView(createTextView("Preparation Time: " + this.recipe.getPreparationTimeString()), layoutParamsLabel);
+        linearLayout.addView(createTextView("Servings: " + this.recipe.getServings()), layoutParamsLabel);
+        linearLayout.addView(createTextView("Description: " + this.recipe.getDescription()), layoutParamsLabel);
+    }
+
+    private void initializeIngredientsAndInstructionsView(LinearLayout linearLayout, LayoutParams layoutParamsLabel, LayoutParams layoutParamsListLabel)
+    {
+        linearLayout.addView(createTextView("Ingredients:"), layoutParamsListLabel);
+        Consumer<Ingredient> addIngredientToLinearLayoutView = ingredient -> linearLayout.addView(createTextView(ingredient.toString()), layoutParamsLabel);
+        recipe.getIngredients().getIngredientsList().forEach(addIngredientToLinearLayoutView);
+
+        linearLayout.addView(createTextView("Instructions:"), layoutParamsListLabel);
+
+        ArrayList<String> instructionsList = recipe.getInstructions().getInstructionsList();
+        // Add one because first index starts at 1, not 0.
+        int instructionsListSize = instructionsList.size() + 1;
+        IntConsumer addInstructionToLinearLayoutView = count -> linearLayout.addView(createTextView(count + ". " + instructionsList.get(count)),
+                layoutParamsLabel);
+        IntStream.range(1, instructionsListSize).forEach(addInstructionToLinearLayoutView);
     }
 
     /**

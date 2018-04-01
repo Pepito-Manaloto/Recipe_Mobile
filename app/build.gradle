@@ -4,7 +4,6 @@ def ANDROID_VERSION = "27.0.2"
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "$ANDROID_VERSION"
 
     defaultConfig {
         applicationId "com.aaron.recipe"
@@ -49,14 +48,21 @@ android {
 def LEAKCANARY_VERSION = "1.5.4"
 
 dependencies {
-    testCompile 'junit:junit:4.12'
-    debugCompile "com.squareup.leakcanary:leakcanary-android:$LEAKCANARY_VERSION"
-    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$LEAKCANARY_VERSION"
+    implementation "com.android.support:support-fragment:$ANDROID_VERSION"
+    implementation "com.android.support:recyclerview-v7:$ANDROID_VERSION"
+    implementation 'commons-io:commons-io:2.5'
+    implementation 'org.apache.commons:commons-lang3:3.7'
+    implementation 'commons-codec:commons-codec:1.10'
 
-    compile "com.android.support:support-fragment:$ANDROID_VERSION"
-    compile "com.android.support:recyclerview-v7:$ANDROID_VERSION"
-    compile 'commons-io:commons-io:2.5'
-    compile 'org.apache.commons:commons-lang3:3.7'
-    compile 'commons-codec:commons-codec:1.10'
-    compile 'com.facebook.stetho:stetho:1.5.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.0.5'
+
+
+    implementation 'com.facebook.stetho:stetho:1.5.0'
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$LEAKCANARY_VERSION"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$LEAKCANARY_VERSION"
+
+    testImplementation 'junit:junit:4.12'
 }

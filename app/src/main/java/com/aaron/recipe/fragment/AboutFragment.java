@@ -2,24 +2,22 @@ package com.aaron.recipe.fragment;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.TextViewCompat;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
 import com.aaron.recipe.R;
 import com.aaron.recipe.bean.Settings;
+import com.aaron.recipe.listener.BackButtonListener;
+import com.aaron.recipe.listener.DeleteLongClickListener;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
 
@@ -32,9 +30,11 @@ import static com.aaron.recipe.model.RecipeManager.DATE_FORMAT_LONG;
 /**
  * The application about fragment.
  */
-public class AboutFragment extends Fragment
+public class AboutFragment extends Fragment implements Backable
 {
     public static final String CLASS_NAME = AboutFragment.class.getSimpleName();
+    private static final int RECIPE_COUNT_COLUMNS = 2;
+
     private RecipeManager recipeManager;
     private Settings settings;
 
@@ -46,20 +46,23 @@ public class AboutFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        this.settings = getActivity().getIntent().getParcelableExtra(EXTRA_SETTINGS);
-
         setHasOptionsMenu(true);
         getActivity().setTitle(R.string.menu_about);
+        initializeActionBar();
 
+        this.settings = getActivity().getIntent().getParcelableExtra(EXTRA_SETTINGS);
+        this.recipeManager = new RecipeManager(getContext());
+
+        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate.");
+    }
+
+    private void initializeActionBar()
+    {
         ActionBar actionBar = getActivity().getActionBar();
         if(actionBar != null)
         {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-        this.recipeManager = new RecipeManager(getActivity());
-
-        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate.");
     }
 
     /**
@@ -71,120 +74,68 @@ public class AboutFragment extends Fragment
         Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateView.");
 
         View view = inflater.inflate(R.layout.fragment_about, parent, false);
-
-        view.setFocusableInTouchMode(true);
-        view.requestFocus();
-        view.setOnKeyListener(new View.OnKeyListener()
-        {
-            /**
-             * Handles back button.
-             */
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event)
-            {
-                // For back button
-                if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
-                {
-                    setFragmentActivityResult();
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        });
-
-        view.setOnLongClickListener(new OnLongClickListener()
-        {
-            /**
-             * If yes is selected, vocabularies on disk will be deleted.
-             */
-            @Override
-            public boolean onLongClick(View arg0)
-            {
-                promptUserOnDelete();
-                return true;
-            }
-        });
-
-        final TextView buildNumberTextView = view.findViewById(R.id.text_build_number);
-        TextView lastUpdatedTextView = view.findViewById(R.id.text_last_updated);
+        initializeView(view);
 
         String buildNumber = getActivity().getString(R.string.build_num);
-        String lastUpdated = this.recipeManager.getLastUpdated(DATE_FORMAT_LONG);
-
+        final TextView buildNumberTextView = view.findViewById(R.id.text_build_number);
         buildNumberTextView.setText(buildNumber);
+
+        String lastUpdated = this.recipeManager.getLastUpdated(DATE_FORMAT_LONG);
+        TextView lastUpdatedTextView = view.findViewById(R.id.text_last_updated);
         lastUpdatedTextView.setText(lastUpdated);
 
-        GridLayout grid = view.findViewById(R.id.gridlayout_count);
-        grid.setColumnCount(2);
-
-        Map<String, Integer> recipesCount = this.recipeManager.getRecipesCount();
-        Set<Map.Entry<String, Integer>> entrySet = recipesCount.entrySet();
-        grid.setRowCount(entrySet.size());
-
-        int ctr = 0;
-        for(Map.Entry<String, Integer> entry : entrySet)
-        {
-            // Label
-            GridLayout.LayoutParams layoutParamLabel = new GridLayout.LayoutParams(GridLayout.spec(ctr, GridLayout.LEFT), GridLayout.spec(0, GridLayout.LEFT));
-
-            TextView label = new TextView(getActivity());
-            label.setText(entry.getKey());
-            TextViewCompat.setTextAppearance(label, R.style.TextView_sub_about);
-
-            // Count
-            GridLayout.LayoutParams layoutParamCount = new GridLayout.LayoutParams(GridLayout.spec(ctr, GridLayout.LEFT), GridLayout.spec(1, GridLayout.LEFT));
-            layoutParamCount.setMargins(75, 0, 0, 0);
-            TextView count = new TextView(getActivity());
-            count.setText(String.valueOf(entry.getValue()));
-            TextViewCompat.setTextAppearance(count, R.style.TextView_sub_about);
-
-            grid.addView(label, layoutParamLabel);
-            grid.addView(count, layoutParamCount);
-
-            ctr++;
-        }
+        initializeRecipeCount(view);
 
         return view;
     }
 
-    /**
-     * Pops-up a prompt dialog with 'yes' or 'no' button.
-     * Selecting 'yes' will delete all recipes from disk.
-     */
-    private void promptUserOnDelete()
+    private void initializeView(View view)
     {
-        Log.d(LogsManager.TAG, CLASS_NAME + ": promptUserOnDelete.");
-        LogsManager.addToLogs(CLASS_NAME + ": promptUserOnDelete.");
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(new BackButtonListener(this));
+        view.setOnLongClickListener(new DeleteLongClickListener(this, recipeManager, this::setFragmentActivityResult));
+    }
 
-        AlertDialog.Builder prompt = new AlertDialog.Builder(getActivity());
-        prompt.setMessage("Delete recipes from disk?");
+    private void initializeRecipeCount(View view)
+    {
+        GridLayout grid = view.findViewById(R.id.gridlayout_count);
+        grid.setColumnCount(RECIPE_COUNT_COLUMNS);
 
-        prompt.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+        Map<String, Integer> recipesCount = this.recipeManager.getRecipesCount();
+        Set<Map.Entry<String, Integer>> entrySet = recipesCount.entrySet();
+
+        int gridRowCount = entrySet.size();
+        grid.setRowCount(gridRowCount);
+
+        int rowNumber = 0;
+        for(Map.Entry<String, Integer> entry : entrySet)
         {
-            public void onClick(DialogInterface dialog, int id)
-            {
-                Log.d(LogsManager.TAG, CLASS_NAME + ": promptUserOnDelete. Yes selected.");
-                LogsManager.addToLogs(CLASS_NAME + ": promptUserOnDelete. Yes selected.");
+            addRecipeCountLabelToGrid(rowNumber, entry.getKey(), grid);
+            addRecipeCountToGrid(rowNumber, String.valueOf(entry.getValue()), grid);
+            rowNumber++;
+        }
+    }
 
-                recipeManager.deleteRecipeFromDisk();
-                setFragmentActivityResult();
-            }
-        });
-        prompt.setNegativeButton("No", new DialogInterface.OnClickListener()
-        {
-            public void onClick(DialogInterface dialog, int id)
-            {
-                Log.d(LogsManager.TAG, CLASS_NAME + ": promptUserOnDelete. No selected.");
-                LogsManager.addToLogs(CLASS_NAME + ": promptUserOnDelete. No selected.");
+    private void addRecipeCountLabelToGrid(int rowNumber, String labelText, GridLayout grid)
+    {
+        GridLayout.LayoutParams layoutParamLabel = new GridLayout.LayoutParams(GridLayout.spec(rowNumber, GridLayout.LEFT),
+                GridLayout.spec(0, GridLayout.LEFT));
+        TextView label = new TextView(getActivity());
+        label.setText(labelText);
+        TextViewCompat.setTextAppearance(label, R.style.TextView_sub_about);
+        grid.addView(label, layoutParamLabel);
+    }
 
-                dialog.cancel();
-            }
-        });
-
-        prompt.create().show();
+    private void addRecipeCountToGrid(int rowNumber, String countText, GridLayout grid)
+    {
+        GridLayout.LayoutParams layoutParamCount = new GridLayout.LayoutParams(GridLayout.spec(rowNumber, GridLayout.LEFT),
+                GridLayout.spec(1, GridLayout.LEFT));
+        layoutParamCount.setMargins(75, 0, 0, 0);
+        TextView count = new TextView(getActivity());
+        count.setText(countText);
+        TextViewCompat.setTextAppearance(count, R.style.TextView_sub_about);
+        grid.addView(count, layoutParamCount);
     }
 
     /**
@@ -205,6 +156,11 @@ public class AboutFragment extends Fragment
                 return super.onOptionsItemSelected(item);
             }
         }
+    }
+
+    public void setActivityResultOnBackEvent()
+    {
+        setFragmentActivityResult();
     }
 
     /**

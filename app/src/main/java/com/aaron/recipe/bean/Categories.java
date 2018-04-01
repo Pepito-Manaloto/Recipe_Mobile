@@ -1,8 +1,13 @@
 package com.aaron.recipe.bean;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 /**
  * Categories bean.
@@ -83,12 +88,12 @@ public class Categories
      */
     public static int getId(String category)
     {
-        for(Map.Entry<Integer, String> entry : CATEGORIES_MAP.entrySet())
+        Predicate<Map.Entry<Integer, String>> categoriesMapValueEqualToCategory = entry -> entry.getValue().equals(category);
+        Map.Entry<Integer, String> entry = CATEGORIES_MAP.entrySet().stream().filter(categoriesMapValueEqualToCategory).findFirst().orElse(null);
+
+        if(nonNull(entry))
         {
-            if(entry.getValue().equals(category))
-            {
-                return entry.getKey();
-            }
+            return entry.getKey();
         }
 
         return DEFAULT_INDEX;

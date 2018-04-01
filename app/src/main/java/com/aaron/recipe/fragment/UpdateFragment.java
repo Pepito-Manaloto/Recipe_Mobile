@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * The update dialog fragment that retrieves recipe list from the server.
  */
+@Deprecated
 public class UpdateFragment extends DialogFragment
 {
     public static final String CLASS_NAME = UpdateFragment.class.getSimpleName();
