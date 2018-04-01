@@ -51,8 +51,7 @@ public class DeleteLongClickListener implements View.OnLongClickListener
      */
     private void promptUserOnDelete()
     {
-        Log.d(LogsManager.TAG, AboutFragment.CLASS_NAME + ": promptUserOnDelete.");
-        LogsManager.addToLogs(AboutFragment.CLASS_NAME + ": promptUserOnDelete.");
+        LogsManager.log(AboutFragment.CLASS_NAME, "promptUserOnDelete", "");
 
         final AboutFragment fragment = this.fragmentRef.get();
 
@@ -85,7 +84,6 @@ public class DeleteLongClickListener implements View.OnLongClickListener
 
     private void logDialogAction(String action)
     {
-        Log.d(LogsManager.TAG, AboutFragment.CLASS_NAME + ": promptUserOnDelete. " + action + " selected.");
-        LogsManager.addToLogs(AboutFragment.CLASS_NAME + ": promptUserOnDelete.  " + action + "  selected.");
+        LogsManager.log(AboutFragment.CLASS_NAME, "promptUserOnDelete", action + "  selected.");
     }
 }

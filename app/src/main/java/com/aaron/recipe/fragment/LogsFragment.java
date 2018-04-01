@@ -137,8 +137,7 @@ public class LogsFragment extends Fragment implements Backable
         getActivity().setResult(Activity.RESULT_OK, data);
         getActivity().finish();
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": setFragmentAcivityResult. Current settings -> " + this.settings);
-        LogsManager.addToLogs(CLASS_NAME + ": setFragmentAcivityResult. Current settings -> " + this.settings);
+        LogsManager.log(CLASS_NAME, "setFragmentAcivityResult", "Current settings -> " + this.settings);
     }
 
     public void setTextareaText(final String text)

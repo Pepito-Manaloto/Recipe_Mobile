@@ -141,10 +141,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper
         try
         {
             database.beginTransaction();
-            database.execSQL("DROP IF TABLE EXISTS " + TABLE_RECIPE);
-            database.execSQL("DROP IF TABLE EXISTS " + TABLE_INGREDIENTS);
-            database.execSQL("DROP IF TABLE EXISTS " + TABLE_INSTRUCTIONS);
-            database.execSQL("DROP IF TABLE EXISTS " + TABLE_CATEGORIES);
+            database.execSQL("DROP TABLE IF EXISTS " + TABLE_RECIPE);
+            database.execSQL("DROP TABLE IF EXISTS " + TABLE_INGREDIENTS);
+            database.execSQL("DROP TABLE IF EXISTS " + TABLE_INSTRUCTIONS);
+            database.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
             database.setTransactionSuccessful();
         }
         finally

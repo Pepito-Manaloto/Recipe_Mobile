@@ -1,6 +1,7 @@
 package com.aaron.recipe.fragment;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -61,7 +62,7 @@ public class RecipeFragment extends Fragment
         RecipeFragment recipeFragment = new RecipeFragment();
         recipeFragment.setArguments(bundle);
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": newInstance. page=" + page);
+        LogsManager.log(CLASS_NAME, "newInstance", "page=" + page);
 
         return recipeFragment;
     }
@@ -95,10 +96,14 @@ public class RecipeFragment extends Fragment
 
     private void initializeActionBar()
     {
-        ActionBar actionBar = getActivity().getActionBar();
-        if(actionBar != null)
+        Activity activity = getActivity();
+        if(activity != null)
         {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            ActionBar actionBar = activity.getActionBar();
+            if(actionBar != null)
+            {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
         }
     }
 

@@ -3,6 +3,10 @@ package com.aaron.recipe.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.facebook.stetho.common.StringUtil;
+
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * A single ingredient.
  */
@@ -117,7 +121,7 @@ public class Ingredient implements Parcelable
 
         String toReturn = quantityInFraction.getFraction() + " " + this.measurement + " " + this.ingredient;
 
-        if(this.comment.length() > 0)
+        if(StringUtils.isNotBlank(comment))
         {
             toReturn += " (" + this.comment + ")";
         }

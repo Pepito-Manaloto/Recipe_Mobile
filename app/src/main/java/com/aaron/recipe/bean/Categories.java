@@ -1,12 +1,10 @@
 package com.aaron.recipe.bean;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 /**
@@ -91,7 +89,7 @@ public class Categories
         Predicate<Map.Entry<Integer, String>> categoriesMapValueEqualToCategory = entry -> entry.getValue().equals(category);
         Map.Entry<Integer, String> entry = CATEGORIES_MAP.entrySet().stream().filter(categoriesMapValueEqualToCategory).findFirst().orElse(null);
 
-        if(nonNull(entry))
+        if(nonNull(entry) && nonNull(entry.getKey()))
         {
             return entry.getKey();
         }

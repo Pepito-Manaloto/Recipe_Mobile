@@ -95,8 +95,7 @@ public class RecipeManager
         {
             String query = "?last_updated=" + URLEncoder.encode(this.getLastUpdated(DATE_FORMAT_SHORT_24), "UTF-8");
 
-            Log.d(LogsManager.TAG, CLASS_NAME + ": getRecipesFromWeb. url=" + url + query);
-            LogsManager.addToLogs(CLASS_NAME + ": getRecipesFromWeb. url=" + url + query);
+            LogsManager.log(CLASS_NAME, "getRecipesFromWeb", "url=" + url + query);
 
             response = this.httpClient.get(url, query, HEADERS);
 
@@ -143,13 +142,11 @@ public class RecipeManager
         {
             if(ex == null)
             {
-                Log.d(LogsManager.TAG, CLASS_NAME + ": getRecipesFromWeb. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
-                LogsManager.addToLogs(CLASS_NAME + ": getRecipesFromWeb. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
+                LogsManager.log(CLASS_NAME, "getRecipesFromWeb", "responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
             }
             else
             {
-                Log.e(LogsManager.TAG, CLASS_NAME + ": getRecipesFromWeb. " + ex.getClass().getSimpleName() + ": " + ex.getMessage(), ex);
-                LogsManager.addToLogs(CLASS_NAME + ": getRecipesFromWeb. Exception=" + ex.getClass().getSimpleName() + " trace=" + ex.getStackTrace());
+                LogsManager.log(CLASS_NAME, "getRecipesFromWeb", ex.getClass().getSimpleName() + ": " + ex.getMessage(), ex);
             }
         }
 
@@ -216,8 +213,10 @@ public class RecipeManager
             {
                 JSONObject ingredientsJsonObj = ingredientsJsonArray.getJSONObject(i);
                 ingredients
-                        .addIngredient(new Ingredient(ingredientsJsonObj.getDouble(ColumnIngredients.quantity.name()), ingredientsJsonObj.getString(ColumnIngredients.measurement.name()),
-                                ingredientsJsonObj.getString(ColumnIngredients.ingredient.name()), ingredientsJsonObj.getString(ColumnIngredients.comment_.name())));
+                        .addIngredient(new Ingredient(ingredientsJsonObj.getDouble(ColumnIngredients.quantity.name()),
+                                ingredientsJsonObj.getString(ColumnIngredients.measurement.name()),
+                                ingredientsJsonObj.getString(ColumnIngredients.ingredient.name()),
+                                ingredientsJsonObj.getString(ColumnIngredients.comment_.name())));
             }
 
             JSONArray instructionsJsonArray = jsonArray.getJSONArray(2);
@@ -242,8 +241,7 @@ public class RecipeManager
             }
         }
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": parseRecipesFromJsonObject. map=" + map);
-        LogsManager.addToLogs(CLASS_NAME + ": parseRecipesFromJsonObject. json_length=" + jsonObject.length());
+        LogsManager.log(CLASS_NAME, "parseRecipesFromJsonObject", "json_length=" + jsonObject.length());
 
         return map;
     }
@@ -321,8 +319,7 @@ public class RecipeManager
             this.dbHelper.close();
         }
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": saveToDisk.");
-        LogsManager.addToLogs(CLASS_NAME + ": saveToDisk.");
+        LogsManager.log(CLASS_NAME, "saveToDisk", "");
 
         return true;
     }
@@ -364,12 +361,10 @@ public class RecipeManager
         }
         catch(ParseException e)
         {
-            Log.e(LogsManager.TAG, CLASS_NAME + ": getLastUpdated. " + e.getClass().getSimpleName() + ": " + e.getMessage(), e);
-            LogsManager.addToLogs(CLASS_NAME + ": getLastUpdated. Exception=" + e.getClass().getSimpleName() + " trace=" + e.getStackTrace());
+            LogsManager.log(CLASS_NAME, "getLastUpdated", e.getClass().getSimpleName() + ": " + e.getMessage(), e);
         }
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": getLastUpdated. lastUpdatedDate=" + lastUpdatedDate);
-        LogsManager.addToLogs(CLASS_NAME + ": getLastUpdated. lastUpdatedDate=" + lastUpdatedDate);
+        LogsManager.log(CLASS_NAME, "getLastUpdated", "lastUpdatedDate=" + lastUpdatedDate);
 
         return lastUpdatedDate;
     }
@@ -396,8 +391,7 @@ public class RecipeManager
             }
         }
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": getRecipesCount. values=" + map.values());
-        LogsManager.addToLogs(CLASS_NAME + ": getRecipesCount. values_size=" + map.values().size());
+        LogsManager.log(CLASS_NAME, "getRecipesCount", "values_size=" + map.values().size());
 
         return map;
     }
@@ -415,8 +409,8 @@ public class RecipeManager
         try(SQLiteDatabase db = this.dbHelper.getReadableDatabase())
         {
             String[] columns = new String[] { ColumnRecipe.id.name(), ColumnRecipe.title.name(),
-                                              ColumnRecipe.category.name(), ColumnRecipe.preparation_time.name(),
-                                              ColumnRecipe.servings.name(), ColumnRecipe.description.name() };
+                    ColumnRecipe.category.name(), ColumnRecipe.preparation_time.name(),
+                    ColumnRecipe.servings.name(), ColumnRecipe.description.name() };
             String whereClause;
             String[] whereArgs;
             String orderBy = ColumnRecipe.title.name() + " ASC";
@@ -444,8 +438,7 @@ public class RecipeManager
             }
         }
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": getRecipesFromDisk. category=" + selectedCategory);
-        LogsManager.addToLogs(CLASS_NAME + ": getRecipesFromDisk. category=" + selectedCategory);
+        LogsManager.log(CLASS_NAME, "getRecipesFromDisk", "category=" + selectedCategory);
 
         return list;
     }
@@ -469,7 +462,8 @@ public class RecipeManager
 
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
 
-        String[] ingredientsColumns = new String[] { ColumnIngredients.quantity.name(), ColumnIngredients.measurement.name(), ColumnIngredients.ingredient.name(), ColumnIngredients.comment_.name() };
+        String[] ingredientsColumns = new String[] { ColumnIngredients.quantity.name(), ColumnIngredients.measurement.name(),
+                ColumnIngredients.ingredient.name(), ColumnIngredients.comment_.name() };
         String[] instructionsColumns = new String[] { ColumnInstructions.instruction.name() };
         String whereClause = ColumnIngredients.recipe_id.name() + " = ?";
         String[] whereArgs = new String[] { String.valueOf(id) };

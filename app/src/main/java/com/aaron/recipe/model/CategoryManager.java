@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.aaron.recipe.bean.Categories;
@@ -95,30 +94,29 @@ public class CategoryManager
                 {
                     response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
                     response.setText("Error no categories retrieved.");
-                    Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate Error initializing categories, response empty. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
-                    LogsManager.addToLogs(CLASS_NAME + ": onCreate Error initializing categories, response empty. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
+
+                    LogsManager.log(CLASS_NAME, "onCreate",
+                            "Error initializing categories, response empty. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
                 }
             }
             else
             {
                 response.setText("Error response is not 200.");
-                Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate Error initializing categories, response not 200. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
-                LogsManager.addToLogs(CLASS_NAME + ": onCreate Error initializing categories, response not 200. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
+                LogsManager.log(CLASS_NAME, "onCreate",
+                        "Error initializing categories, response not 200. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
             }
         }
         catch(JSONException e)
         {
             response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
             response.setText("Error parsing categories." + e.getMessage());
-            Log.e(LogsManager.TAG, CLASS_NAME + ": onCreate. Error parsing categories response. Error: " + e.getMessage());
-            LogsManager.addToLogs(CLASS_NAME + ": onCreate. Error parsing categories response. Error: " + e.getMessage());
+            LogsManager.log(CLASS_NAME, "onCreate", "Error parsing categories response. Error: " + e.getMessage(), e);
         }
         catch(IOException e)
         {
             response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
             response.setText("Error retrieving categories. " + e.getMessage());
-            Log.e(LogsManager.TAG, CLASS_NAME + ": onCreate. Error retrieving categories. Error: " + e.getMessage());
-            LogsManager.addToLogs(CLASS_NAME + ": onCreate. Error retrieving categories. Error: " + e.getMessage());
+            LogsManager.log(CLASS_NAME, "onCreate", "Error retrieving categories. Error: " + e.getMessage(), e);
         }
 
         return response;
@@ -239,8 +237,7 @@ public class CategoryManager
         }
 
         int size = array.size();
-        Log.d(LogsManager.TAG, CLASS_NAME + ": getCategoriesFromDisk. length=" + size);
-        LogsManager.addToLogs(CLASS_NAME + ": getCategoriesFromDisk. length=" + size);
+        LogsManager.log(CLASS_NAME, "getCategoriesFromDisk", "length=" + size);
 
         return array;
     }

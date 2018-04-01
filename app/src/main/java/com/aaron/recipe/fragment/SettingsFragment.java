@@ -89,8 +89,7 @@ public class SettingsFragment extends Fragment implements Backable
         this.categoryAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, Categories.getCategoriesArray());
         this.categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate. settings=" + this.settings);
-        LogsManager.addToLogs(CLASS_NAME + ": onCreate. settings=" + this.settings);
+        LogsManager.log(CLASS_NAME, "onCreate", "settings=" + this.settings);
     }
 
     private void initializeActionBar()
@@ -212,8 +211,7 @@ public class SettingsFragment extends Fragment implements Backable
         getActivity().setResult(Activity.RESULT_OK, data);
         getActivity().finish();
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": setFragmentActivityResult. New settings -> " + this.settings);
-        LogsManager.addToLogs(CLASS_NAME + ": setFragmentActivityResult. New settings -> " + this.settings);
+        LogsManager.log(CLASS_NAME, "setFragmentActivityResult", "New settings -> " + this.settings);
     }
 
     private void updateSettings()

@@ -44,8 +44,7 @@ public class RecipeApplication extends Application
 
     private void loadCategories()
     {
-        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate. Init categories.");
-        LogsManager.addToLogs(CLASS_NAME + ": onCreate. Init categories.");
+        LogsManager.log(CLASS_NAME, "onCreate", "Init categories");
 
         CategoryManager categoryManager = new CategoryManager(this);
         SparseArray<String> categoriesArray = categoryManager.getCategoriesFromDisk();

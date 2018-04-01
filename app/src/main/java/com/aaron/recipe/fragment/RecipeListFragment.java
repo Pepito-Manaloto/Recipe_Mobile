@@ -93,8 +93,7 @@ public class RecipeListFragment extends ListFragment
 
         setHasOptionsMenu(true);
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate. settings=" + this.settings);
-        LogsManager.addToLogs(CLASS_NAME + ": onCreate. settings=" + this.settings);
+        LogsManager.log(CLASS_NAME, "onCreate", "settings=" + this.settings);
     }
 
     /**
@@ -148,8 +147,7 @@ public class RecipeListFragment extends ListFragment
             return;
         }
 
-        Log.d(LogsManager.TAG, CLASS_NAME + ": onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
-        LogsManager.addToLogs(CLASS_NAME + ": onActivityResult. requestCode=" + requestCode + " resultCode=" + resultCode);
+        LogsManager.log(CLASS_NAME, "onActivityResult", "requestCode=" + requestCode + " resultCode=" + resultCode);
 
         boolean activityFromUpdateFragmentWithExtraData = requestCode == MenuRequest.UPDATE.getCode() && data != null
                 && data.hasExtra(UpdateFragment.EXTRA_RECIPE_LIST);
