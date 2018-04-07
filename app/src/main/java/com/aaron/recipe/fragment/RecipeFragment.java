@@ -150,11 +150,9 @@ public class RecipeFragment extends Fragment
         linearLayout.addView(createTextView("Instructions:"), layoutParamsListLabel);
 
         ArrayList<String> instructionsList = recipe.getInstructions().getInstructionsList();
-        // Add one because first index starts at 1, not 0.
-        int instructionsListSize = instructionsList.size() + 1;
-        IntConsumer addInstructionToLinearLayoutView = count -> linearLayout.addView(createTextView(count + ". " + instructionsList.get(count)),
+        IntConsumer addInstructionToLinearLayoutView = count -> linearLayout.addView(createTextView((count + 1) + ". " + instructionsList.get(count)),
                 layoutParamsLabel);
-        IntStream.range(1, instructionsListSize).forEach(addInstructionToLinearLayoutView);
+        IntStream.range(1, instructionsList.size()).forEach(addInstructionToLinearLayoutView);
     }
 
     /**

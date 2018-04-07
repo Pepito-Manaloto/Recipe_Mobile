@@ -5,21 +5,23 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.SparseArray;
+import android.widget.Toast;
 
+import com.aaron.recipe.R;
 import com.aaron.recipe.bean.Categories;
-import com.aaron.recipe.bean.ResponseCategory;
+import com.aaron.recipe.response.ResponseCategory;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
+import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.aaron.recipe.model.MySQLiteHelper.ColumnCategories;
 import static com.aaron.recipe.model.MySQLiteHelper.TABLE_CATEGORIES;
@@ -30,16 +32,13 @@ import static com.aaron.recipe.model.MySQLiteHelper.TABLE_CATEGORIES;
 public class CategoryManager
 {
     public static final String CLASS_NAME = CategoryManager.class.getSimpleName();
-    private static final List<HttpClient.Header> HEADERS;
+
+    private static final AtomicBoolean IS_UPDATING = new AtomicBoolean(false);
+    private static CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     private MySQLiteHelper dbHelper;
-    private HttpClient<ResponseCategory> httpClient;
-
-    static
-    {
-        HEADERS = new ArrayList<>(0);
-        HEADERS.add(new HttpClient.Header("Authorization", new String(Hex.encodeHex(DigestUtils.md5("aaron")))));
-    }
+    private HttpClient httpClient;
+    private WeakReference<Context> contextRef;
 
     /**
      * Constructor initializes the url.
@@ -50,91 +49,75 @@ public class CategoryManager
     public CategoryManager(final Context context)
     {
         this.dbHelper = new MySQLiteHelper(context);
-        this.httpClient = new HttpClient<>(ResponseCategory.class);
+        this.httpClient = new HttpClient(context.getString(R.string.url_address_default));
+        this.contextRef = new WeakReference<>(context);
     }
 
     /**
-     * Retrieves the categories from the server.
-     *
-     * @param url
-     *            the url of the recipe web service
-     * @return ResponseCategory
+     * Retrieves the categories from the server, then update cache and database.
      */
-    public ResponseCategory getCategoriesFromWeb(String url)
+    public void updateCategories(Action doFinally)
     {
-        ResponseCategory response = new ResponseCategory();
-        try
+        startUpdating();
+
+        Disposable disposable = httpClient.getCategories()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doFinally(doFinally)
+                .subscribeWith(getCategoriesFromWebObserver());
+
+        compositeDisposable.add(disposable);
+    }
+
+    private DisposableSingleObserver<List<ResponseCategory>> getCategoriesFromWebObserver()
+    {
+        return new DisposableSingleObserver<List<ResponseCategory>>()
         {
-            response = this.httpClient.get(url, HEADERS);
-
-            if(response.getStatusCode() == HttpURLConnection.HTTP_OK)
+            @Override
+            public void onSuccess(List<ResponseCategory> response)
             {
-                String responseBody = response.getBody();
-                if(StringUtils.isNotBlank(responseBody)) // Response body empty
+                boolean saved = saveCategories(response);
+                if(saved)
                 {
-                    JSONArray jsonArray = new JSONArray(responseBody);
-                    SparseArray<String> categoriesArray = new SparseArray<>();
-
-                    int length = jsonArray.length();
-                    for(int i = 0; i < length; i++)
-                    {
-                        JSONObject json = jsonArray.getJSONObject(i);
-                        String name = json.getString(ColumnCategories.name.name());
-                        int id = json.getInt(ColumnCategories.id.name());
-
-                        categoriesArray.append(id, name);
-                    }
-
-                    response.setCategories(categoriesArray);
-                    response.setTextSuccess();
-
-                    return response;
+                    LogsManager.log(CLASS_NAME, "onSuccess", "Categories = " + Categories.getCategories());
                 }
                 else
                 {
-                    response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
-                    response.setText("Error no categories retrieved.");
-
-                    LogsManager.log(CLASS_NAME, "onCreate",
-                            "Error initializing categories, response empty. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
+                    Context context = contextRef.get();
+                    if(context != null)
+                    {
+                        Toast.makeText(context, "Error saving categories.", Toast.LENGTH_LONG).show();
+                    }
+                    LogsManager.log(CLASS_NAME, "onSuccess", "Failed saving categories.");
                 }
             }
-            else
-            {
-                response.setText("Error response is not 200.");
-                LogsManager.log(CLASS_NAME, "onCreate",
-                        "Error initializing categories, response not 200. responseText=" + response.getText() + " responseCode=" + response.getStatusCode());
-            }
-        }
-        catch(JSONException e)
-        {
-            response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
-            response.setText("Error parsing categories." + e.getMessage());
-            LogsManager.log(CLASS_NAME, "onCreate", "Error parsing categories response. Error: " + e.getMessage(), e);
-        }
-        catch(IOException e)
-        {
-            response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
-            response.setText("Error retrieving categories. " + e.getMessage());
-            LogsManager.log(CLASS_NAME, "onCreate", "Error retrieving categories. Error: " + e.getMessage(), e);
-        }
 
-        return response;
+            @Override
+            public void onError(Throwable e)
+            {
+                Context context = contextRef.get();
+                if(context != null)
+                {
+                    Toast.makeText(context, context.getString(R.string.error_retrieving_categories), Toast.LENGTH_LONG).show();
+                }
+
+                LogsManager.log(CLASS_NAME, "onError", "Error retrieving categories. Error: " + e.getMessage(), e);
+            }
+        };
+
     }
 
     /**
      * Store categories in cache and persist to the database.
      *
-     * @param categoriesArray
-     *            the category map where the id is the key and category is the value
-     *
+     * @param responseCategories the categories response to save
      */
-    public boolean saveCategories(SparseArray<String> categoriesArray)
+    private boolean saveCategories(List<ResponseCategory> responseCategories)
     {
-        if(categoriesArray != null && categoriesArray.size() > 1)
+        if(responseCategories != null && !responseCategories.isEmpty())
         {
-            this.saveCategoriesInCache(categoriesArray);
-            this.saveCategoriesInDatabase(categoriesArray);
+            saveCategoriesInCache(responseCategories);
+            saveCategoriesInDatabase(responseCategories);
 
             return true;
         }
@@ -145,67 +128,80 @@ public class CategoryManager
     /**
      * Store categories in cache.
      *
-     * @param categoryArray
-     *            the category map where the id is the key and category is the value
-     *
+     * @param responseCategories the categories response to save
      */
-    public void saveCategoriesInCache(SparseArray<String> categoryArray)
+    private void saveCategoriesInCache(List<ResponseCategory> responseCategories)
     {
-        if(categoryArray != null)
+        Consumer<ResponseCategory> putResponseCategoryToCache = (category) ->
         {
-            int length = categoryArray.size();
-            for(int i = 0; i < length; i++)
-            {
-                int id = categoryArray.keyAt(i);
-                String category = categoryArray.get(id);
-                Categories.getCategoriesMap().put(id, category);
-                Categories.getCategories().add(category);
-            }
-        }
+            Categories.getCategoriesMap().put(category.getId(), category.getName());
+            Categories.getCategories().add(category.getName());
+        };
+        responseCategories.forEach(putResponseCategoryToCache);
     }
 
     /**
      * Persists the category list to the database.
      *
-     * @param categoryArray
-     *            the category map where the id is the key and category is the value
+     * @param responseCategories the categories response to save
      */
-    public void saveCategoriesInDatabase(SparseArray<String> categoryArray)
+    private void saveCategoriesInDatabase(List<ResponseCategory> responseCategories)
     {
-        if(categoryArray != null)
+        SQLiteDatabase db = this.dbHelper.getWritableDatabase();
+        ContentValues categoryValues = new ContentValues();
+
+        try
         {
-            int length = categoryArray.size();
-            if(length > 0)
+            db.beginTransaction();
+
+            // Delete categories to insert latest data
+            db.delete(TABLE_CATEGORIES, null, null);
+
+            Consumer<ResponseCategory> insertResponseCategoryToDatabase = (category) ->
             {
-                SQLiteDatabase db = this.dbHelper.getWritableDatabase();
-                ContentValues categoryValues = new ContentValues();
+                categoryValues.put(ColumnCategories.id.name(), category.getId());
+                categoryValues.put(ColumnCategories.name.name(), category.getName());
 
-                try
-                {
-                    db.beginTransaction();
+                db.insert(TABLE_CATEGORIES, null, categoryValues);
+            };
+            responseCategories.forEach(insertResponseCategoryToDatabase);
 
-                    // Delete categories to insert latest data
-                    db.delete(TABLE_CATEGORIES, null, null);
+            db.setTransactionSuccessful();
+        }
+        finally
+        {
+            db.endTransaction();
+            db.close();
+            this.dbHelper.close();
+        }
+    }
 
-                    for(int i = 0; i < length; i++)
-                    {
-                        int id = categoryArray.keyAt(i);
-                        String name = categoryArray.get(id);
-                        categoryValues.put(ColumnCategories.id.name(), id);
-                        categoryValues.put(ColumnCategories.name.name(), name);
+    /**
+     * Clears all observer in the composite disposable.
+     * Uses clear because the CompositeDisposable is static and is used throughout the life of the application.
+     */
+    public static void clearCategoriesWebObserver()
+    {
+        if(!compositeDisposable.isDisposed())
+        {
+            compositeDisposable.clear();
+        }
+    }
 
-                        db.insert(TABLE_CATEGORIES, null, categoryValues);
-                    }
-
-                    db.setTransactionSuccessful();
-                }
-                finally
-                {
-                    db.endTransaction();
-                    db.close();
-                    this.dbHelper.close();
-                }
-            }
+    /**
+     * Store categories in cache.
+     *
+     * @param categoriesArray the categories array
+     */
+    public void saveCategoriesInCache(SparseArray<String> categoriesArray)
+    {
+        int length = categoriesArray.size();
+        for(int i = 0; i < length; i++)
+        {
+            int id = categoriesArray.keyAt(i);
+            String category = categoriesArray.get(id);
+            Categories.getCategoriesMap().put(id, category);
+            Categories.getCategories().add(category);
         }
     }
 
@@ -236,9 +232,23 @@ public class CategoryManager
             }
         }
 
-        int size = array.size();
-        LogsManager.log(CLASS_NAME, "getCategoriesFromDisk", "length=" + size);
+        LogsManager.log(CLASS_NAME, "getCategoriesFromDisk", "length=" + array.size());
 
         return array;
+    }
+
+    private static void startUpdating()
+    {
+        IS_UPDATING.set(true);
+    }
+
+    public static void doneUpdating()
+    {
+        IS_UPDATING.set(false);
+    }
+
+    public static boolean isNotUpdating()
+    {
+        return !IS_UPDATING.get();
     }
 }

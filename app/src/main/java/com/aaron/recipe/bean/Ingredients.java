@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Ingredients Class.
@@ -12,7 +13,7 @@ public class Ingredients implements Parcelable
 {
     private String title;
     private ArrayList<Ingredient> ingredientsList;
-    
+
     /**
      * Default Constructor.
      */
@@ -20,6 +21,12 @@ public class Ingredients implements Parcelable
     {
         this.title = title;
         this.ingredientsList = new ArrayList<>(numOfIngredient);
+    }
+
+    public Ingredients(String title, List<Ingredient> ingredientsList)
+    {
+        this.title = title;
+        this.ingredientsList = new ArrayList<>(ingredientsList);
     }
 
     /**
@@ -89,7 +96,7 @@ public class Ingredients implements Parcelable
     public String toString()
     {
         return "title: " + this.title +
-               " ingredients: " + this.ingredientsList;
+                " ingredients: " + this.ingredientsList;
     }
 
     /**

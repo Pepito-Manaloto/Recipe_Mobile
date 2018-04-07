@@ -1,7 +1,6 @@
 package com.aaron.recipe.fragment;
 
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.aaron.recipe.R;
@@ -24,10 +24,12 @@ import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.listener.RecipeSearchListener;
 import com.aaron.recipe.listener.ShowHideFastScrollListener;
+import com.aaron.recipe.model.CategoryManager;
 import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
 
@@ -35,7 +37,7 @@ public class RecipeListFragment extends ListFragment
 {
     private enum MenuRequest
     {
-        UPDATE(0), SETTINGS(1), ABOUT(2), LOGS(3);
+        SETTINGS(1), ABOUT(2), LOGS(3);
 
         private int code;
 
@@ -51,13 +53,15 @@ public class RecipeListFragment extends ListFragment
     }
 
     public static final String CLASS_NAME = RecipeListFragment.class.getSimpleName();
-    private static final String DIALOG_UPDATE = "update";
+    public static final String EXTRA_RECIPE_LIST = "com.aaron.recipe.fragment.recipe_list.list";
+    private static final AtomicBoolean IS_UPDATING = new AtomicBoolean(false);
+
     private ArrayList<Recipe> list;
     private Settings settings;
+    private CategoryManager categoryManager;
     private RecipeManager recipeManager;
     private RecipeListRowAdapter recipeAdapter;
-
-    public static final String EXTRA_RECIPE_LIST = "com.aaron.recipe.fragment.recipe_list.list";
+    private ProgressBar updateProgressBar;
 
     /**
      * Initializes non-fragment user interface.
@@ -81,7 +85,8 @@ public class RecipeListFragment extends ListFragment
             this.settings = new Settings();
         }
 
-        this.recipeManager = new RecipeManager(getActivity());
+        this.categoryManager = new CategoryManager(getContext());
+        this.recipeManager = new RecipeManager(getContext());
 
         if(this.list == null)
         {
@@ -104,6 +109,7 @@ public class RecipeListFragment extends ListFragment
     {
         View view = inflater.inflate(R.layout.fragment_recipe_list, parent, false);
 
+        updateProgressBar = view.findViewById(R.id.progress_bar_update);
         Log.d(LogsManager.TAG, CLASS_NAME + ": onCreateView.");
 
         return view;
@@ -148,29 +154,6 @@ public class RecipeListFragment extends ListFragment
         }
 
         LogsManager.log(CLASS_NAME, "onActivityResult", "requestCode=" + requestCode + " resultCode=" + resultCode);
-
-        boolean activityFromUpdateFragmentWithExtraData = requestCode == MenuRequest.UPDATE.getCode() && data != null
-                && data.hasExtra(UpdateFragment.EXTRA_RECIPE_LIST);
-        if(activityFromUpdateFragmentWithExtraData)
-        {
-            // But we are sure of its type
-            @SuppressWarnings("unchecked")
-            ArrayList<Recipe> list = data.getParcelableArrayListExtra(UpdateFragment.EXTRA_RECIPE_LIST);
-
-            // Handles occasional NullPointerException.
-            if(list != null && !list.isEmpty())
-            {
-                this.list = list;
-            }
-            else
-            {
-                this.list = this.recipeManager.getRecipesFromDisk(this.settings.getCategory());
-            }
-
-            updateListOnUiThread(this.list);
-
-            return;
-        }
 
         boolean activityFromSettingsOrAboutOrLogsFragment = requestCode == MenuRequest.SETTINGS.getCode() || requestCode == MenuRequest.ABOUT.getCode()
                 || requestCode == MenuRequest.LOGS.getCode();
@@ -225,8 +208,6 @@ public class RecipeListFragment extends ListFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        FragmentManager fm = getActivity().getFragmentManager();
-
         switch(item.getItemId())
         {
             case R.id.menu_search:
@@ -235,16 +216,15 @@ public class RecipeListFragment extends ListFragment
             }
             case R.id.menu_update:
             {
-                UpdateFragment updateDialog = UpdateFragment.newInstance(this.settings);
-
-                if(updateDialog.isUpdating())
+                if(!IS_UPDATING.get())
                 {
-                    Toast.makeText(getActivity(), getActivity().getString(R.string.dialog_already_updating_message), Toast.LENGTH_LONG).show();
+                    Log.d(LogsManager.TAG, CLASS_NAME + ": onOptionsItemSelected. Updating vocabularies.");
+                    preUpdating();
+                    categoryManager.updateCategories(this::updateRecipes);
                 }
                 else
                 {
-                    updateDialog.setTargetFragment(this, MenuRequest.UPDATE.getCode());
-                    updateDialog.show(fm, DIALOG_UPDATE);
+                    Toast.makeText(getActivity(), getActivity().getString(R.string.dialog_already_updating_message), Toast.LENGTH_LONG).show();
                 }
 
                 return true;
@@ -268,6 +248,41 @@ public class RecipeListFragment extends ListFragment
             {
                 return super.onOptionsItemSelected(item);
             }
+        }
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        CategoryManager.clearCategoriesWebObserver();
+        RecipeManager.clearRecipesWebObserver();
+    }
+
+    private void preUpdating()
+    {
+        IS_UPDATING.set(true);
+        updateProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    public void updateRecipes()
+    {
+        CategoryManager.doneUpdating();
+        recipeManager.updateRecipesFromWeb(this::doneUpdating, this::updateRecipeList);
+    }
+
+    private void doneUpdating()
+    {
+        IS_UPDATING.set(false);
+        updateProgressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void updateRecipeList(ArrayList<Recipe> recipeList)
+    {
+        if(recipeList != null && !recipeList.isEmpty())
+        {
+            this.list = recipeList;
+            updateListOnUiThread(this.list);
         }
     }
 

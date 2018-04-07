@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="match_parent" >
     
     <ListView
         android:id="@android:id/list"
@@ -17,4 +16,17 @@
         android:gravity="center_horizontal|center_vertical"
         android:text="@string/text_empty_list" />
 
-</LinearLayout>
+    <ProgressBar
+        android:id="@+id/progress_bar_update"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:minHeight="15dp"
+        android:maxHeight="15dp"
+        android:minWidth="15dp"
+        android:maxWidth="15dp"
+        android:indeterminateTint="@color/sysGray"
+        android:indeterminateTintMode="src_in"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        android:gravity="center_horizontal|center_vertical" />
+</FrameLayout>

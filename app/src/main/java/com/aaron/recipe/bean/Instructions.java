@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Instructions class.
@@ -20,6 +21,12 @@ public class Instructions implements Parcelable
     {
         this.title = title;
         this.instructionsList = new ArrayList<>(numberOfInstructions);
+    }
+
+    public Instructions(String title, List<String> instructionsList)
+    {
+        this.title = title;
+        this.instructionsList = new ArrayList<>(instructionsList);
     }
 
     /**

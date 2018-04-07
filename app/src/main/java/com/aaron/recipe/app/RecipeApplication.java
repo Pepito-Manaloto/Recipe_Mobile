@@ -1,12 +1,10 @@
 package com.aaron.recipe.app;
 
 import android.app.Application;
-import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.aaron.recipe.R;
-import com.aaron.recipe.async.CategoriesRetrieverThread;
 import com.aaron.recipe.bean.Categories;
 import com.aaron.recipe.model.CategoryManager;
 import com.aaron.recipe.model.LogsManager;
@@ -56,21 +54,14 @@ public class RecipeApplication extends Application
         }
         else
         {
-            if(!CategoriesRetrieverThread.isUpdating())
+            if(CategoryManager.isNotUpdating())
             {
-                startCategoriesRetrieverThread();
+                categoryManager.updateCategories(CategoryManager::doneUpdating);
             }
             else
             {
                 Toast.makeText(this, this.getString(R.string.categories_currently_updating), Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    private void startCategoriesRetrieverThread()
-    {
-        CategoriesRetrieverThread categoriesRetrieverThread = new CategoriesRetrieverThread(getApplicationContext(), null);
-        categoriesRetrieverThread.execute();
-        CategoriesRetrieverThread.setIsUpdating();
     }
 }
