@@ -19,7 +19,8 @@
         android:id="@+id/imageview_refresh_category"
         style="@style/ImageView_settings"
         android:layout_marginTop="25dp"
-        android:layout_toEndOf="@id/spinner_category"/>
+        android:layout_toEndOf="@id/spinner_category"
+        android:contentDescription="@string/desc_update"/>
 
     <TextView
         android:id="@+id/textview_font"
@@ -57,7 +58,8 @@
         style="@style/TextView_settings"
         android:layout_below="@id/spinner_font_size"
         android:layout_marginTop="5dp"
-        android:text="@string/text_server"/>
+        android:text="@string/text_server"
+        android:labelFor="@id/edittext_server_url"/>
 
     <EditText
         android:id="@+id/edittext_server_url"

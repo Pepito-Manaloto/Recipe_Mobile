@@ -51,7 +51,7 @@ public class UpdateCategoriesListener implements View.OnClickListener
     {
         if(fragment != null)
         {
-            fragment.updateCategoriesSpinner();
+            fragment.updateCategoriesSpinnerAndStopRefreshAnimation();
         }
 
         CategoryManager.doneUpdating();

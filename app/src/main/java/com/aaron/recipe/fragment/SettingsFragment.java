@@ -184,11 +184,11 @@ public class SettingsFragment extends Fragment implements Backable
         }
     }
 
-    public void updateCategoriesSpinner()
+    public void updateCategoriesSpinnerAndStopRefreshAnimation()
     {
         Activity settingsActivity = getActivity();
 
-        // The activity is null if the AsyncTask is not yet finished but this is no longer the current activity.
+        // The activity is null if the update is not yet finished but this is no longer the current activity.
         if(settingsActivity != null)
         {
             this.categoryAdapter = new ArrayAdapter<>(settingsActivity, android.R.layout.simple_spinner_item, Categories.getCategoriesArray());

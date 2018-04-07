@@ -8,6 +8,7 @@
         android:id="@+id/edittext_search_field"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:inputType="text" />
+        android:inputType="text"
+        android:hint="@string/hint_none"/>
 
 </LinearLayout>

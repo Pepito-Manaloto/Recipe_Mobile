@@ -17,6 +17,7 @@
     <!-- HINTS -->
     <string name="hint_recipe">Search Recipe</string>
     <string name="hint_logs">Search Logs</string>
+    <string name="hint_none" />
 
     <!-- DIALOG LABELS -->
     <string name="dialog_update_title">Updating</string>
@@ -35,6 +36,9 @@
     <string name="text_servings">Servings:</string>
     <string name="text_preparation_time">Preparation Time:</string>
     <string name="text_description">Description:</string>
+
+    <!-- ImageView description -->
+    <string name="desc_update">Update</string>
 
     <!-- Error messages -->
     <string name="error_retrieving_categories">Failed retrieving categories from server. Update url in settings and try to update again.</string>
