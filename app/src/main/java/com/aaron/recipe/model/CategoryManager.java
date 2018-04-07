@@ -15,6 +15,8 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.stream.IntStream;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -132,12 +134,13 @@ public class CategoryManager
      */
     private void saveCategoriesInCache(List<ResponseCategory> responseCategories)
     {
-        Consumer<ResponseCategory> putResponseCategoryToCache = (category) ->
-        {
-            Categories.getCategoriesMap().put(category.getId(), category.getName());
-            Categories.getCategories().add(category.getName());
-        };
-        responseCategories.forEach(putResponseCategoryToCache);
+        responseCategories.forEach((category) -> saveCategoryInCache(category.getId(), category.getName()));
+    }
+
+    private void saveCategoryInCache(int id, String category)
+    {
+        Categories.getCategoriesMap().put(id, category);
+        Categories.getCategories().add(category);
     }
 
     /**
@@ -148,7 +151,6 @@ public class CategoryManager
     private void saveCategoriesInDatabase(List<ResponseCategory> responseCategories)
     {
         SQLiteDatabase db = this.dbHelper.getWritableDatabase();
-        ContentValues categoryValues = new ContentValues();
 
         try
         {
@@ -156,15 +158,7 @@ public class CategoryManager
 
             // Delete categories to insert latest data
             db.delete(TABLE_CATEGORIES, null, null);
-
-            Consumer<ResponseCategory> insertResponseCategoryToDatabase = (category) ->
-            {
-                categoryValues.put(ColumnCategories.id.name(), category.getId());
-                categoryValues.put(ColumnCategories.name.name(), category.getName());
-
-                db.insert(TABLE_CATEGORIES, null, categoryValues);
-            };
-            responseCategories.forEach(insertResponseCategoryToDatabase);
+            responseCategories.forEach((category) -> saveCategoryInDatabase(db, category.getId(), category.getName()));
 
             db.setTransactionSuccessful();
         }
@@ -174,6 +168,14 @@ public class CategoryManager
             db.close();
             this.dbHelper.close();
         }
+    }
+
+    private void saveCategoryInDatabase(SQLiteDatabase db, int id, String category)
+    {
+        ContentValues categoryValues = new ContentValues();
+        categoryValues.put(ColumnCategories.id.name(), id);
+        categoryValues.put(ColumnCategories.name.name(), category);
+        db.insert(TABLE_CATEGORIES, null, categoryValues);
     }
 
     /**
@@ -195,14 +197,8 @@ public class CategoryManager
      */
     public void saveCategoriesInCache(SparseArray<String> categoriesArray)
     {
-        int length = categoriesArray.size();
-        for(int i = 0; i < length; i++)
-        {
-            int id = categoriesArray.keyAt(i);
-            String category = categoriesArray.get(id);
-            Categories.getCategoriesMap().put(id, category);
-            Categories.getCategories().add(category);
-        }
+        IntConsumer saveCategoryInCache = i -> saveCategoryInCache(categoriesArray.keyAt(i), categoriesArray.get(categoriesArray.keyAt(i)));
+        IntStream.range(0, categoriesArray.size()).forEach(saveCategoryInCache);
     }
 
     /**

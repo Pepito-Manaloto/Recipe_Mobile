@@ -103,13 +103,11 @@ public class AboutFragment extends Fragment implements Backable
         grid.setColumnCount(RECIPE_COUNT_COLUMNS);
 
         Map<String, Integer> recipesCount = this.recipeManager.getRecipesCount();
-        Set<Map.Entry<String, Integer>> entrySet = recipesCount.entrySet();
-
-        int gridRowCount = entrySet.size();
+        int gridRowCount = recipesCount.size();
         grid.setRowCount(gridRowCount);
 
         int rowNumber = 0;
-        for(Map.Entry<String, Integer> entry : entrySet)
+        for(Map.Entry<String, Integer> entry : recipesCount.entrySet())
         {
             addRecipeCountLabelToGrid(rowNumber, entry.getKey(), grid);
             addRecipeCountToGrid(rowNumber, String.valueOf(entry.getValue()), grid);

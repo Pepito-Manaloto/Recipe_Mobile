@@ -56,6 +56,18 @@ public class Ingredients implements Parcelable
         return this.title;
     }
 
+    public Ingredients setTitle(String title)
+    {
+        this.title = title;
+        return this;
+    }
+
+    public Ingredients setIngredientsList(ArrayList<Ingredient> ingredientsList)
+    {
+        this.ingredientsList = ingredientsList;
+        return this;
+    }
+
     /**
      * Checks for equality, only checks the title of the ingredient.
      * @param obj Ingredients object to compare to

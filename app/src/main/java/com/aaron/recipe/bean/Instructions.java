@@ -60,6 +60,18 @@ public class Instructions implements Parcelable
         return this.title;
     }
 
+    public Instructions setTitle(String title)
+    {
+        this.title = title;
+        return this;
+    }
+
+    public Instructions setInstructionsList(ArrayList<String> instructionsList)
+    {
+        this.instructionsList = instructionsList;
+        return this;
+    }
+
     /**
      * Checks for equality, only checks the title of the instructions.
      *

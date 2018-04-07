@@ -30,7 +30,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -111,10 +113,14 @@ public class RecipeManager
 
     private Recipe convertResponseRecipeIntoRecipe(ResponseRecipe responseRecipe)
     {
-        return new Recipe(responseRecipe.getTitle(), responseRecipe.getCategory(), responseRecipe.getServings(),
-                responseRecipe.getPreparationTime(), responseRecipe.getDescription(),
-                convertResponseIngredientListIntoIngredients(responseRecipe.getTitle(), responseRecipe.getIngredientList()),
-                convertResponseInstructionListIntoInstructions(responseRecipe.getTitle(), responseRecipe.getInstructionList()));
+        return new Recipe()
+                .setTitle(responseRecipe.getTitle())
+                .setCategory(responseRecipe.getCategory())
+                .setServings(responseRecipe.getServings())
+                .setPreparationTime(responseRecipe.getPreparationTime())
+                .setDescription(responseRecipe.getDescription())
+                .setIngredients(convertResponseIngredientListIntoIngredients(responseRecipe.getTitle(), responseRecipe.getIngredientList()))
+                .setInstructions(convertResponseInstructionListIntoInstructions(responseRecipe.getTitle(), responseRecipe.getInstructionList()));
     }
 
     private Ingredients convertResponseIngredientListIntoIngredients(String title, List<ResponseIngredient> responseIngredientList)
@@ -125,8 +131,11 @@ public class RecipeManager
 
     private Ingredient convertResponseIngredientIntoIngredient(ResponseIngredient responseIngredient)
     {
-        return new Ingredient(responseIngredient.getQuantity(), responseIngredient.getMeasurement(), responseIngredient.getIngredient(),
-                responseIngredient.getComment());
+        return new Ingredient()
+                .setQuantity(responseIngredient.getQuantity())
+                .setMeasurement(responseIngredient.getMeasurement())
+                .setIngredient(responseIngredient.getIngredient())
+                .setComment(responseIngredient.getComment());
     }
 
     private Instructions convertResponseInstructionListIntoInstructions(String title, List<ResponseInstruction> responseInstructionList)
@@ -161,6 +170,19 @@ public class RecipeManager
             @Override
             public void onSuccess(ArrayList<Recipe> recipes)
             {
+                String message = determineToastMessageFromResult(recipes);
+
+                Context context = contextRef.get();
+                if(context != null)
+                {
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                }
+
+                updateFragment.accept(recipes);
+            }
+
+            private String determineToastMessageFromResult(ArrayList<Recipe> recipes)
+            {
                 String message;
                 if(recipes == null)
                 {
@@ -183,13 +205,7 @@ public class RecipeManager
                     }
                 }
 
-                Context context = contextRef.get();
-                if(context != null)
-                {
-                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                }
-
-                updateFragment.accept(recipes);
+                return message;
             }
 
             @Override
@@ -212,13 +228,9 @@ public class RecipeManager
      * @param recipeList the recipe lists to be stored
      * @return true on success, else false
      */
-    public boolean saveRecipesToDisk(final List<Recipe> recipeList)
+    private boolean saveRecipesToDisk(final List<Recipe> recipeList)
     {
         SQLiteDatabase db = this.dbHelper.getWritableDatabase();
-        ContentValues recipeValues = new ContentValues();
-        ContentValues ingredientsValues = new ContentValues();
-        ContentValues instructionsValues = new ContentValues();
-        FastDateFormat dateFormatter = FastDateFormat.getInstance(DATE_FORMAT_LONG, Locale.getDefault());
 
         try
         {
@@ -227,43 +239,7 @@ public class RecipeManager
             this.deleteQuery(db);
 
             // Iterate each recipe of a particular category
-            for(Recipe recipe : recipeList)
-            {
-                recipeValues.put(ColumnRecipe.title.name(), recipe.getTitle());
-                recipeValues.put(ColumnRecipe.category.name(), Categories.getId(recipe.getCategory()));
-                recipeValues.put(ColumnRecipe.preparation_time.name(), recipe.getPreparationTime());
-                recipeValues.put(ColumnRecipe.servings.name(), recipe.getServings());
-                recipeValues.put(ColumnRecipe.description.name(), recipe.getDescription());
-                recipeValues.put(ColumnRecipe.date_in.name(), dateFormatter.format(this.curDate));
-
-                long recipeId = db.insert(TABLE_RECIPE, null, recipeValues);
-
-                int count = 1;
-                // Iterate over all ingredients of a recipe
-                for(Ingredient ingredient : recipe.getIngredients().getIngredientsList())
-                {
-                    ingredientsValues.put(ColumnIngredients.recipe_id.name(), recipeId);
-                    ingredientsValues.put(ColumnIngredients.quantity.name(), ingredient.getQuantity());
-                    ingredientsValues.put(ColumnIngredients.measurement.name(), ingredient.getMeasurement());
-                    ingredientsValues.put(ColumnIngredients.ingredient.name(), ingredient.getIngredient());
-                    ingredientsValues.put(ColumnIngredients.comment_.name(), ingredient.getComment());
-                    ingredientsValues.put(ColumnIngredients.count.name(), count++);
-
-                    db.insert(TABLE_INGREDIENTS, null, ingredientsValues);
-                }
-
-                count = 1; // reset count
-
-                // Iterate over all instructions of a recipe
-                for(String instruction : recipe.getInstructions().getInstructionsList())
-                {
-                    instructionsValues.put(ColumnInstructions.recipe_id.name(), recipeId);
-                    instructionsValues.put(ColumnInstructions.instruction.name(), instruction);
-                    instructionsValues.put(ColumnInstructions.count.name(), count++);
-
-                    db.insert(TABLE_INSTRUCTIONS, null, instructionsValues);
-                }
-            }
+            recipeList.forEach(recipe -> insertRecipeToDatabase(db, recipe));
 
             db.setTransactionSuccessful();
         }
@@ -277,6 +253,54 @@ public class RecipeManager
         LogsManager.log(CLASS_NAME, "saveToDisk", "");
 
         return true;
+    }
+
+    private void insertRecipeToDatabase(SQLiteDatabase db, Recipe recipe)
+    {
+        long recipeId = insertRecipeDetailsToDatabase(db, recipe);
+
+        List<Ingredient> ingredientList = recipe.getIngredients().getIngredientsList();
+        IntConsumer insertIngredientToDatabase = count -> insertIngredientToDatabase(count, db, ingredientList, recipeId);
+        IntStream.range(0, ingredientList.size()).forEach(insertIngredientToDatabase);
+
+        List<String> instructionsList = recipe.getInstructions().getInstructionsList();
+        IntConsumer insertInstructionToDatabase = count -> insertInstructionToDatabase(count, db, instructionsList, recipeId);
+        IntStream.range(0, instructionsList.size()).forEach(insertInstructionToDatabase);
+    }
+
+    private long insertRecipeDetailsToDatabase(SQLiteDatabase db, Recipe recipe)
+    {
+        ContentValues recipeValues = new ContentValues();
+        recipeValues.put(ColumnRecipe.title.name(), recipe.getTitle());
+        recipeValues.put(ColumnRecipe.category.name(), Categories.getId(recipe.getCategory()));
+        recipeValues.put(ColumnRecipe.preparation_time.name(), recipe.getPreparationTime());
+        recipeValues.put(ColumnRecipe.servings.name(), recipe.getServings());
+        recipeValues.put(ColumnRecipe.description.name(), recipe.getDescription());
+        recipeValues.put(ColumnRecipe.date_in.name(), FastDateFormat.getInstance(DATE_FORMAT_LONG, Locale.getDefault()).format(this.curDate));
+        return db.insert(TABLE_RECIPE, null, recipeValues);
+    }
+
+    private void insertIngredientToDatabase(int count, SQLiteDatabase db, List<Ingredient> ingredientList, long recipeId)
+    {
+        ContentValues ingredientsValues = new ContentValues();
+        ingredientsValues.put(ColumnIngredients.recipe_id.name(), recipeId);
+        ingredientsValues.put(ColumnIngredients.quantity.name(), ingredientList.get(count).getQuantity());
+        ingredientsValues.put(ColumnIngredients.measurement.name(), ingredientList.get(count).getMeasurement());
+        ingredientsValues.put(ColumnIngredients.ingredient.name(), ingredientList.get(count).getIngredient());
+        ingredientsValues.put(ColumnIngredients.comment_.name(), ingredientList.get(count).getComment());
+        ingredientsValues.put(ColumnIngredients.count.name(), count + 1);
+
+        db.insert(TABLE_INGREDIENTS, null, ingredientsValues);
+    }
+
+    private void insertInstructionToDatabase(int count, SQLiteDatabase db, List<String> instructionsList, long recipeId)
+    {
+        ContentValues instructionsValues = new ContentValues();
+        instructionsValues.put(ColumnInstructions.recipe_id.name(), recipeId);
+        instructionsValues.put(ColumnInstructions.instruction.name(), instructionsList.get(count));
+        instructionsValues.put(ColumnInstructions.count.name(), count + 1);
+
+        db.insert(TABLE_INSTRUCTIONS, null, instructionsValues);
     }
 
     /**
@@ -333,7 +357,7 @@ public class RecipeManager
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
         String whereClause = ColumnRecipe.category.name() + " = ?";
 
-        for(Map.Entry<Integer, String> entry : Categories.getCategoriesMap().entrySet())
+        Consumer<Map.Entry<Integer, String>> putRecipeCountOfCategoryToMap = entry ->
         {
             try(Cursor cursor = db.query(TABLE_RECIPE, COLUMN_COUNT, whereClause, new String[] { entry.getKey().toString() }, null, null, null))
             {
@@ -342,7 +366,8 @@ public class RecipeManager
                     map.put(entry.getValue(), cursor.getInt(0));
                 }
             }
-        }
+        };
+        Categories.getCategoriesMap().entrySet().forEach(putRecipeCountOfCategoryToMap);
 
         LogsManager.log(CLASS_NAME, "getRecipesCount", "values_size=" + map.values().size());
 
@@ -430,12 +455,12 @@ public class RecipeManager
             {
                 do
                 {
-                    double quantity = ingredientCursor.getDouble(0);
-                    String measurement = ingredientCursor.getString(1);
-                    String ingredient = ingredientCursor.getString(2);
-                    String comment = ingredientCursor.getString(3);
-
-                    ingredients.addIngredient(new Ingredient(quantity, measurement, ingredient, comment));
+                    Ingredient ingredient = new Ingredient()
+                                                .setQuantity(ingredientCursor.getDouble(0))
+                                                .setMeasurement(ingredientCursor.getString(1))
+                                                .setIngredient(ingredientCursor.getString(2))
+                                                .setComment(ingredientCursor.getString(3));
+                    ingredients.addIngredient(ingredient);
                 } while(ingredientCursor.moveToNext());
             }
         }
@@ -457,7 +482,9 @@ public class RecipeManager
             }
         }
 
-        return new Recipe(id, title, category, servings, preparationTime, description, ingredients, instructions);
+        return new Recipe().setId(id).setTitle(title).setCategory(category).setServings(servings)
+                .setPreparationTime(preparationTime).setDescription(description)
+                .setIngredients(ingredients).setInstructions(instructions);
     }
 
     /**
@@ -487,45 +514,6 @@ public class RecipeManager
         db.delete(TABLE_INSTRUCTIONS, null, null);
 
         return result;
-    }
-
-    /**
-     * Returns the recipes based on the current selected category.
-     *
-     * @param recipeMap
-     *            the recipe map
-     * @param size
-     *            the number of recipes in the map
-     * @param selectedCategory
-     *            the current selected category
-     * @return ArrayList<Recipe>
-     */
-    public ArrayList<Recipe> getRecipesFromMap(final Map<String, ArrayList<Recipe>> recipeMap, final int size, final String selectedCategory)
-    {
-        if(Categories.DEFAULT.equals(selectedCategory)) // Combines all ArrayList<Recipe> into a single ArrayList
-        {
-            ArrayList<Recipe> allRecipeList;
-
-            if(size == 0)
-            {
-                allRecipeList = new ArrayList<>();
-            }
-            else
-            {
-                allRecipeList = new ArrayList<>(size);
-            }
-
-            for(ArrayList<Recipe> list : recipeMap.values())
-            {
-                allRecipeList.addAll(list);
-            }
-
-            return allRecipeList;
-        }
-        else
-        {
-            return recipeMap.get(selectedCategory);
-        }
     }
 
     /**

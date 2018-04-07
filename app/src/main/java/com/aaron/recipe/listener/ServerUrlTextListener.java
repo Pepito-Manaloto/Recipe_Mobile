@@ -4,7 +4,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 
 import com.aaron.recipe.bean.Settings;
-import com.aaron.recipe.model.CategoryManager;
 import com.aaron.recipe.model.HttpClient;
 
 import java.util.regex.Pattern;

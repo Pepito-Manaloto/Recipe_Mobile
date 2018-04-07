@@ -18,6 +18,11 @@ public class Ingredient implements Parcelable
     /**
      * Default constructor.
      */
+    public Ingredient()
+    {
+        /* Used for builder */
+    }
+
     public Ingredient(final double quantity, final String measurement, final String ingredient, final String comment)
     {
         this.quantity = quantity;
@@ -64,6 +69,30 @@ public class Ingredient implements Parcelable
     public String getComment()
     {
         return this.comment;
+    }
+
+    public Ingredient setQuantity(double quantity)
+    {
+        this.quantity = quantity;
+        return this;
+    }
+
+    public Ingredient setMeasurement(String measurement)
+    {
+        this.measurement = measurement;
+        return this;
+    }
+
+    public Ingredient setIngredient(String ingredient)
+    {
+        this.ingredient = ingredient;
+        return this;
+    }
+
+    public Ingredient setComment(String comment)
+    {
+        this.comment = comment;
+        return this;
     }
 
     /**

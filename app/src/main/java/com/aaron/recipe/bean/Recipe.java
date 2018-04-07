@@ -20,7 +20,13 @@ public class Recipe implements Parcelable
     /**
      * Default constructor.
      */
-    public Recipe(final int id, final String title, final String category, final int servings, final int preparationTime, final String description, final Ingredients ingredients, final Instructions instructions)
+    public Recipe()
+    {
+        /* Used for builder */
+    }
+
+    public Recipe(final int id, final String title, final String category, final int servings, final int preparationTime, final String description,
+            final Ingredients ingredients, final Instructions instructions)
     {
         this.id = id;
         this.title = title;
@@ -32,7 +38,8 @@ public class Recipe implements Parcelable
         this.instructions = instructions;
     }
 
-    public Recipe(final String title, final String category, final int servings, final int preparationTime, final String description, final Ingredients ingredients, final Instructions instructions)
+    public Recipe(final String title, final String category, final int servings, final int preparationTime, final String description,
+            final Ingredients ingredients, final Instructions instructions)
     {
         this(-1, title, category, servings, preparationTime, description, ingredients, instructions);
     }
@@ -167,6 +174,54 @@ public class Recipe implements Parcelable
     public Instructions getInstructions()
     {
         return this.instructions;
+    }
+
+    public Recipe setId(int id)
+    {
+        this.id = id;
+        return this;
+    }
+
+    public Recipe setTitle(String title)
+    {
+        this.title = title;
+        return this;
+    }
+
+    public Recipe setCategory(String category)
+    {
+        this.category = category;
+        return this;
+    }
+
+    public Recipe setServings(int servings)
+    {
+        this.servings = servings;
+        return this;
+    }
+
+    public Recipe setPreparationTime(int preparationTime)
+    {
+        this.preparationTime = preparationTime;
+        return this;
+    }
+
+    public Recipe setDescription(String description)
+    {
+        this.description = description;
+        return this;
+    }
+
+    public Recipe setIngredients(Ingredients ingredients)
+    {
+        this.ingredients = ingredients;
+        return this;
+    }
+
+    public Recipe setInstructions(Instructions instructions)
+    {
+        this.instructions = instructions;
+        return this;
     }
 
     /**
