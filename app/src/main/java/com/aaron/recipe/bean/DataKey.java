@@ -1,4 +1,5 @@
 package com.aaron.recipe.bean;
+
 /**
  * Holds all the keys used in Bundle and Intent-extra.
  */
