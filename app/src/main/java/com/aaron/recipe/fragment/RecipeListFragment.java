@@ -31,7 +31,8 @@ import com.aaron.recipe.model.RecipeManager;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
+import static com.aaron.recipe.bean.DataKey.EXTRA_RECIPE_LIST;
+import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
 
 public class RecipeListFragment extends ListFragment
 {
@@ -53,7 +54,6 @@ public class RecipeListFragment extends ListFragment
     }
 
     public static final String CLASS_NAME = RecipeListFragment.class.getSimpleName();
-    public static final String EXTRA_RECIPE_LIST = "com.aaron.recipe.fragment.recipe_list.list";
     private static final AtomicBoolean IS_UPDATING = new AtomicBoolean(false);
 
     private ArrayList<Recipe> list;
@@ -74,10 +74,10 @@ public class RecipeListFragment extends ListFragment
 
         if(savedInstanceState != null)
         {
-            this.settings = savedInstanceState.getParcelable(EXTRA_SETTINGS);
+            this.settings = savedInstanceState.getParcelable(EXTRA_SETTINGS.toString());
 
             // But we are sure of its type
-            this.list = savedInstanceState.getParcelableArrayList(EXTRA_RECIPE_LIST);
+            this.list = savedInstanceState.getParcelableArrayList(EXTRA_RECIPE_LIST.toString());
         }
 
         if(this.settings == null)
@@ -136,8 +136,8 @@ public class RecipeListFragment extends ListFragment
     {
         super.onSaveInstanceState(outState);
 
-        outState.putParcelable(EXTRA_SETTINGS, this.settings);
-        outState.putParcelableArrayList(EXTRA_RECIPE_LIST, this.list);
+        outState.putParcelable(EXTRA_SETTINGS.toString(), this.settings);
+        outState.putParcelableArrayList(EXTRA_RECIPE_LIST.toString(), this.list);
 
         Log.d(LogsManager.TAG, CLASS_NAME + ": onSaveInstanceState");
     }
@@ -157,10 +157,10 @@ public class RecipeListFragment extends ListFragment
 
         boolean activityFromSettingsOrAboutOrLogsFragment = requestCode == MenuRequest.SETTINGS.getCode() || requestCode == MenuRequest.ABOUT.getCode()
                 || requestCode == MenuRequest.LOGS.getCode();
-        boolean settingsHasExtraData = data != null && data.hasExtra(EXTRA_SETTINGS);
+        boolean settingsHasExtraData = data != null && data.hasExtra(EXTRA_SETTINGS.toString());
         if(activityFromSettingsOrAboutOrLogsFragment && settingsHasExtraData)
         {
-            this.settings = data.getParcelableExtra(EXTRA_SETTINGS);
+            this.settings = data.getParcelableExtra(EXTRA_SETTINGS.toString());
 
             this.list = this.recipeManager.getRecipesFromDisk(this.settings.getCategory());
             this.updateListOnUiThread(this.list);
@@ -289,7 +289,7 @@ public class RecipeListFragment extends ListFragment
     private void startNextActivityWithExtraSettingsData(Class<? extends Activity> nextActivityClass, MenuRequest requestCode)
     {
         Intent intent = new Intent(getActivity(), nextActivityClass);
-        intent.putExtra(EXTRA_SETTINGS, this.settings);
+        intent.putExtra(EXTRA_SETTINGS.toString(), this.settings);
         startActivityForResult(intent, requestCode.getCode());
     }
 }

@@ -357,21 +357,22 @@ public class RecipeManager
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
         String whereClause = ColumnRecipe.category.name() + " = ?";
 
-        Consumer<Map.Entry<Integer, String>> putRecipeCountOfCategoryToMap = entry ->
-        {
-            try(Cursor cursor = db.query(TABLE_RECIPE, COLUMN_COUNT, whereClause, new String[] { entry.getKey().toString() }, null, null, null))
-            {
-                if(cursor.moveToFirst())
-                {
-                    map.put(entry.getValue(), cursor.getInt(0));
-                }
-            }
-        };
-        Categories.getCategoriesMap().entrySet().forEach(putRecipeCountOfCategoryToMap);
+        Categories.getCategoriesMap().entrySet().forEach(entry -> putRecipeCountOfCategoryToMap(map, entry, db, whereClause));
 
         LogsManager.log(CLASS_NAME, "getRecipesCount", "values_size=" + map.values().size());
 
         return map;
+    }
+
+    private void putRecipeCountOfCategoryToMap(Map<String, Integer> map, Map.Entry<Integer, String> entry, SQLiteDatabase db, String whereClause)
+    {
+        try(Cursor cursor = db.query(TABLE_RECIPE, COLUMN_COUNT, whereClause, new String[] { entry.getKey().toString() }, null, null, null))
+        {
+            if(cursor.moveToFirst())
+            {
+                map.put(entry.getValue(), cursor.getInt(0));
+            }
+        }
     }
 
     /**

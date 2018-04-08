@@ -5,6 +5,8 @@ import android.app.Fragment;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.fragment.SettingsFragment;
 
+import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
+
 /**
  * SettingsFragment activity.
  */
@@ -20,7 +22,7 @@ public class SettingsActivity extends SingleFragmentActivity
     @Override
     protected Fragment createFragment()
     {
-        Settings settings = this.getIntent().getParcelableExtra(SettingsFragment.EXTRA_SETTINGS);
+        Settings settings = this.getIntent().getParcelableExtra(EXTRA_SETTINGS.toString());
         this.fragment = SettingsFragment.newInstance(this.fragment, settings);
 
         return this.fragment;

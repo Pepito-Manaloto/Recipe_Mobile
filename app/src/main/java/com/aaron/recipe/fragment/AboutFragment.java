@@ -22,9 +22,8 @@ import com.aaron.recipe.model.LogsManager;
 import com.aaron.recipe.model.RecipeManager;
 
 import java.util.Map;
-import java.util.Set;
 
-import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
+import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
 import static com.aaron.recipe.model.RecipeManager.DATE_FORMAT_LONG;
 
 /**
@@ -50,7 +49,7 @@ public class AboutFragment extends Fragment implements Backable
         getActivity().setTitle(R.string.menu_about);
         initializeActionBar();
 
-        this.settings = getActivity().getIntent().getParcelableExtra(EXTRA_SETTINGS);
+        this.settings = getActivity().getIntent().getParcelableExtra(EXTRA_SETTINGS.toString());
         this.recipeManager = new RecipeManager(getContext());
 
         Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate.");
@@ -168,7 +167,7 @@ public class AboutFragment extends Fragment implements Backable
     {
         Intent data = new Intent();
 
-        data.putExtra(EXTRA_SETTINGS, this.settings);
+        data.putExtra(EXTRA_SETTINGS.toString(), this.settings);
         getActivity().setResult(Activity.RESULT_OK, data);
         getActivity().finish();
 

@@ -3,6 +3,7 @@ package com.aaron.recipe.model;
 import android.util.Log;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -59,7 +60,8 @@ public class LogsManager
         StringBuilder sb = new StringBuilder();
 
         Predicate<String> logLineContainsKeyword = line -> line.contains(keyword);
-        Arrays.stream(lines).filter(logLineContainsKeyword).forEach((line) -> sb.append(line).append(lineSeparator));
+        Consumer<String> appendLineToStringBuilder = line -> sb.append(line).append(lineSeparator);
+        Arrays.stream(lines).filter(logLineContainsKeyword).forEach(appendLineToStringBuilder);
 
         return sb.toString();
     }
@@ -71,7 +73,7 @@ public class LogsManager
      */
     public boolean saveToDisk()
     {
-        /**
+        /*
          * TODO: Implements functionalities
          */
         return false;

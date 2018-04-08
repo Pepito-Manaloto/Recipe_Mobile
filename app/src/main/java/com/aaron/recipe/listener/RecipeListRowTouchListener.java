@@ -13,9 +13,9 @@ import com.aaron.recipe.bean.Settings;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import static com.aaron.recipe.adapter.RecipePagerAdapter.EXTRA_PAGE;
-import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_RECIPE_LIST;
-import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
+import static com.aaron.recipe.bean.DataKey.EXTRA_PAGE;
+import static com.aaron.recipe.bean.DataKey.EXTRA_RECIPE_LIST;
+import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
 
 /**
  * Helper class for handling Recipe selection and Recipe list row scrolling.
@@ -86,9 +86,9 @@ public class RecipeListRowTouchListener implements OnTouchListener
     private void startRecipeActivity(Activity activity)
     {
         Intent intent = new Intent(activity, RecipeActivity.class);
-        intent.putExtra(EXTRA_PAGE, this.page);
-        intent.putExtra(EXTRA_RECIPE_LIST, this.recipeList);
-        intent.putExtra(EXTRA_SETTINGS, this.settings);
+        intent.putExtra(EXTRA_PAGE.toString(), this.page);
+        intent.putExtra(EXTRA_RECIPE_LIST.toString(), this.recipeList);
+        intent.putExtra(EXTRA_SETTINGS.toString(), this.settings);
         activity.startActivity(intent);
     }
 }

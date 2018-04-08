@@ -28,13 +28,14 @@ import com.aaron.recipe.model.LogsManager;
 
 import org.apache.commons.lang3.StringUtils;
 
+import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
+
 /**
  * The application settings fragment.
  */
 public class SettingsFragment extends Fragment implements Backable
 {
     public static final String CLASS_NAME = SettingsFragment.class.getSimpleName();
-    public static final String EXTRA_SETTINGS = "com.aaron.recipe.fragment.settings";
     private Settings settings;
 
     private ArrayAdapter<String> categoryAdapter;
@@ -55,7 +56,7 @@ public class SettingsFragment extends Fragment implements Backable
     public static SettingsFragment newInstance(SettingsFragment fragment, final Settings settings)
     {
         Bundle args = new Bundle();
-        args.putParcelable(EXTRA_SETTINGS, settings);
+        args.putParcelable(EXTRA_SETTINGS.toString(), settings);
 
         SettingsFragment settingsFragment = newSettingsFragment(fragment);
         settingsFragment.setArguments(args);
@@ -88,7 +89,7 @@ public class SettingsFragment extends Fragment implements Backable
         getActivity().setTitle(R.string.menu_settings);
         initializeActionBar();
 
-        this.settings = getArguments().getParcelable(SettingsFragment.EXTRA_SETTINGS);
+        this.settings = getArguments().getParcelable(EXTRA_SETTINGS.toString());
         this.categoryAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, Categories.getCategoriesArray());
         this.categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.categoryManager = new CategoryManager(getContext());
@@ -212,7 +213,7 @@ public class SettingsFragment extends Fragment implements Backable
         updateSettings();
 
         Intent data = new Intent();
-        data.putExtra(EXTRA_SETTINGS, this.settings);
+        data.putExtra(EXTRA_SETTINGS.toString(), this.settings);
         getActivity().setResult(Activity.RESULT_OK, data);
         getActivity().finish();
 

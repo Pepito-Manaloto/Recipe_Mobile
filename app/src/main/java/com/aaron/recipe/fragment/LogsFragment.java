@@ -22,7 +22,7 @@ import com.aaron.recipe.listener.BackButtonListener;
 import com.aaron.recipe.listener.LogsSearchListener;
 import com.aaron.recipe.model.LogsManager;
 
-import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
+import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
 
 /**
  * The application logs fragment.
@@ -46,7 +46,7 @@ public class LogsFragment extends Fragment implements Backable
         getActivity().setTitle(R.string.menu_logs);
         initializeActionBar();
 
-        this.settings = getActivity().getIntent().getParcelableExtra(EXTRA_SETTINGS);
+        this.settings = getActivity().getIntent().getParcelableExtra(EXTRA_SETTINGS.toString());
         this.logsManager = new LogsManager();
 
         Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate.");
@@ -133,7 +133,7 @@ public class LogsFragment extends Fragment implements Backable
     {
         Intent data = new Intent();
 
-        data.putExtra(EXTRA_SETTINGS, this.settings);
+        data.putExtra(EXTRA_SETTINGS.toString(), this.settings);
         getActivity().setResult(Activity.RESULT_OK, data);
         getActivity().finish();
 

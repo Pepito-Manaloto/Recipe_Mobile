@@ -3,6 +3,7 @@ package com.aaron.recipe.fragment;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
@@ -25,9 +26,9 @@ import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 
 import static android.widget.LinearLayout.LayoutParams;
-import static com.aaron.recipe.adapter.RecipePagerAdapter.EXTRA_PAGE;
-import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_RECIPE_LIST;
-import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
+import static com.aaron.recipe.bean.DataKey.EXTRA_PAGE;
+import static com.aaron.recipe.bean.DataKey.EXTRA_RECIPE_LIST;
+import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
 
 /**
  * The recipe fragment, shows all recipe in one scrollable screen.
@@ -55,9 +56,9 @@ public class RecipeFragment extends Fragment
     public static RecipeFragment newInstance(final int page, final ArrayList<Recipe> recipeList, final Settings settings)
     {
         Bundle bundle = new Bundle();
-        bundle.putInt(EXTRA_PAGE, page);
-        bundle.putParcelableArrayList(EXTRA_RECIPE_LIST, recipeList);
-        bundle.putParcelable(EXTRA_SETTINGS, settings);
+        bundle.putInt(EXTRA_PAGE.toString(), page);
+        bundle.putParcelableArrayList(EXTRA_RECIPE_LIST.toString(), recipeList);
+        bundle.putParcelable(EXTRA_SETTINGS.toString(), settings);
 
         RecipeFragment recipeFragment = new RecipeFragment();
         recipeFragment.setArguments(bundle);
@@ -87,10 +88,10 @@ public class RecipeFragment extends Fragment
 
     private void parseBundleARguments(Bundle args)
     {
-        this.settings = args.getParcelable(EXTRA_SETTINGS);
+        this.settings = args.getParcelable(EXTRA_SETTINGS.toString());
 
-        int page = args.getInt(EXTRA_PAGE);
-        ArrayList<Recipe> recipeList = args.getParcelableArrayList(EXTRA_RECIPE_LIST);
+        int page = args.getInt(EXTRA_PAGE.toString());
+        ArrayList<Recipe> recipeList = args.getParcelableArrayList(EXTRA_RECIPE_LIST.toString());
         this.recipe = recipeList == null ? null : recipeList.get(page);
     }
 
@@ -108,7 +109,7 @@ public class RecipeFragment extends Fragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState)
     {
         LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.fragment_recipe, parent, false);
 

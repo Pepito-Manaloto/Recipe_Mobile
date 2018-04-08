@@ -14,9 +14,9 @@ import com.aaron.recipe.listener.PageChangeListener;
 
 import java.util.ArrayList;
 
-import static com.aaron.recipe.adapter.RecipePagerAdapter.EXTRA_PAGE;
-import static com.aaron.recipe.fragment.RecipeListFragment.EXTRA_RECIPE_LIST;
-import static com.aaron.recipe.fragment.SettingsFragment.EXTRA_SETTINGS;
+import static com.aaron.recipe.bean.DataKey.EXTRA_PAGE;
+import static com.aaron.recipe.bean.DataKey.EXTRA_RECIPE_LIST;
+import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
 
 /**
  * Recipe activity, uses old SDK to support view pager.
@@ -31,8 +31,8 @@ public class RecipeActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fragment_container);
 
-        this.recipeList = this.getIntent().getParcelableArrayListExtra(EXTRA_RECIPE_LIST);
-        int page = this.getIntent().getIntExtra(EXTRA_PAGE, 0);
+        this.recipeList = this.getIntent().getParcelableArrayListExtra(EXTRA_RECIPE_LIST.toString());
+        int page = this.getIntent().getIntExtra(EXTRA_PAGE.toString(), 0);
 
         setTitle(getRecipeTitle(page));
         initializeViewPager(page);
@@ -41,7 +41,7 @@ public class RecipeActivity extends FragmentActivity
     private void initializeViewPager(int page)
     {
         FragmentManager fm = getSupportFragmentManager();
-        Settings settings = this.getIntent().getParcelableExtra(EXTRA_SETTINGS);
+        Settings settings = this.getIntent().getParcelableExtra(EXTRA_SETTINGS.toString());
 
         ViewPager viewPager = findViewById(R.id.view_pager);
         FragmentPagerAdapter pagerAdapter = new RecipePagerAdapter(fm, recipeList, settings);

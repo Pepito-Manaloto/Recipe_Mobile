@@ -15,8 +15,6 @@ import java.util.ArrayList;
  */
 public class RecipePagerAdapter extends FragmentPagerAdapter
 {
-    public static String EXTRA_PAGE = "com.aaron.recipe.adapter.page";
-
     private ArrayList<Recipe> recipeList;
     private Settings settings;
 
