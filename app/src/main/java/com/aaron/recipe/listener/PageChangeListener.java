@@ -33,7 +33,7 @@ public class PageChangeListener implements OnPageChangeListener
             final RecipeActivity activity = this.activityRef.get();
             if(activity != null)
             {
-                Runnable updateRecipeTitle = () -> activity.setTitle(activity.getRecipeTitle(position));
+                Runnable updateRecipeTitle = () -> activity.setTitle(activity.getRecipeTitleFromPage(position));
                 activity.runOnUiThread(updateRecipeTitle);
             }
         }

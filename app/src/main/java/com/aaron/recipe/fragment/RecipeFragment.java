@@ -46,14 +46,11 @@ public class RecipeFragment extends Fragment
      * is why this static initializer is used. There is also no way to pass data to RecipePageAdapter through savedInstanceState intent, that is why we
      * pass data through instance creation.
      *
-     * @param page
-     *            the page
-     * @param recipeList
-     *            the recipe list
-     * @param settings
-     *            the settings
+     * @param page the page
+     * @param recipeList the recipe list
+     * @param settings the settings
      */
-    public static RecipeFragment newInstance(final int page, final ArrayList<Recipe> recipeList, final Settings settings)
+    public static RecipeFragment newInstance(int page, final ArrayList<Recipe> recipeList, final Settings settings)
     {
         Bundle bundle = new Bundle();
         bundle.putInt(EXTRA_PAGE.toString(), page);
@@ -77,7 +74,7 @@ public class RecipeFragment extends Fragment
         Bundle args = getArguments();
         if(args != null)
         {
-            parseBundleARguments(args);
+            parseBundleArguments(args);
         }
 
         setHasOptionsMenu(true);
@@ -86,7 +83,7 @@ public class RecipeFragment extends Fragment
         Log.d(LogsManager.TAG, CLASS_NAME + ": onCreate.");
     }
 
-    private void parseBundleARguments(Bundle args)
+    private void parseBundleArguments(Bundle args)
     {
         this.settings = args.getParcelable(EXTRA_SETTINGS.toString());
 

@@ -15,8 +15,10 @@ import com.aaron.recipe.listener.PageChangeListener;
 import java.util.ArrayList;
 
 import static com.aaron.recipe.bean.DataKey.EXTRA_PAGE;
+import static com.aaron.recipe.bean.DataKey.EXTRA_RECIPE;
 import static com.aaron.recipe.bean.DataKey.EXTRA_RECIPE_LIST;
 import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
+import static java.util.Objects.nonNull;
 
 /**
  * Recipe activity, uses old SDK to support view pager.
@@ -24,6 +26,7 @@ import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
 public class RecipeActivity extends FragmentActivity
 {
     private ArrayList<Recipe> recipeList;
+    private Recipe recipe;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -32,9 +35,10 @@ public class RecipeActivity extends FragmentActivity
         setContentView(R.layout.activity_fragment_container);
 
         this.recipeList = this.getIntent().getParcelableArrayListExtra(EXTRA_RECIPE_LIST.toString());
+        this.recipe = this.getIntent().getParcelableExtra(EXTRA_RECIPE.toString());
         int page = this.getIntent().getIntExtra(EXTRA_PAGE.toString(), 0);
 
-        setTitle(getRecipeTitle(page));
+        setTitle(getRecipeTitleFromRecipeElsePage(page));
         initializeViewPager(page);
     }
 
@@ -53,7 +57,17 @@ public class RecipeActivity extends FragmentActivity
         viewPager.addOnPageChangeListener(new PageChangeListener(this));
     }
 
-    public String getRecipeTitle(int page)
+    private String getRecipeTitleFromRecipeElsePage(int page)
+    {
+        if(nonNull(recipe))
+        {
+            return recipeList.get(recipeList.indexOf(recipe)).getTitle();
+        }
+
+        return recipeList.get(page).getTitle();
+    }
+
+    public String getRecipeTitleFromPage(int page)
     {
         return recipeList.get(page).getTitle();
     }

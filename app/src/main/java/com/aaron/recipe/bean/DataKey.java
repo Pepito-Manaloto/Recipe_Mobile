@@ -6,6 +6,7 @@ package com.aaron.recipe.bean;
 public enum DataKey
 {
     EXTRA_PAGE("com.aaron.recipe.adapter.page"),
+    EXTRA_RECIPE("com.aaron.recipe.adapter.recipe"),
     EXTRA_SETTINGS("com.aaron.recipe.fragment.settings"),
     EXTRA_RECIPE_LIST("com.aaron.recipe.fragment.recipe_list.list");
 

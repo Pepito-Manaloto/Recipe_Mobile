@@ -14,6 +14,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import static com.aaron.recipe.bean.DataKey.EXTRA_PAGE;
+import static com.aaron.recipe.bean.DataKey.EXTRA_RECIPE;
 import static com.aaron.recipe.bean.DataKey.EXTRA_RECIPE_LIST;
 import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
 
@@ -26,19 +27,20 @@ public class RecipeListRowTouchListener implements OnTouchListener
     private ArrayList<Recipe> recipeList;
     private Settings settings;
     private float historicX;
+    private Recipe recipe;
     private int page;
 
     /**
      * Default constructor.
      *
-     * @param page
-     *            the position of the selected recipe
+     * @param page the position of the selected recipe
      */
-    public RecipeListRowTouchListener(Activity activity, ArrayList<Recipe> recipeList, Settings settings, final int page)
+    public RecipeListRowTouchListener(Activity activity, ArrayList<Recipe> recipeList, Settings settings, final Recipe recipe, final int page)
     {
         this.activityRef = new WeakReference<>(activity);
         this.recipeList = recipeList;
         this.settings = settings;
+        this.recipe = recipe;
         this.page = page;
     }
 
@@ -87,6 +89,7 @@ public class RecipeListRowTouchListener implements OnTouchListener
     {
         Intent intent = new Intent(activity, RecipeActivity.class);
         intent.putExtra(EXTRA_PAGE.toString(), this.page);
+        intent.putExtra(EXTRA_RECIPE.toString(), this.recipe);
         intent.putExtra(EXTRA_RECIPE_LIST.toString(), this.recipeList);
         intent.putExtra(EXTRA_SETTINGS.toString(), this.settings);
         activity.startActivity(intent);
