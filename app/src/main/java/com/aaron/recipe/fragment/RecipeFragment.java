@@ -150,7 +150,7 @@ public class RecipeFragment extends Fragment
         ArrayList<String> instructionsList = recipe.getInstructions().getInstructionsList();
         IntConsumer addInstructionToLinearLayoutView = count -> linearLayout.addView(createTextView((count + 1) + ". " + instructionsList.get(count)),
                 layoutParamsLabel);
-        IntStream.range(1, instructionsList.size()).forEach(addInstructionToLinearLayoutView);
+        IntStream.range(0, instructionsList.size()).forEach(addInstructionToLinearLayoutView);
     }
 
     /**

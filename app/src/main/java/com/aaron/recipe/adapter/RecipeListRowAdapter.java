@@ -2,7 +2,6 @@ package com.aaron.recipe.adapter;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnTouchListener;
