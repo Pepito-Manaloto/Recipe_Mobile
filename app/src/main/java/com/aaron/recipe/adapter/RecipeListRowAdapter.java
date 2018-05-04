@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.function.Predicate;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 /**
  * ListView adapter for recipe list.
  */
@@ -92,7 +94,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         clear();
         String searchedText = searched.trim();
 
-        if(searchedText.length() == 0)
+        if(isBlank(searchedText))
         {
             addAll(this.recipeListTemp);
         }

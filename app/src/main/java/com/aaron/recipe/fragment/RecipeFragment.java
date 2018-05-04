@@ -21,9 +21,6 @@ import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.model.LogsManager;
 
 import java.util.ArrayList;
-import java.util.function.Consumer;
-import java.util.function.IntConsumer;
-import java.util.stream.IntStream;
 
 import static android.widget.LinearLayout.LayoutParams;
 import static com.aaron.recipe.bean.DataKey.EXTRA_PAGE;
@@ -142,15 +139,22 @@ public class RecipeFragment extends Fragment
     private void initializeIngredientsAndInstructionsView(LinearLayout linearLayout, LayoutParams layoutParamsLabel, LayoutParams layoutParamsListLabel)
     {
         linearLayout.addView(createTextView("Ingredients:"), layoutParamsListLabel);
-        Consumer<Ingredient> addIngredientToLinearLayoutView = ingredient -> linearLayout.addView(createTextView(ingredient.toString()), layoutParamsLabel);
-        recipe.getIngredients().getIngredientsList().forEach(addIngredientToLinearLayoutView);
+
+        ArrayList<Ingredient> ingredientsList = recipe.getIngredients().getIngredientsList();
+        for(Ingredient ingredient : ingredientsList)
+        {
+            linearLayout.addView(createTextView(ingredient.toString()), layoutParamsLabel);
+        }
 
         linearLayout.addView(createTextView("Instructions:"), layoutParamsListLabel);
 
+        int count = 1;
         ArrayList<String> instructionsList = recipe.getInstructions().getInstructionsList();
-        IntConsumer addInstructionToLinearLayoutView = count -> linearLayout.addView(createTextView((count + 1) + ". " + instructionsList.get(count)),
-                layoutParamsLabel);
-        IntStream.range(0, instructionsList.size()).forEach(addInstructionToLinearLayoutView);
+        for(String instruction : instructionsList)
+        {
+            linearLayout.addView(createTextView(count + ". " + instruction), layoutParamsLabel);
+            count++;
+        }
     }
 
     /**

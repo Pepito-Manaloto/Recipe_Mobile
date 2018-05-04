@@ -26,9 +26,8 @@ import com.aaron.recipe.listener.UpdateCategoriesListener;
 import com.aaron.recipe.model.CategoryManager;
 import com.aaron.recipe.model.LogsManager;
 
-import org.apache.commons.lang3.StringUtils;
-
 import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * The application settings fragment.
@@ -149,7 +148,7 @@ public class SettingsFragment extends Fragment implements Backable
     public String getServerUrl()
     {
         String url = this.settings.getServerURL();
-        if(StringUtils.isBlank(url))
+        if(isBlank(url))
         {
             url = getActivity().getString(R.string.url_address_default);
         }

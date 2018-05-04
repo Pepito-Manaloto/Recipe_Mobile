@@ -134,7 +134,10 @@ public class CategoryManager
      */
     private void saveCategoriesInCache(List<ResponseCategory> responseCategories)
     {
-        responseCategories.forEach((category) -> saveCategoryInCache(category.getId(), category.getName()));
+        for(ResponseCategory category : responseCategories)
+        {
+            saveCategoryInCache(category.getId(), category.getName());
+        }
     }
 
     private void saveCategoryInCache(int id, String category)
@@ -158,7 +161,11 @@ public class CategoryManager
 
             // Delete categories to insert latest data
             db.delete(TABLE_CATEGORIES, null, null);
-            responseCategories.forEach((category) -> saveCategoryInDatabase(db, category.getId(), category.getName()));
+
+            for(ResponseCategory category : responseCategories)
+            {
+                saveCategoryInDatabase(db, category.getId(), category.getName());
+            }
 
             db.setTransactionSuccessful();
         }
