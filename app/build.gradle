@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-def ANDROID_VERSION = "27.0.2"
+def ANDROID_VERSION = "27.1.1"
 
 android {
     compileSdkVersion 27
@@ -45,29 +45,36 @@ android {
     preBuild.dependsOn updateVersion
 }
 
-def LEAKCANARY_VERSION = "1.5.4"
+def COMMONS_IO_VERSION = "2.5"
+def APACHE_COMMONS_LANG3_VERSION = "3.7"
+def COMMONS_CODEC_VERSION = "1.10"
 def RETROFIT_VERSION = "2.3.0"
+def RXJAVA2_VERSION = "2.1.1"
+def RXANDROID_VERSION = "2.0.1"
+def JAKEWHARTON_THREE_TEN_ABP_VERSION = "1.1.0"
+def STETHO_VERSION = "1.5.0"
+def LEAKCANARY_VERSION = "1.5.4"
+def JUNIT_VERSION = "4.12"
 
 dependencies {
     implementation "com.android.support:support-fragment:$ANDROID_VERSION"
     implementation "com.android.support:recyclerview-v7:$ANDROID_VERSION"
-    implementation 'commons-io:commons-io:2.5'
-    implementation 'org.apache.commons:commons-lang3:3.7'
-    implementation 'commons-codec:commons-codec:1.10'
+    implementation "commons-io:commons-io:$COMMONS_IO_VERSION"
+    implementation "org.apache.commons:commons-lang3:$APACHE_COMMONS_LANG3_VERSION"
+    implementation "commons-codec:commons-codec:$COMMONS_CODEC_VERSION"
 
     implementation "com.squareup.retrofit2:retrofit:$RETROFIT_VERSION"
     implementation "com.squareup.retrofit2:converter-jackson:$RETROFIT_VERSION"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$RETROFIT_VERSION"
 
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.1'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation "io.reactivex.rxjava2:rxjava:$RXJAVA2_VERSION"
+    implementation "io.reactivex.rxjava2:rxandroid:$RXANDROID_VERSION"
 
-    implementation 'com.jakewharton.threetenabp:threetenabp:1.0.5'
+    implementation "com.jakewharton.threetenabp:threetenabp:$JAKEWHARTON_THREE_TEN_ABP_VERSION"
 
-
-    implementation 'com.facebook.stetho:stetho:1.5.0'
+    implementation "com.facebook.stetho:stetho:$STETHO_VERSION"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$LEAKCANARY_VERSION"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$LEAKCANARY_VERSION"
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation "junit:junit:$JUNIT_VERSION"
 }
