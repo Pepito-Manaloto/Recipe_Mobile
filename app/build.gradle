@@ -52,9 +52,12 @@ def RETROFIT_VERSION = "2.3.0"
 def RXJAVA2_VERSION = "2.1.1"
 def RXANDROID_VERSION = "2.0.1"
 def JAKEWHARTON_THREE_TEN_ABP_VERSION = "1.1.0"
+def THREE_TEN_ABP_VERSION = "1.3.6"
 def STETHO_VERSION = "1.5.0"
 def LEAKCANARY_VERSION = "1.5.4"
+def MOCKITO_CORE_VERSION = "2.18.3"
 def JUNIT_VERSION = "4.12"
+def ROBOLECTRIC_VERSION = "3.6.1"
 
 dependencies {
     implementation "com.android.support:support-fragment:$ANDROID_VERSION"
@@ -76,5 +79,10 @@ dependencies {
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$LEAKCANARY_VERSION"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$LEAKCANARY_VERSION"
 
+    testImplementation "org.mockito:mockito-core:$MOCKITO_CORE_VERSION"
     testImplementation "junit:junit:$JUNIT_VERSION"
+    testImplementation "org.robolectric:robolectric:$ROBOLECTRIC_VERSION"
+    testImplementation("org.threeten:threetenbp:$THREE_TEN_ABP_VERSION") {
+        exclude group: 'com.jakewharton.threetenabp', module: 'threetenabp'
+    }
 }
