@@ -3,8 +3,11 @@ package com.aaron.recipe.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Instructions class.
@@ -72,39 +75,31 @@ public class Instructions implements Parcelable
         return this;
     }
 
-    /**
-     * Checks for equality, only checks the title of the instructions.
-     *
-     * @param obj
-     *            Instruction object to compare to
-     * @return boolean true if equal, else false
-     */
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if(!(obj instanceof Instructions))
+        if(this == o)
+        {
+            return true;
+        }
+
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
-        else
-        {
-            Instructions that = (Instructions) obj;
-            return this.title.equals(that.getTitle());
-        }
+
+        Instructions that = (Instructions) o;
+
+        return new EqualsBuilder()
+                .append(title, that.title)
+                .append(instructionsList, that.instructionsList)
+                .isEquals();
     }
 
-    /**
-     * Returns the hashcode of this object. Derived from title.
-     *
-     * @return int
-     */
     @Override
     public int hashCode()
     {
-        int hash = 3;
-        hash = 47 * hash + (this.title + "_INSTRUCTIONS").hashCode();
-
-        return hash;
+        return Objects.hash(title, instructionsList);
     }
 
     /**

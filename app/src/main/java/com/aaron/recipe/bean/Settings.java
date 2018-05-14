@@ -4,6 +4,10 @@ import android.graphics.Typeface;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
+import java.util.Objects;
+
 /**
  * Java bean for the application settings.
  */
@@ -234,44 +238,39 @@ public class Settings implements Parcelable
     @Override
     public String toString()
     {
-        return "Category: " + this.category + " Font name: " + this.fontName + " Font style: " + this.fontStyle + " Font size: " + this.fontSize + " Server URL: " + this.serverURL;
+        return "Category: " + this.category + " Font name: " + this.fontName + " Font style: " + this.fontStyle + " Font size: " + this.fontSize
+                + " Server URL: " + this.serverURL;
     }
 
-    /**
-     * Checks all attribute for equality.
-     *
-     * @param o Settings to compare
-     * @return true if equals, else false
-     */
     @Override
     public boolean equals(Object o)
     {
-        if(!(o instanceof Settings))
+        if(this == o)
+        {
+            return true;
+        }
+
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
-        else
-        {
-            Settings settings = (Settings) o;
 
-            return fontSize == settings.fontSize && category.equals(settings.category) && fontName == settings.fontName && fontStyle == settings.fontStyle && (serverURL != null ? serverURL.equals(settings.serverURL) : settings.serverURL == null);
-        }
+        Settings settings = (Settings) o;
+
+        return new EqualsBuilder()
+                .append(fontSize, settings.fontSize)
+                .append(category, settings.category)
+                .append(fontName, settings.fontName)
+                .append(fontStyle, settings.fontStyle)
+                .append(serverURL, settings.serverURL)
+                .isEquals();
     }
 
-    /**
-     * Returns a unique hash code of the Settings object.
-     *
-     * @return int
-     */
     @Override
     public int hashCode()
     {
-        int result = category != null ? category.hashCode() : 0;
-        result = 31 * result + (fontName != null ? fontName.hashCode() : 0);
-        result = 31 * result + (fontStyle != null ? fontStyle.hashCode() : 0);
-        result = 31 * result + fontSize;
-        result = 31 * result + (serverURL != null ? serverURL.hashCode() : 0);
-        return result;
+
+        return Objects.hash(category, fontName, fontStyle, fontSize, serverURL);
     }
 
     /**

@@ -3,6 +3,10 @@ package com.aaron.recipe.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
+import java.util.Objects;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseCategory
@@ -44,15 +48,17 @@ public class ResponseCategory
         }
 
         ResponseCategory that = (ResponseCategory) o;
-        return id == that.id && (name != null ? name.equals(that.name) : that.name == null);
+
+        return new EqualsBuilder()
+                .append(id, that.id)
+                .append(name, that.name)
+                .isEquals();
     }
 
     @Override
     public int hashCode()
     {
-        int result = id;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        return result;
+        return Objects.hash(id, name);
     }
 
     @Override

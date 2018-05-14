@@ -3,6 +3,10 @@ package com.aaron.recipe.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
+import java.util.Objects;
+
 /**
  * Recipe class.
  */
@@ -224,54 +228,37 @@ public class Recipe implements Parcelable
         return this;
     }
 
-    /**
-     * Checks all attribute for equality.
-     *
-     * @param o
-     *            Recipe to compare
-     * @return true if equals, else false
-     */
     @Override
     public boolean equals(Object o)
     {
-        if(!(o instanceof Recipe)) // object being compared is not Recipe
+        if(this == o)
+        {
+            return true;
+        }
+
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
-        else
-        {
-            Recipe that = (Recipe) o;
 
-            return this.id == that.getId() &&
-                    this.title.equals(that.getTitle()) &&
-                    this.servings == that.getServings() &&
-                    this.category.equals(that.getCategory()) &&
-                    this.getPreparationTimeString().equals(that.getPreparationTimeString()) &&
-                    this.description.equals(that.getDescription()) &&
-                    this.ingredients.equals(that.getIngredients()) &&
-                    this.instructions.equals(that.getInstructions());
-        }
+        Recipe recipe = (Recipe) o;
+
+        return new EqualsBuilder()
+                .append(id, recipe.id)
+                .append(servings, recipe.servings)
+                .append(preparationTime, recipe.preparationTime)
+                .append(title, recipe.title)
+                .append(category, recipe.category)
+                .append(description, recipe.description)
+                .append(ingredients, recipe.ingredients)
+                .append(instructions, recipe.instructions)
+                .isEquals();
     }
 
-    /**
-     * Returns a unique hash code of the Recipe object.
-     *
-     * @return int
-     */
     @Override
     public int hashCode()
     {
-        int hash = 3;
-        hash = 47 * hash + this.id;
-        hash = 47 * hash + this.title.hashCode();
-        hash = 47 * hash + this.category.hashCode();
-        hash = 47 * hash + this.servings;
-        hash = 47 * hash + this.getPreparationTimeString().hashCode();
-        hash = 47 * hash + this.description.hashCode();
-        hash = 47 * hash + this.ingredients.hashCode();
-        hash = 47 * hash + this.instructions.hashCode();
-
-        return hash;
+        return Objects.hash(id, title, category, servings, preparationTime, description, ingredients, instructions);
     }
 
     /**
@@ -288,8 +275,8 @@ public class Recipe implements Parcelable
                 " Servings: " + this.servings +
                 " Preparation Time: " + this.getPreparationTimeString() +
                 " Description: " + this.description +
-                " Ingredients: " + this.ingredients.toString() +
-                " Instructions: " + this.instructions.toString();
+                " Ingredients: " + this.ingredients +
+                " Instructions: " + this.instructions;
     }
 
     /**

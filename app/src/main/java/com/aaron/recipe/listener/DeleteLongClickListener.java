@@ -2,7 +2,6 @@ package com.aaron.recipe.listener;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.util.Log;
 import android.view.View;
 
 import com.aaron.recipe.fragment.AboutFragment;
@@ -17,6 +16,9 @@ import java.lang.ref.WeakReference;
  */
 public class DeleteLongClickListener implements View.OnLongClickListener
 {
+    private static final String YES = "Yes";
+    private static final String No = "No";
+
     private RecipeManager recipeManager;
     private WeakReference<AboutFragment> fragmentRef;
     private Action postDeleteAction;
@@ -60,8 +62,8 @@ public class DeleteLongClickListener implements View.OnLongClickListener
             AlertDialog.Builder prompt = new AlertDialog.Builder(fragment.getActivity());
             prompt.setMessage("Delete recipes from disk?");
 
-            prompt.setPositiveButton("Yes", this::yesButtonAction);
-            prompt.setNegativeButton("No", this::noButtonAction);
+            prompt.setPositiveButton(YES, this::yesButtonAction);
+            prompt.setNegativeButton(No, this::noButtonAction);
 
             prompt.create().show();
         }
@@ -69,7 +71,7 @@ public class DeleteLongClickListener implements View.OnLongClickListener
 
     private void yesButtonAction(DialogInterface dialog, int id)
     {
-        logDialogAction("Yes");
+        logDialogAction(YES);
 
         recipeManager.deleteRecipeFromDisk();
         postDeleteAction.execute();
@@ -77,7 +79,7 @@ public class DeleteLongClickListener implements View.OnLongClickListener
 
     private void noButtonAction(DialogInterface dialog, int id)
     {
-        logDialogAction("No");
+        logDialogAction(No);
 
         dialog.cancel();
     }

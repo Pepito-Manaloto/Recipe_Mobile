@@ -4,6 +4,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
+import java.util.Objects;
 
 /**
  * A single ingredient.
@@ -95,45 +98,33 @@ public class Ingredient implements Parcelable
         return this;
     }
 
-    /**
-     * Checks for equality, only checks the title of the ingredient.
-     * 
-     * @param obj
-     *            Ingredients object to compare to
-     * @return boolean true if equal, else false
-     */
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if(!(obj instanceof Ingredient))
+        if(this == o)
+        {
+            return true;
+        }
+
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
-        else
-        {
-            Ingredient that = (Ingredient) obj;
-            return this.quantity == that.getQuantity() &&
-                    this.measurement.equals(that.getMeasurement()) &&
-                    this.ingredient.equals(that.getIngredient()) &&
-                    this.comment.equals(that.getComment());
-        }
+
+        Ingredient that = (Ingredient) o;
+
+        return new EqualsBuilder()
+                .append(quantity, that.quantity)
+                .append(measurement, that.measurement)
+                .append(ingredient, that.ingredient)
+                .append(comment, that.comment)
+                .isEquals();
     }
 
-    /**
-     * Returns the hashcode of this object. Derived from title.
-     * 
-     * @return int
-     */
     @Override
     public int hashCode()
     {
-        int hash = 3;
-        hash = 47 * hash + (int) this.quantity;
-        hash = 47 * hash + this.measurement.hashCode();
-        hash = 47 * hash + this.ingredient.hashCode();
-        hash = 47 * hash + this.comment.hashCode();
-
-        return hash;
+        return Objects.hash(quantity, measurement, ingredient, comment);
     }
 
     /**

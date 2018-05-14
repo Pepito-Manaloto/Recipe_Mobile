@@ -3,8 +3,11 @@ package com.aaron.recipe.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Ingredients Class.
@@ -68,36 +71,31 @@ public class Ingredients implements Parcelable
         return this;
     }
 
-    /**
-     * Checks for equality, only checks the title of the ingredient.
-     * @param obj Ingredients object to compare to
-     * @return boolean true if equal, else false
-     */
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object o)
     {
-        if(!(obj instanceof Ingredients))
+        if(this == o)
+        {
+            return true;
+        }
+
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
-        else
-        {
-            Ingredients that = (Ingredients) obj;
-            return this.title.equals(that.getTitle());
-        }
+
+        Ingredients that = (Ingredients) o;
+
+        return new EqualsBuilder()
+                .append(title, that.title)
+                .append(ingredientsList, that.ingredientsList)
+                .isEquals();
     }
 
-    /**
-     * Returns the hashcode of this object. Derived from title.
-     * @return int
-     */
     @Override
     public int hashCode()
     {
-        int hash = 3;
-        hash = 47 * hash + (this.title + "_INGREDIENTS").hashCode();
-
-        return hash;
+        return Objects.hash(title, ingredientsList);
     }
 
     /**

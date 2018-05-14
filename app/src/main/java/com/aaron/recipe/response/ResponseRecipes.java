@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Bean representing the http response from a /categories request.
@@ -66,10 +66,7 @@ public class ResponseRecipes
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(17, 37)
-                .append(recentlyAddedCount)
-                .append(recipeList)
-                .toHashCode();
+        return Objects.hash(recentlyAddedCount, recipeList);
     }
 
     @Override

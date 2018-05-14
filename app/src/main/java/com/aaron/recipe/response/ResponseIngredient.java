@@ -5,8 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -84,12 +85,7 @@ public class ResponseIngredient
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(17, 37)
-                .append(quantity)
-                .append(measurement)
-                .append(ingredient)
-                .append(comment)
-                .toHashCode();
+        return Objects.hash(quantity, measurement, ingredient, comment);
     }
 
     @Override
