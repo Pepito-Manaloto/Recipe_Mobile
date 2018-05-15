@@ -87,7 +87,7 @@ public class Recipe implements Parcelable
             formattedPreparationTime += " mins";
         }
 
-        return formattedPreparationTime;
+        return formattedPreparationTime.trim();
     }
 
     /**
