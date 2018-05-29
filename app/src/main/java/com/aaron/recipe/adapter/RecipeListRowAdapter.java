@@ -29,6 +29,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
 {
     public static final String CLASS_NAME = RecipeListRowAdapter.class.getSimpleName();
     private Activity activity;
+    private ArrayList<Recipe> recipeList;
     private ArrayList<Recipe> recipeListTemp;
     private Settings settings;
 
@@ -44,6 +45,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         super(activity, 0, recipeList);
 
         this.activity = activity;
+        this.recipeList = recipeList;
         this.recipeListTemp = new ArrayList<>(recipeList);
         this.settings = settings;
     }
@@ -79,7 +81,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
         }
 
         Recipe recipe = getItem(position);
-        holder.setRecipeView(recipe, settings, new RecipeListRowTouchListener(activity, recipeListTemp, settings, recipe, position));
+        holder.setRecipeView(recipe, settings, new RecipeListRowTouchListener(activity, recipeList, settings, recipe, position));
 
         return listRowView;
     }

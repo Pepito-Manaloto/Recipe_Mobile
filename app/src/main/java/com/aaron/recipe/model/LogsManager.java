@@ -3,8 +3,8 @@ package com.aaron.recipe.model;
 import android.util.Log;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+
+import static java.lang.System.lineSeparator;
 
 /**
  * Handles the application logging(different from LogCat).
@@ -22,7 +22,7 @@ public class LogsManager
      */
     public static void log(final String className, final String methodName, final String text)
     {
-        logs.append(text).append("\n");
+        logs.append(text).append(lineSeparator());
         Log.d(LogsManager.TAG, className + ": " + methodName + ". " + text);
     }
 
@@ -34,7 +34,7 @@ public class LogsManager
      */
     public static void log(final String className, final String methodName, final String text, final Throwable t)
     {
-        logs.append(text).append("\nError: ").append(t.getMessage()).append("\n");
+        logs.append(text).append(lineSeparator()).append("Error: ").append(t.getMessage()).append(lineSeparator());
         Log.e(LogsManager.TAG, className + ": " + methodName + ". " + text, t);
     }
 
@@ -45,7 +45,16 @@ public class LogsManager
      */
     public String getLogs()
     {
-        return logs.toString().substring(0, logs.length() - 1); // Removes trailing '\n' character
+        int lineSeparatorChars = lineSeparator().length();
+        int logsLength = logs.length();
+        int trailingLineSeparatorStartIndex = logsLength - lineSeparatorChars;
+
+        if(lineSeparator().equals(logs.substring(trailingLineSeparatorStartIndex, logsLength)))
+        {
+            return logs.toString().substring(0, trailingLineSeparatorStartIndex); // Removes trailing '\n' character
+        }
+
+        return logs.toString();
     }
 
     /**
@@ -55,13 +64,10 @@ public class LogsManager
      */
     public String getLogs(final String keyword)
     {
-        String lineSeparator = System.lineSeparator();
-        String[] lines = logs.toString().split(lineSeparator);
+        String[] lines = logs.toString().split(lineSeparator());
         StringBuilder sb = new StringBuilder();
 
-        Predicate<String> logLineContainsKeyword = line -> line.contains(keyword);
-        Consumer<String> appendLineToStringBuilder = line -> sb.append(line).append(lineSeparator);
-        Arrays.stream(lines).filter(logLineContainsKeyword).forEach(appendLineToStringBuilder);
+        Arrays.stream(lines).filter(line -> line.contains(keyword)).forEach(line -> sb.append(line).append(lineSeparator()));
 
         return sb.toString();
     }
