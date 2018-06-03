@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -250,7 +251,7 @@ public class RecipeManager
 
             db.setTransactionSuccessful();
         }
-        catch(Exception e)
+        catch(SQLiteException e)
         {
             LogsManager.log(CLASS_NAME, "saveToDisk", e.getMessage(), e);
             return false;
@@ -266,7 +267,7 @@ public class RecipeManager
         return true;
     }
 
-    private void insertRecipeToDatabase(SQLiteDatabase db, Recipe recipe) throws Exception
+    private void insertRecipeToDatabase(SQLiteDatabase db, Recipe recipe) throws SQLiteException
     {
         long recipeId = insertRecipeDetailsToDatabase(db, recipe);
         validateInsert(recipeId);
@@ -290,11 +291,11 @@ public class RecipeManager
         }
     }
 
-    private void validateInsert(long result) throws Exception
+    private void validateInsert(long result) throws SQLiteException
     {
         if(result == -1)
         {
-            throw new Exception();
+            throw new SQLiteException();
         }
     }
 

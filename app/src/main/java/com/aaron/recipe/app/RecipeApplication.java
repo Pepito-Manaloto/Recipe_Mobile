@@ -9,6 +9,7 @@ import com.aaron.recipe.bean.Categories;
 import com.aaron.recipe.model.CategoryManager;
 import com.aaron.recipe.model.LogsManager;
 import com.facebook.stetho.Stetho;
+import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.squareup.leakcanary.LeakCanary;
 
 /**
@@ -37,6 +38,7 @@ public class RecipeApplication extends Application
             Stetho.initializeWithDefaults(this);
         }
 
+        AndroidThreeTen.init(this);
         if(Categories.getCategories().size() <= 1)
         {
             loadCategories();
