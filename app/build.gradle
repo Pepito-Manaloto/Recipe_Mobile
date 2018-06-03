@@ -43,6 +43,12 @@ android {
     }
 
     preBuild.dependsOn updateVersion
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 def COMMONS_IO_VERSION = "2.5"

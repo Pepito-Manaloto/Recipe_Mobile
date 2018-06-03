@@ -13,7 +13,7 @@ import android.content.Context;
  * Created by Aaron on 02/01/2018.
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(manifest = Config.NONE)
+@Config(application = RecipeTestApplication.class)
 public abstract class RobolectricTest
 {
     protected Context getContext()

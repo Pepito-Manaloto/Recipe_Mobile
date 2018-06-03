@@ -1,5 +1,8 @@
 package com.aaron.recipe.model;
 
+import android.content.Context;
+
+import com.aaron.recipe.R;
 import com.aaron.recipe.response.ResponseCategory;
 import com.aaron.recipe.response.ResponseRecipes;
 
@@ -32,9 +35,9 @@ public class HttpClient
     private static OkHttpClient okHttpClient;
     private static RecipeService service;
 
-    public HttpClient(String hostname)
+    public HttpClient(Context context)
     {
-        initializeRetrofit(hostname);
+        initializeRetrofit(context.getString(R.string.url_address_default));
     }
 
     private void initializeRetrofit(String hostname)

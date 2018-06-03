@@ -23,16 +23,19 @@ public class RecipeApplication extends Application
     {
         super.onCreate();
 
-        if(LeakCanary.isInAnalyzerProcess(this))
+        if(!isTest())
         {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
-        LeakCanary.install(this);
+            if(LeakCanary.isInAnalyzerProcess(this))
+            {
+                // This process is dedicated to LeakCanary for heap analysis.
+                // You should not init your app in this process.
+                return;
+            }
+            LeakCanary.install(this);
 
-        // Access in Google Chrome url via -> chrome://inspect
-        Stetho.initializeWithDefaults(this);
+            // Access in Google Chrome url via -> chrome://inspect
+            Stetho.initializeWithDefaults(this);
+        }
 
         if(Categories.getCategories().size() <= 1)
         {
@@ -63,5 +66,10 @@ public class RecipeApplication extends Application
                 Toast.makeText(this, this.getString(R.string.categories_currently_updating), Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    protected boolean isTest()
+    {
+        return false;
     }
 }

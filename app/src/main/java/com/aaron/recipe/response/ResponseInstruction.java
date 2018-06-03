@@ -14,6 +14,15 @@ public class ResponseInstruction
 {
     private String instruction;
 
+    public ResponseInstruction()
+    {
+    }
+
+    public ResponseInstruction(String instruction)
+    {
+        this.instruction = instruction;
+    }
+
     public String getInstruction()
     {
         return instruction;

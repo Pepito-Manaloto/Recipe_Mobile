@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.aaron.recipe.R;
 import com.aaron.recipe.bean.Categories;
 import com.aaron.recipe.bean.Ingredient;
 import com.aaron.recipe.bean.Ingredients;
@@ -18,16 +17,13 @@ import com.aaron.recipe.response.ResponseInstruction;
 import com.aaron.recipe.response.ResponseRecipe;
 import com.aaron.recipe.response.ResponseRecipes;
 
-import org.apache.commons.lang3.time.FastDateFormat;
+import org.threeten.bp.LocalDateTime;
 
 import java.lang.ref.WeakReference;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -46,6 +42,7 @@ import static com.aaron.recipe.model.MySQLiteHelper.ColumnRecipe;
 import static com.aaron.recipe.model.MySQLiteHelper.TABLE_INGREDIENTS;
 import static com.aaron.recipe.model.MySQLiteHelper.TABLE_INSTRUCTIONS;
 import static com.aaron.recipe.model.MySQLiteHelper.TABLE_RECIPE;
+import static org.threeten.bp.format.DateTimeFormatter.ofPattern;
 
 /**
  * Handles the web call to retrieve recipes in JSON object representation. Handles the data storage of recipes.
@@ -54,12 +51,14 @@ public class RecipeManager
 {
     public static final String CLASS_NAME = RecipeManager.class.getSimpleName();
 
-    private static CompositeDisposable compositeDisposable = new CompositeDisposable();
-    public static final String DATE_FORMAT_LONG = "MMMM d, yyyy hh:mm:ss a";
+    public static final String DEFAULT_LAST_UPDATED = "1950-01-01 00:00:00";
+    public static final String DATE_FORMAT_DATABASE = "MMMM d, yyyy hh:mm:ss a";
     public static final String DATE_FORMAT_SHORT_24 = "yyyy-MM-dd HH:mm:ss";
 
+    private static CompositeDisposable compositeDisposable = new CompositeDisposable();
+
     private MySQLiteHelper dbHelper;
-    private Date curDate;
+    private LocalDateTime dateIn;
     private HttpClient httpClient;
     private WeakReference<Context> contextRef;
 
@@ -72,8 +71,8 @@ public class RecipeManager
     public RecipeManager(final Context context)
     {
         this.dbHelper = new MySQLiteHelper(context);
-        this.curDate = new Date();
-        this.httpClient = new HttpClient(context.getString(R.string.url_address_default));
+        this.dateIn = LocalDateTime.now();
+        this.httpClient = new HttpClient(context);
         this.contextRef = new WeakReference<>(context);
     }
 
@@ -154,6 +153,7 @@ public class RecipeManager
             }
             else
             {
+                // Note: Handled as NullPointerException in onError(), because onSuccess paramter cannot be null
                 return null;
             }
         }
@@ -182,11 +182,7 @@ public class RecipeManager
             private String determineToastMessageFromResult(ArrayList<Recipe> recipes)
             {
                 String message;
-                if(recipes == null)
-                {
-                    message = "Failed saving to disk.";
-                }
-                else if(recipes.isEmpty())
+                if(recipes.isEmpty())
                 {
                     message = "No new recipes available.";
                 }
@@ -212,7 +208,17 @@ public class RecipeManager
                 Context context = contextRef.get();
                 if(context != null)
                 {
-                    Toast.makeText(context, "Error retrieving recipes: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    String message;
+                    if(e instanceof NullPointerException)
+                    {
+                        message = "Failed saving to disk.";
+                    }
+                    else
+                    {
+                        message = e.getMessage();
+                    }
+
+                    Toast.makeText(context, "Error retrieving recipes: " + message, Toast.LENGTH_LONG).show();
                 }
 
                 LogsManager.log(CLASS_NAME, "onError", "Error retrieving recipes. Error: " + e.getMessage(), e);
@@ -244,11 +250,15 @@ public class RecipeManager
 
             db.setTransactionSuccessful();
         }
+        catch(Exception e)
+        {
+            LogsManager.log(CLASS_NAME, "saveToDisk", e.getMessage(), e);
+            return false;
+        }
         finally
         {
             db.endTransaction();
             db.close();
-            this.dbHelper.close();
         }
 
         LogsManager.log(CLASS_NAME, "saveToDisk", "");
@@ -256,15 +266,17 @@ public class RecipeManager
         return true;
     }
 
-    private void insertRecipeToDatabase(SQLiteDatabase db, Recipe recipe)
+    private void insertRecipeToDatabase(SQLiteDatabase db, Recipe recipe) throws Exception
     {
         long recipeId = insertRecipeDetailsToDatabase(db, recipe);
+        validateInsert(recipeId);
 
         int count = 1;
         List<Ingredient> ingredientList = recipe.getIngredients().getIngredientsList();
         for(Ingredient ingredient : ingredientList)
         {
-            insertIngredientToDatabase(count, db, ingredient, recipeId);
+            long result = insertIngredientToDatabase(count, db, ingredient, recipeId);
+            validateInsert(result);
             count++;
         }
 
@@ -272,8 +284,17 @@ public class RecipeManager
         List<String> instructionsList = recipe.getInstructions().getInstructionsList();
         for(String instruction : instructionsList)
         {
-            insertInstructionToDatabase(count, db, instruction, recipeId);
+            long result = insertInstructionToDatabase(count, db, instruction, recipeId);
+            validateInsert(result);
             count++;
+        }
+    }
+
+    private void validateInsert(long result) throws Exception
+    {
+        if(result == -1)
+        {
+            throw new Exception();
         }
     }
 
@@ -281,15 +302,15 @@ public class RecipeManager
     {
         ContentValues recipeValues = new ContentValues();
         recipeValues.put(ColumnRecipe.title.name(), recipe.getTitle());
-        recipeValues.put(ColumnRecipe.category.name(), Categories.getId(recipe.getCategory()));
+        recipeValues.put(ColumnRecipe.category_id.name(), Categories.getId(recipe.getCategory()));
         recipeValues.put(ColumnRecipe.preparation_time.name(), recipe.getPreparationTime());
         recipeValues.put(ColumnRecipe.servings.name(), recipe.getServings());
         recipeValues.put(ColumnRecipe.description.name(), recipe.getDescription());
-        recipeValues.put(ColumnRecipe.date_in.name(), FastDateFormat.getInstance(DATE_FORMAT_LONG, Locale.getDefault()).format(this.curDate));
+        recipeValues.put(ColumnRecipe.date_in.name(), dateIn.format(ofPattern(DATE_FORMAT_DATABASE)));
         return db.insert(TABLE_RECIPE, null, recipeValues);
     }
 
-    private void insertIngredientToDatabase(int count, SQLiteDatabase db, Ingredient ingredient, long recipeId)
+    private long insertIngredientToDatabase(int count, SQLiteDatabase db, Ingredient ingredient, long recipeId)
     {
         ContentValues ingredientsValues = new ContentValues();
         ingredientsValues.put(ColumnIngredients.recipe_id.name(), recipeId);
@@ -299,17 +320,17 @@ public class RecipeManager
         ingredientsValues.put(ColumnIngredients.comment_.name(), ingredient.getComment());
         ingredientsValues.put(ColumnIngredients.count.name(), count);
 
-        db.insert(TABLE_INGREDIENTS, null, ingredientsValues);
+        return db.insert(TABLE_INGREDIENTS, null, ingredientsValues);
     }
 
-    private void insertInstructionToDatabase(int count, SQLiteDatabase db, String instruction, long recipeId)
+    private long insertInstructionToDatabase(int count, SQLiteDatabase db, String instruction, long recipeId)
     {
         ContentValues instructionsValues = new ContentValues();
         instructionsValues.put(ColumnInstructions.recipe_id.name(), recipeId);
         instructionsValues.put(ColumnInstructions.instruction.name(), instruction);
         instructionsValues.put(ColumnInstructions.count.name(), count);
 
-        db.insert(TABLE_INSTRUCTIONS, null, instructionsValues);
+        return db.insert(TABLE_INSTRUCTIONS, null, instructionsValues);
     }
 
     /**
@@ -321,7 +342,7 @@ public class RecipeManager
      */
     public String getLastUpdated(final String format)
     {
-        String lastUpdatedDate = "1950-01-01 00:00:00";
+        String lastUpdatedDate = DEFAULT_LAST_UPDATED;
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
         String[] columns = new String[] { ColumnRecipe.date_in.name(), };
         String orderBy = ColumnRecipe.date_in.name() + " DESC";
@@ -339,16 +360,9 @@ public class RecipeManager
             }
         }
 
-        try
-        {
-            // Parse String to Date, to be able to format properly.
-            Date date = FastDateFormat.getInstance(DATE_FORMAT_LONG, Locale.getDefault()).parse(lastUpdatedDate);
-            lastUpdatedDate = FastDateFormat.getInstance(format, Locale.getDefault()).format(date);
-        }
-        catch(ParseException e)
-        {
-            LogsManager.log(CLASS_NAME, "getLastUpdated", e.getClass().getSimpleName() + ": " + e.getMessage(), e);
-        }
+        // Parse String to LocalDateTime, to be able to format properly.
+        LocalDateTime date = LocalDateTime.parse(lastUpdatedDate, ofPattern(DATE_FORMAT_DATABASE));
+        lastUpdatedDate = ofPattern(format).format(date);
 
         LogsManager.log(CLASS_NAME, "getLastUpdated", "lastUpdatedDate=" + lastUpdatedDate);
 
@@ -364,7 +378,7 @@ public class RecipeManager
     {
         Map<String, Integer> map = new HashMap<>();
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
-        String whereClause = ColumnRecipe.category.name() + " = ?";
+        String whereClause = ColumnRecipe.category_id.name() + " = ?";
 
         for(Map.Entry<Integer, String> entry : Categories.getCategoriesMap().entrySet())
         {
@@ -402,7 +416,7 @@ public class RecipeManager
         try(SQLiteDatabase db = this.dbHelper.getReadableDatabase())
         {
             String[] columns = new String[] { ColumnRecipe.id.name(), ColumnRecipe.title.name(),
-                    ColumnRecipe.category.name(), ColumnRecipe.preparation_time.name(),
+                    ColumnRecipe.category_id.name(), ColumnRecipe.preparation_time.name(),
                     ColumnRecipe.servings.name(), ColumnRecipe.description.name() };
             String whereClause;
             String[] whereArgs;
@@ -415,7 +429,7 @@ public class RecipeManager
             }
             else
             {
-                whereClause = ColumnRecipe.category.name() + " = ?";
+                whereClause = ColumnRecipe.category_id.name() + " = ?";
                 whereArgs = new String[] { String.valueOf(Categories.getId(selectedCategory)) };
             }
 

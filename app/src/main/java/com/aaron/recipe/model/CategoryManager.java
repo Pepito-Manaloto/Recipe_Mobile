@@ -50,7 +50,7 @@ public class CategoryManager
     public CategoryManager(final Context context)
     {
         this.dbHelper = new MySQLiteHelper(context);
-        this.httpClient = new HttpClient(context.getString(R.string.url_address_default));
+        this.httpClient = new HttpClient(context);
         this.contextRef = new WeakReference<>(context);
     }
 

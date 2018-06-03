@@ -24,7 +24,7 @@ import com.aaron.recipe.model.RecipeManager;
 import java.util.Map;
 
 import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
-import static com.aaron.recipe.model.RecipeManager.DATE_FORMAT_LONG;
+import static com.aaron.recipe.model.RecipeManager.DATE_FORMAT_DATABASE;
 
 /**
  * The application about fragment.
@@ -79,7 +79,7 @@ public class AboutFragment extends Fragment implements Backable
         final TextView buildNumberTextView = view.findViewById(R.id.text_build_number);
         buildNumberTextView.setText(buildNumber);
 
-        String lastUpdated = this.recipeManager.getLastUpdated(DATE_FORMAT_LONG);
+        String lastUpdated = this.recipeManager.getLastUpdated(DATE_FORMAT_DATABASE);
         TextView lastUpdatedTextView = view.findViewById(R.id.text_last_updated);
         lastUpdatedTextView.setText(lastUpdated);
 

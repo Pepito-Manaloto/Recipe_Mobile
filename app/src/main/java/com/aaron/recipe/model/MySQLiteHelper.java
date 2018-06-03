@@ -25,7 +25,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
      */
     public enum ColumnRecipe
     {
-        id, title, category, preparation_time, description, servings, date_in,
+        id, title, category_id, preparation_time, description, servings, date_in,
     }
 
     /**
@@ -56,12 +56,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper
             "(" +
             ColumnRecipe.id.name() + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             ColumnRecipe.title.name() + " TEXT UNIQUE NOT NULL, " +
-            ColumnRecipe.category.name() + " INTEGER NOT NULL, " +
+            ColumnRecipe.category_id.name() + " INTEGER NOT NULL, " +
             ColumnRecipe.preparation_time.name() + " INTEGER NOT NULL, " +
             ColumnRecipe.description.name() + " TEXT NOT NULL, " +
             ColumnRecipe.servings.name() + " INTEGER NOT NULL, " +
             ColumnRecipe.date_in.name() + " TEXT NOT NULL, " +
-            "FOREIGN KEY (category) REFERENCES " + TABLE_CATEGORIES + "(id)" +
+            "FOREIGN KEY (" + ColumnRecipe.category_id.name() + ") REFERENCES " + TABLE_CATEGORIES + "(id)" +
             ");";
 
     private static final String CREATE_TABLE_INGREDIENTS = "CREATE TABLE " + TABLE_INGREDIENTS +
