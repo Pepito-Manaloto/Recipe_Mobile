@@ -14,13 +14,15 @@ import java.util.function.Predicate;
  */
 public class Fraction implements Parcelable
 {
+    private static final String PLUS = " + ";
+
     /**
      * Constants for fractional characters.
      */
     public enum CommonFraction
     {
         THREE_FOURTH("¾", 0.75),
-        ONE_HALF_PLUS_ONE_EIGHT("½ + ⅛", 0.625),
+        TWO_THIRD("⅔", 0.66),
         ONE_HALF("½", 0.5),
         ONE_THIRD("⅓", 0.33),
         ONE_FOURTH("¼", 0.25),
@@ -80,7 +82,7 @@ public class Fraction implements Parcelable
         int wholeNumber = (int) decimalNumber;
         double decimal = MathUtils.round(decimalNumber - wholeNumber, 3);
 
-        String fraction = getCommonFraction(decimal);
+        String fraction = deriveFractionFromDecimal(decimal);
         if(fraction.isEmpty())
         {
             if(decimal == 0)
@@ -98,17 +100,46 @@ public class Fraction implements Parcelable
         }
     }
 
-    private String getCommonFraction(double decimal)
+    private String deriveFractionFromDecimal(double decimal)
     {
         Predicate<CommonFraction> isFractionDecimalEqualToDecimal = cf -> cf.getValue() == decimal;
         Optional<CommonFraction> cf = Arrays.stream(CommonFraction.values()).filter(isFractionDecimalEqualToDecimal).findFirst();
-        String fraction = "";
+        String fraction;
         if(cf.isPresent())
         {
             fraction = cf.get().getCode();
         }
+        else
+        {
+            fraction = getComplexFraction(decimal);
+        }
 
         return fraction;
+    }
+
+    /**
+     *
+     */
+    private String getComplexFraction(double decimal)
+    {
+        CommonFraction[] commonFractions = CommonFraction.values();
+        int lastIndex = commonFractions.length - 1;
+
+        for(int firstFractionIndex = lastIndex; firstFractionIndex > 0; firstFractionIndex--)
+        {
+            for(int secondFractionIndex = firstFractionIndex - 1; secondFractionIndex >= 0; secondFractionIndex--)
+            {
+                CommonFraction firstFraction = commonFractions[firstFractionIndex];
+                CommonFraction secondFraction = commonFractions[secondFractionIndex];
+                double twoFractionsSum = firstFraction.getValue() + secondFraction.getValue();
+                if(decimal == twoFractionsSum)
+                {
+                    return secondFraction.getCode() + PLUS + firstFraction.getCode();
+                }
+            }
+        }
+
+        return "";
     }
 
     /**
