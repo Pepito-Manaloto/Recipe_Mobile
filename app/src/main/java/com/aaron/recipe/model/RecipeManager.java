@@ -23,9 +23,9 @@ import org.threeten.bp.LocalDateTime;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -377,7 +377,7 @@ public class RecipeManager
      */
     public Map<String, Integer> getRecipesCount()
     {
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, Integer> map = new TreeMap<>();
         SQLiteDatabase db = this.dbHelper.getReadableDatabase();
         String whereClause = ColumnRecipe.category_id.name() + " = ?";
 
@@ -385,7 +385,11 @@ public class RecipeManager
         {
             Integer id = entry.getKey();
             String category = entry.getValue();
-            putRecipeCountOfCategoryToMap(map, id, category, db, whereClause);
+
+            if(!Categories.DEFAULT.equals(category))
+            {
+                putRecipeCountOfCategoryToMap(map, id, category, db, whereClause);
+            }
         }
 
         LogsManager.log(CLASS_NAME, "getRecipesCount", "values_size=" + map.values().size());

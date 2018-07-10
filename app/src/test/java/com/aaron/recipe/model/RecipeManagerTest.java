@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -47,8 +48,11 @@ import static com.aaron.recipe.model.RecipeManager.DATE_FORMAT_SHORT_24;
 import static com.aaron.recipe.model.RecipeManager.DEFAULT_LAST_UPDATED;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Comparator.comparing;
 import static java.util.Objects.nonNull;
 import static java.util.UUID.randomUUID;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.summingInt;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomUtils.nextDouble;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
@@ -194,15 +198,17 @@ public class RecipeManagerTest extends RobolectricTest
     }
 
     @Test
-    public void givenRecipesInDisk_whenGetRecipesCount_thenShouldRecipesCountPerCategory()
+    public void givenRecipesInDisk_whenGetRecipesCount_thenShouldReturnRecipesCountPerCategoryInAscendingOrder()
     {
         List<Recipe> recipes = givenRecipesInDisk();
 
         Map<String, Integer> recipesCountFromDisk = manager.getRecipesCount();
 
         // Collectors.counting() is not used, because it returns a Long type
-        Map<String, Integer> recipesCount = recipes.stream().collect(Collectors.groupingBy(Recipe::getCategory, Collectors.summingInt(i -> 1)));
-        assertTrue(recipesCount.equals(recipesCountFromDisk));
+        Map<String, Integer> recipesCount = recipes.stream()
+                .collect(groupingBy(Recipe::getCategory, TreeMap::new, summingInt(i -> 1)));
+
+        assertEquals(recipesCount.toString(), recipesCountFromDisk.toString());
     }
 
     @Test
@@ -303,7 +309,7 @@ public class RecipeManagerTest extends RobolectricTest
         when(spyManager.getLastUpdated(anyString())).thenReturn(DEFAULT_LAST_UPDATED);
 
         SQLiteDatabase mockedSQLiteDatabase = mock(SQLiteDatabase.class);
-        when(mockedSQLiteDatabase.insert(anyString(), isNull(), any(ContentValues.class))).thenThrow(new RuntimeException("FUCK YOU!"));
+        when(mockedSQLiteDatabase.insert(anyString(), isNull(), any(ContentValues.class))).thenThrow(new RuntimeException("Failed saving to disk."));
 
         MySQLiteHelper mockedSQLiteHelper = mock(MySQLiteHelper.class);
         when(mockedSQLiteHelper.getWritableDatabase()).thenReturn(mockedSQLiteDatabase);
