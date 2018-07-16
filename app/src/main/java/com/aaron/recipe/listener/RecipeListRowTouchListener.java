@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 
 import com.aaron.recipe.activity.RecipeActivity;
+import com.aaron.recipe.bean.IntentRequestCode;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 
@@ -92,6 +93,6 @@ public class RecipeListRowTouchListener implements OnTouchListener
         intent.putExtra(EXTRA_RECIPE.toString(), this.recipe);
         intent.putExtra(EXTRA_RECIPE_LIST.toString(), this.recipeList);
         intent.putExtra(EXTRA_SETTINGS.toString(), this.settings);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent, IntentRequestCode.RECIPE.getCode());
     }
 }

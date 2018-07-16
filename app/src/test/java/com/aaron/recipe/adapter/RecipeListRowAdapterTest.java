@@ -40,7 +40,7 @@ public class RecipeListRowAdapterTest extends RobolectricTest
         adapter.filter(searchText);
 
         boolean allRecipesStartsWithSearchText = recipeList.stream().map(r -> r.getTitle().toLowerCase()).allMatch(s -> s.startsWith(searchText.toLowerCase()));
-        System.out.println(recipeList);
+
         assertFalse(recipeList.isEmpty());
         assertTrue(allRecipesStartsWithSearchText);
     }

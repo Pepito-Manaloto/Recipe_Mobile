@@ -20,6 +20,7 @@ import com.aaron.recipe.activity.AboutActivity;
 import com.aaron.recipe.activity.LogsActivity;
 import com.aaron.recipe.activity.SettingsActivity;
 import com.aaron.recipe.adapter.RecipeListRowAdapter;
+import com.aaron.recipe.bean.IntentRequestCode;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.listener.RecipeSearchListener;
@@ -36,23 +37,6 @@ import static com.aaron.recipe.bean.DataKey.EXTRA_SETTINGS;
 
 public class RecipeListFragment extends ListFragment
 {
-    private enum MenuRequest
-    {
-        SETTINGS(1), ABOUT(2), LOGS(3);
-
-        private int code;
-
-        MenuRequest(int code)
-        {
-            this.code = code;
-        }
-
-        int getCode()
-        {
-            return code;
-        }
-    }
-
     public static final String CLASS_NAME = RecipeListFragment.class.getSimpleName();
     private static final AtomicBoolean IS_UPDATING = new AtomicBoolean(false);
 
@@ -155,10 +139,9 @@ public class RecipeListFragment extends ListFragment
 
         LogsManager.log(CLASS_NAME, "onActivityResult", "requestCode=" + requestCode + " resultCode=" + resultCode);
 
-        boolean activityFromSettingsOrAboutOrLogsFragment = requestCode == MenuRequest.SETTINGS.getCode() || requestCode == MenuRequest.ABOUT.getCode()
-                || requestCode == MenuRequest.LOGS.getCode();
+        boolean requestCodeValid =  IntentRequestCode.isValid(requestCode);
         boolean settingsHasExtraData = data != null && data.hasExtra(EXTRA_SETTINGS.toString());
-        if(activityFromSettingsOrAboutOrLogsFragment && settingsHasExtraData)
+        if(requestCodeValid && settingsHasExtraData)
         {
             this.settings = data.getParcelableExtra(EXTRA_SETTINGS.toString());
 
@@ -231,17 +214,17 @@ public class RecipeListFragment extends ListFragment
             }
             case R.id.menu_settings:
             {
-                startNextActivityWithExtraSettingsData(SettingsActivity.class, MenuRequest.SETTINGS);
+                startNextActivityWithExtraSettingsData(SettingsActivity.class, IntentRequestCode.SETTINGS);
                 return true;
             }
             case R.id.menu_about:
             {
-                startNextActivityWithExtraSettingsData(AboutActivity.class, MenuRequest.ABOUT);
+                startNextActivityWithExtraSettingsData(AboutActivity.class, IntentRequestCode.ABOUT);
                 return true;
             }
             case R.id.menu_logs:
             {
-                startNextActivityWithExtraSettingsData(LogsActivity.class, MenuRequest.LOGS);
+                startNextActivityWithExtraSettingsData(LogsActivity.class, IntentRequestCode.LOGS);
                 return true;
             }
             default:
@@ -286,7 +269,7 @@ public class RecipeListFragment extends ListFragment
         }
     }
 
-    private void startNextActivityWithExtraSettingsData(Class<? extends Activity> nextActivityClass, MenuRequest requestCode)
+    private void startNextActivityWithExtraSettingsData(Class<? extends Activity> nextActivityClass, IntentRequestCode requestCode)
     {
         Intent intent = new Intent(getActivity(), nextActivityClass);
         intent.putExtra(EXTRA_SETTINGS.toString(), this.settings);
