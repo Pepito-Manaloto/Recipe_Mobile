@@ -10,8 +10,12 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class RecipeListRowAdapterTest extends RobolectricTest
@@ -39,10 +43,12 @@ public class RecipeListRowAdapterTest extends RobolectricTest
 
         adapter.filter(searchText);
 
-        boolean allRecipesStartsWithSearchText = recipeList.stream().map(r -> r.getTitle().toLowerCase()).allMatch(s -> s.startsWith(searchText.toLowerCase()));
-
         assertFalse(recipeList.isEmpty());
-        assertTrue(allRecipesStartsWithSearchText);
+        assertThat(recipeList, contains(hasProperty("title", is("Lobster tail")),
+                hasProperty("title", is("lobster soup")),
+                hasProperty("title", is("Lobster bisque")),
+                hasProperty("title", is("Dessert lobster")),
+                hasProperty("title", is("A whole bunch of LOBSTERballz"))));
     }
 
     @Test
@@ -96,6 +102,11 @@ public class RecipeListRowAdapterTest extends RobolectricTest
         recipeList.add(newRecipe("lobster soup"));
         recipeList.add(newRecipe("Beef celery"));
         recipeList.add(newRecipe("Lobster bisque"));
+        recipeList.add(newRecipe("Cake o cake"));
+        recipeList.add(newRecipe("Dessert lobster"));
+        recipeList.add(newRecipe("Pie"));
+        recipeList.add(newRecipe("Apple tart"));
+        recipeList.add(newRecipe("A whole bunch of LOBSTERballz"));
 
         return recipeList;
     }

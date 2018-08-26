@@ -110,10 +110,24 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
 
     private void filterRecipeByTitle(String searchedText)
     {
-        Predicate<Recipe> recipeTitleStartsWithSearchedText = recipe -> recipe.getTitle().toLowerCase(Locale.getDefault())
-                .startsWith(searchedText.toLowerCase(Locale.getDefault()));
+        recipeListTemp.stream().filter(r -> recipeTitleStartsWithSearchedText(searchedText, r)).forEach(this::add);
+    }
 
-        recipeListTemp.stream().filter(recipeTitleStartsWithSearchedText).forEach(this::add);
+    private boolean recipeTitleStartsWithSearchedText(String searchedText, Recipe recipe)
+    {
+        String search = searchedText.toLowerCase(Locale.getDefault());
+        String title = recipe.getTitle().toLowerCase(Locale.getDefault());
+        String[] titleWordParts = title.split(" ");
+
+        for(String word: titleWordParts)
+        {
+            if(word.startsWith(search))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
