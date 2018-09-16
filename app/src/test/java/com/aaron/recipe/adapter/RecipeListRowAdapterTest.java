@@ -10,46 +10,12 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class RecipeListRowAdapterTest extends RobolectricTest
 {
     private RecipeListRowAdapter adapter;
-
-    @Test
-    public void givenEmptySearchTextAndRecipeList_whenFilter_thenShouldReturnRecipeListUnchanged()
-    {
-        ArrayList<Recipe> recipeList = givenRecipeList();
-        adapter = initializeRecipeListRowAdapter(recipeList);
-        ArrayList<Recipe> originalRecipeList = new ArrayList<>(recipeList);
-
-        adapter.filter("");
-
-        assertEquals(originalRecipeList, recipeList);
-    }
-
-    @Test
-    public void givenSearchTextAndRecipeList_whenFilter_thenShouldOnlyReturnRecipeListWithTitleThatStartsWithTheSearchText()
-    {
-        String searchText = "lObSter";
-        ArrayList<Recipe> recipeList = givenRecipeList();
-        adapter = initializeRecipeListRowAdapter(recipeList);
-
-        adapter.filter(searchText);
-
-        assertFalse(recipeList.isEmpty());
-        assertThat(recipeList, contains(hasProperty("title", is("Lobster tail")),
-                hasProperty("title", is("lobster soup")),
-                hasProperty("title", is("Lobster bisque")),
-                hasProperty("title", is("Dessert lobster")),
-                hasProperty("title", is("A whole bunch of LOBSTERballz"))));
-    }
 
     @Test
     public void givenRecipeList_whenUpdate_thenShouldReplaceAdaptersList()

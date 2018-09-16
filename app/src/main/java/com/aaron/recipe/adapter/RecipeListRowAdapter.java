@@ -14,13 +14,11 @@ import com.aaron.recipe.R;
 import com.aaron.recipe.bean.Recipe;
 import com.aaron.recipe.bean.Settings;
 import com.aaron.recipe.listener.RecipeListRowTouchListener;
-import com.aaron.recipe.model.LogsManager;
 
 import java.util.ArrayList;
-import java.util.Locale;
-import java.util.function.Predicate;
+import java.util.List;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static java.util.Collections.unmodifiableList;
 
 /**
  * ListView adapter for recipe list.
@@ -30,7 +28,7 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
     public static final String CLASS_NAME = RecipeListRowAdapter.class.getSimpleName();
     private Activity activity;
     private ArrayList<Recipe> recipeList;
-    private ArrayList<Recipe> recipeListTemp;
+    private ArrayList<Recipe> recipeListAllUnfiltered;
     private Settings settings;
 
     /**
@@ -46,8 +44,13 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
 
         this.activity = activity;
         this.recipeList = recipeList;
-        this.recipeListTemp = new ArrayList<>(recipeList);
+        this.recipeListAllUnfiltered = new ArrayList<>(recipeList);
         this.settings = settings;
+    }
+
+    public List<Recipe> getRecipeListAllUnfiltered()
+    {
+        return unmodifiableList(recipeListAllUnfiltered);
     }
 
     /**
@@ -87,50 +90,6 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
     }
 
     /**
-     * Filters the recipe list in the adapter with the given searched text. Only shows recipe title that starts with the searched text.
-     *
-     * @param searched the searched word
-     */
-    public void filter(final String searched)
-    {
-        clear();
-        String searchedText = searched.trim();
-
-        if(isBlank(searchedText))
-        {
-            addAll(this.recipeListTemp);
-        }
-        else
-        {
-            filterRecipeByTitle(searchedText);
-        }
-
-        LogsManager.log(CLASS_NAME, "filter", "New list size -> " + getCount());
-    }
-
-    private void filterRecipeByTitle(String searchedText)
-    {
-        recipeListTemp.stream().filter(r -> recipeTitleStartsWithSearchedText(searchedText, r)).forEach(this::add);
-    }
-
-    private boolean recipeTitleStartsWithSearchedText(String searchedText, Recipe recipe)
-    {
-        String search = searchedText.toLowerCase(Locale.getDefault());
-        String title = recipe.getTitle().toLowerCase(Locale.getDefault());
-        String[] titleWordParts = title.split(" ");
-
-        for(String word: titleWordParts)
-        {
-            if(word.startsWith(search))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Updates the recipe list.
      *
      * @param list the list to replace the current
@@ -148,8 +107,8 @@ public class RecipeListRowAdapter extends ArrayAdapter<Recipe>
             if(!tmpList.isEmpty())
             {
                 addAll(tmpList);
-                recipeListTemp.clear();
-                recipeListTemp.addAll(tmpList);
+                recipeListAllUnfiltered.clear();
+                recipeListAllUnfiltered.addAll(tmpList);
             }
         }
     }
